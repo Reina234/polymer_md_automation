@@ -1,13 +1,13 @@
-from pre_processing.converters.conversion_service import ConversionService
-from pre_processing.converters.obabel_converter import OpenBabelConverter
-from pre_processing.metadata.metadata_tracker import MetadataTracker
+from processing.common.file_converters.REDUNDANT_conversion_service import ConversionService
+from processing.common.file_converters.obabel_converter import OpenBabelConverter
+from processing.common.metadata_tracker import MetadataTracker
 # Example: Preparing a PDB file from RDKit
 from pdb_processing.providers.pdb_from_smiles_rdkit import PDBFromSmilesRDKit
 from pdb_processing.managers.pdb_manager import PDBManager
-from solvent.solvent import Solvent
+from data_models.solvent import Solvent
 from solvent.packmol_solvation import PackmolBoxGenerator
-from force_field_handler import   ForceFieldHandler
-from pre_processing.parameterisation.acpype_parameterizer import ACPYPEParameterizer
+
+from processing.atomistic.parameterizers.acpype_parameterizer import ACPYPEParameterizer
 # Define solvent
 ethanol_solvent = Solvent(name="Ethanol", density=0.789, molecular_weight=46.07)
 
