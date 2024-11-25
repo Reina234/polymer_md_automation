@@ -1,0 +1,32 @@
+{
+    "processes": [
+        {
+            "name": "Open Babel",
+            "version": "3.1.1",
+            "description": "Converts pdb files to mol2 files.",
+            "options": {
+                "input_file": "output/pdb_files/Ethanol_RDkit_Test.pdb",
+                "output_format": "mol2",
+                "output_file": "output/pdb_files/Ethanol_RDkit_Test.mol2"
+            }
+        },
+        {
+            "name": "ACPYPE",
+            "version": "2023.10",
+            "description": "Generates GROMACS-compatible force field files.",
+            "options": {
+                "input_file": "/home/reina/polymerpinn/output/pdb_files/Ethanol_RDkit_Test.mol2",
+                "output_dir": "/home/reina/polymerpinn/output/pdb_files",
+                "gro_file": "/home/reina/polymerpinn/output/pdb_files/ethanol_truncated.gro",
+                "top_file": "/home/reina/polymerpinn/output/pdb_files/ethanol_truncated.top",
+                "itp_file": "/home/reina/polymerpinn/output/pdb_files/ethanol_truncated.itp",
+                "charge": "neutral",
+                "force_field": "GAFF2"
+            }
+        }
+    ],
+    "history": [
+        "Open Babel",
+        "ACPYPE"
+    ]
+}

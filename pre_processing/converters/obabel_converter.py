@@ -1,43 +1,75 @@
-from pre_processing.converters.base_file_converter import FileConverter
-from pre_processing.metadata.metadata_manager import MetadataManager
-import subprocess 
-import os 
+import os
+import subprocess
+from pre_processing.converters.base_file_converter import BaseFileConverter
+from pre_processing.metadata.metadata_tracker import MetadataTracker
+from typing import Tuple
 
-class OpenBabelConverter(FileConverter):
+class OpenBabelConverter(BaseFileConverter):
     """
     Converts molecule files using Open Babel.
     """
 
-    def __init__(self, input_format: str, output_format: str, metadata_manager: MetadataManager):
+    def __init__(self, input_format: str, output_format: str, metadata_tracker: MetadataTracker):
         self.input_format = input_format
         self.output_format = output_format
-        super().__init__(metadata_manager)
+        self.metadata_tracker = metadata_tracker
 
-    def supported_formats(self) -> tuple:
-        return (self.input_format, self.output_format)
+    def supported_formats(self) -> Tuple[str, str]:
+        """
+        Return the input and output formats supported by this converter.
+        """
+        return self.input_format, self.output_format
 
     def convert(self, input_file: str, output_dir: str) -> str:
-        output_file = os.path.join(
-            output_dir, os.path.splitext(os.path.basename(input_file))[0] + f".{self.output_format}"
+        """
+        Convert the input file to the specified output format.
+        """
+        if not input_file.endswith(f".{self.input_format}"):
+            raise ValueError(f"Expected a {self.input_format} file. Got: {input_file}")
+
+        # Construct the output file path
+        base_name = os.path.splitext(os.path.basename(input_file))[0]
+        output_file = os.path.join(output_dir, f"{base_name}.{self.output_format}")
+
+        # Run Open Babel conversion
+        try:
+            subprocess.run(
+                [
+                    "obabel",
+                    input_file,
+                    "-O", output_file,
+                    "--gen3D",
+                      "--h"  # Add 3D coordinates if not present
+                ],
+                check=True
+            )
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"Open Babel failed to convert {input_file} to {self.output_format}. Error: {e}")
+
+        # Update metadata
+        self.metadata_tracker.add_process_metadata(
+            name="Open Babel",
+            version="3.1.1",
+            description=f"Converts {self.input_format} files to {self.output_format} files.",
+            options={
+                "input_file": input_file,
+                "output_format": self.output_format,
+                "output_file": output_file,
+            }
         )
-        subprocess.run(
-            [
-                "obabel",
-                input_file,
-                "-O", output_file,
-                "--gen3D"
-            ],
-            check=True
-        )
+
         return output_file
 
     def metadata(self) -> dict:
+        """
+        Return metadata for the Open Babel conversion process.
+        """
         return {
             "name": "Open Babel Converter",
             "version": "3.1.1",
-            "description": f"Converts files from {self.input_format} to {self.output_format} using Open Babel.",
+            "description": f"Converts files from {self.input_format} to {self.output_format}.",
             "options": {
-                "3D coordinates": "Generated if not present",
-                "tool": "Open Babel"
+                "input_format": self.input_format,
+                "output_format": self.output_format,
             }
         }

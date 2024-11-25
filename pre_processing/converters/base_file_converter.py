@@ -1,43 +1,35 @@
 from abc import ABC, abstractmethod
-from pre_processing.metadata.metadata_manager import MetadataManager
-class FileConverter(ABC):
+from typing import Tuple
+
+
+class BaseFileConverter(ABC):
     """
     Abstract base class for file converters.
     """
 
-    def __init__(self, metadata_manager: MetadataManager):
-        self.metadata_manager = metadata_manager
-        self.register_metadata()
-
     @abstractmethod
-    def supported_formats(self) -> tuple:
+    def supported_formats(self) -> Tuple[str, str]:
         """
-        Return (input_format, output_format) to indicate supported conversions.
+        Return a tuple (input_format, output_format) to indicate the supported conversion.
+        Example: ("pdb", "mol2")
         """
         pass
 
     @abstractmethod
     def convert(self, input_file: str, output_dir: str) -> str:
         """
-        Convert the input file to the specified output format.
+        Convert the input file to the desired format.
+        Parameters:
+        - input_file: Path to the input file.
+        - output_dir: Directory to save the converted file.
+        Returns:
+        - Path to the converted output file.
         """
         pass
 
     @abstractmethod
     def metadata(self) -> dict:
         """
-        Provide metadata for this converter.
+        Return metadata describing the conversion tool and its configuration.
         """
         pass
-
-    def register_metadata(self):
-        """
-        Register this converter's metadata with the MetadataManager.
-        """
-        data = self.metadata()
-        self.metadata_manager.register_component(
-            name=data["name"],
-            version=data["version"],
-            description=data["description"],
-            options=data.get("options", {})
-        )

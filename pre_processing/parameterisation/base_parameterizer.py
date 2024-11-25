@@ -1,37 +1,34 @@
 from abc import ABC, abstractmethod
-from pre_processing.converters.conversion_service import ConversionService
-from pre_processing.metadata.metadata_manager import MetadataManager  
+from typing import Dict
+
 
 class BaseParameterizer(ABC):
     """
     Abstract base class for parameterization methods.
+    Defines a consistent interface for parameterizing molecular structures.
     """
 
-    def __init__(self, method_name: str, conversion_service: ConversionService, metadata_manager: MetadataManager):
-        self.method_name = method_name
-        self.conversion_service = conversion_service
-        self.metadata_manager = metadata_manager
-        self.register_metadata()
+    def __init__(self, metadata_tracker):
+        """
+        Initialize the parameterizer with a shared metadata tracker.
+        """
+        self.metadata_tracker = metadata_tracker
 
     @abstractmethod
-    def parameterize(self, input_file: str, output_dir: str) -> str:
+    def parameterize(self, input_file: str, output_dir: str) -> Dict[str, str]:
+        """
+        Abstract method to parameterize a molecule.
+        Parameters:
+        - input_file: Path to the input structure file (e.g., MOL2).
+        - output_dir: Directory to save parameterization outputs.
+        Returns:
+        - Dictionary with paths to generated parameterized files (e.g., GRO, TOP).
+        """
         pass
 
     @abstractmethod
-    def metadata(self) -> dict:
+    def metadata(self) -> Dict:
         """
-        Provide metadata for this parameterizer.
+        Return metadata describing the parameterization tool and its configuration.
         """
         pass
-
-    def register_metadata(self):
-        """
-        Register this parameterizer's metadata with the MetadataManager.
-        """
-        data = self.metadata()
-        self.metadata_manager.register_component(
-            name=data["name"],
-            version=data["version"],
-            description=data["description"],
-            options=data.get("options", {})
-        )
