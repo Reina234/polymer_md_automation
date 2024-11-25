@@ -1,39 +1,75 @@
-from pre_processing.converters.conversion_service import ConversionService
-from pre_processing.metadata.metadata_manager import MetadataManager
-from pre_processing.parameterisation.base_parameterizer import BaseParameterizer
 import os
 import subprocess
+from typing import Dict
+from pre_processing.parameterisation.base_parameterizer import BaseParameterizer
 
 class ACPYPEParameterizer(BaseParameterizer):
     """
-    Parameterizes molecules using ACPYPE with the GAFF force field.
+    Handles parameterization using ACPYPE.
     """
 
-    def __init__(self, conversion_service: ConversionService, metadata_manager: MetadataManager):
-        super().__init__("ACPYPE", conversion_service, metadata_manager)
+    def __init__(self, metadata_tracker):
+        super().__init__(metadata_tracker)
 
-    def parameterize(self, input_file: str, output_dir: str) -> str:
-        input_file = self.conversion_service.convert(input_file, "mol2", output_dir)
-        acpype_dir = os.path.join(output_dir, os.path.splitext(os.path.basename(input_file))[0] + "_acpype")
-        subprocess.run(
-            [
-                "acpype",
-                "-i", input_file,
-                "-b", "POLY",
-                "-o", "gmx",
-                "-n", "0"
-            ],
-            check=True
+    def parameterize(self, input_file: str, output_dir: str) -> Dict[str, str]:
+        """
+        Parameterize the molecule using ACPYPE and update metadata.
+        """
+        # Ensure output directory exists
+        parameterized_dir = os.path.join(output_dir, "parameterized")
+        os.makedirs(parameterized_dir, exist_ok=True)
+
+        # Construct ACPYPE command
+
+    # Build the ACPYPE command
+        command = [
+            "acpype",
+            "-i", input_file,       # Input file
+            "-o", "gmx",            # Output format
+            "-n", "0",              # Neutral charge
+            "-a", "gaff2",           # Use GAFF2 force field
+            "-b", "POLY"
+        ]
+
+        try:
+            # Run the ACPYPE command
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(
+                f"ACPYPE failed to parameterize {input_file}. Command: {' '.join(command)}. Error: {e}"
+            )
+        # Collect generated files
+        base_name = os.path.splitext(os.path.basename(input_file))[0]
+        gro_file = os.path.join(parameterized_dir, f"{base_name}_GMX.gro")
+        top_file = os.path.join(parameterized_dir, f"{base_name}_GMX.top")
+
+        # Update metadata
+        self.metadata_tracker.add_process_metadata(
+            name="ACPYPE",
+            version="2023.10",
+            description="Generates GROMACS-compatible force field files.",
+            options={
+                "input_file": input_file,
+                "output_dir": parameterized_dir,
+                "gro_file": gro_file,
+                "top_file": top_file,
+                "charge": "neutral",
+                "force_field": "GAFF"
+            }
         )
-        return acpype_dir
 
-    def metadata(self) -> dict:
+        return {"gro_file": gro_file, "top_file": top_file}
+
+    def metadata(self) -> Dict:
+        """
+        Return metadata for the ACPYPE parameterizer.
+        """
         return {
             "name": "ACPYPE Parameterizer",
-            "version": "2023.1",
+            "version": "2023.10",
             "description": "Generates GROMACS-compatible force field files using the GAFF force field.",
             "options": {
-                "charge": "Neutral (0)",
+                "charge": "neutral",
                 "force_field": "GAFF"
             }
         }
