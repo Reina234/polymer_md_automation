@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-
+from pre_processing.metadata.metadata_manager import MetadataManager
 class FileConverter(ABC):
     """
     Abstract base class for file converters.
