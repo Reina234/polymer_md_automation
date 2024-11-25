@@ -66,13 +66,11 @@ class PDBManager:
         print("Current notes:", self.provider.additional_notes)
     
         # Prompt user to confirm update
-        update_notes = input("Do you want to update the notes? [y/n]: ").strip().lower()
-    
-        # Handle input validation
-        if update_notes == "n":
-            print("No changes made to additional notes.")
+        overwrite = input("Do you want to update the notes? [y/n]: ").strip().lower()
+        if overwrite == "no":
+            print("[!] No changes made to additional notes. Returning.")
             return
-        elif update_notes != "y":
+        elif overwrite != "yes":
             raise ValueError("Invalid input. Please enter 'y' for yes or 'n' for no.")
     
         # Perform the update

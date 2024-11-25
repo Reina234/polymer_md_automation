@@ -3,9 +3,12 @@ import os
 from pdb_processing.managers.pdb_manager import PDBManager
 
 #NOTE: change it so that input script is generated first, then running packmol checks if it exists, if not, it asks you to run generate
-
+#NOTE: also need a general manager for the DEFAULT directory stuff
+#NOTE: also need logging
 
 class PackmolBoxGenerator:
+    DEFAULT_PACKMOL_INPUT_SCRIPT_DIR = "solvent/packmol_files/input_scripts"
+    DEFAULT_PACKMOL_OUTPUT_DIR = "solvent/packmol_files/output_pdbs"
     def __init__(self, pdb_manager: PDBManager, box_size: float, output_dir: str):
         """
         :param pdb_manager: Instance of PDBManager with a validated PDB.

@@ -1,3 +1,6 @@
+from typing import Optional
+import os 
+
 def validate_pdb_lightweight(pdb_path: str) -> None:
     """
     Validates a PDB file to ensure compatibility with Packmol.
@@ -24,3 +27,22 @@ def validate_pdb_lightweight(pdb_path: str) -> None:
         print("[+] PDB validated for Packmol.")
     except Exception as e:
         raise ValueError(f"PDB validation for Packmol failed: {e}")
+
+
+
+def handle_existing_file(file_path: str) -> Optional[str]:
+    """
+    Check if the file exists and prompt the user to decide whether to overwrite it.
+    :param file_path: Path to the file to check.
+    :return: The file path if it should not be overwritten, otherwise None.
+    """
+    if os.path.exists(file_path):
+        print(f"[!] File '{file_path}' already exists.")
+        overwrite = input("Do you want to overwrite the existing file? [y/n]: ").strip().lower()
+        if overwrite == "y":
+            print("[+] Overwriting existing file. Proceeding with file generation.")
+            return file_path
+        elif overwrite != "n":
+            raise ValueError("Invalid input. Please enter 'y' for yes or 'n' for no.")
+        print("[!] File generation aborted. Returning existing file path.")
+    return None

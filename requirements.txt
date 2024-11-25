@@ -1,0 +1,14 @@
+acpype==2023.10.27
+AmberUtils==21.0
+intermol==0+untagged.20.gb317faf.dirty
+matplotlib==3.9.2
+mkl==2025.0.1
+moltemplate==2.20.20
+numpy==1.26.4
+packmol_memgen==2024.2.9
+pandas==2.2.1
+ParmEd==4.3.0
+pdb4amber==22.0
+pip==24.3.1
+scipy==1.14.1
+

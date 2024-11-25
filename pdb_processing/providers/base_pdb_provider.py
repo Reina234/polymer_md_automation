@@ -5,6 +5,7 @@ class PDBProvider(ABC):
     """
     Abstract base class for generating or loading PDB files from various sources.
     """
+    source: str
 
     def __init__(self, default_note: str, solvent: Solvent, additional_notes: Optional[str] = None):
         """
@@ -39,10 +40,12 @@ class PDBProvider(ABC):
             return f"{self.default_note}\nAdditional notes: {self.additional_notes}"
         return self.default_note
 
+    
     @abstractmethod
     def get_pdb(self, output_dir: str, identifier: str = "") -> str:
         pass
 
+    @property
     @abstractmethod
-    def get_source(self) -> str:
+    def source(self) -> str:
         pass
