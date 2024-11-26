@@ -18,3 +18,21 @@
 [ molecules ]
 ; Compound        nmols
  POLY             1     
+
+#include "path/to/gromos54a7/forcefield.itp"
+#include "path/to/water.itp"
+
+#include "path/to/gromos54a7/forcefield.itp"
+#include "path/to/water.itp"
+
+#include "gromos54a7.ff/forcefield.itp"
+#include "input/solvents/itp/hexane.itp"
+
+#include "gromos54a7.ff/forcefield.itp"
+#include "input/solvents/itp/hexane.itp"
+
+#include "gromos54a7.ff/forcefield.itp"
+#include "input/solvents/itp/hexane.itp"
+
+#include "gromos54a7.ff/forcefield.itp"
+#include "input/solvents/itp/hexane.itp"

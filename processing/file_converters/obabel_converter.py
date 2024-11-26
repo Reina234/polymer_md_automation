@@ -1,7 +1,7 @@
 import os
 import subprocess
-from processing.common.file_converters.base_file_converter import BaseFileConverter
-from processing.common.metadata_tracker import MetadataTracker
+from processing.file_converters.base_file_converter import BaseFileConverter
+from processing.metadata_tracker import MetadataTracker
 from typing import Tuple
 
 class OpenBabelConverter(BaseFileConverter):

@@ -1,4 +1,4 @@
-from processing.common.file_converters.base_file_converter import BaseFileConverter
+from processing.file_converters.base_file_converter import BaseFileConverter
 import os 
 
 class ConversionService:
