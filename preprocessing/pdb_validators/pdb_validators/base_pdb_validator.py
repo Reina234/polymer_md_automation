@@ -1,8 +1,6 @@
 import os
 import logging
 from typing import List, Optional
-from preprocessing.file_commenter import FileCommenter
-from preprocessing.utils import check_file_exists, check_file_type
 from abc import ABC, abstractmethod
 from data_models.solvent import Solvent
 from preprocessing.pdb_validators.pdb_parser import PDBParser

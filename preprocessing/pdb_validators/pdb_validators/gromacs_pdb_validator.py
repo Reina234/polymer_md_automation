@@ -1,9 +1,6 @@
 import os
 import logging
 from typing import List, Optional
-from preprocessing.file_commenter import FileCommenter
-from preprocessing.utils import check_file_exists, check_file_type
-from abc import ABC, abstractmethod
 from preprocessing.pdb_validators.pdb_validators.base_pdb_validator import (
     BasePDBValidator,
 )
@@ -14,7 +11,6 @@ from preprocessing.pdb_validators.pdb_utils import (
     calculate_density,
 )
 from data_models.solvent import Solvent
-from preprocessing.pdb_validators.pdb_parser import PDBParser
 from config.constants import DENSITY_TOLERANCE_PERCENTAGE
 from config.constants import LengthUnits
 
