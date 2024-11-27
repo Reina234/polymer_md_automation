@@ -1,17 +1,9 @@
-# Density check passed. Deviation: 0.02%
-# Density check passed. Deviation: 0.02%
-# Density check passed. Deviation: 0.02%
-# Density check passed. Deviation: 0.02%
-# Density check passed. Deviation: 0.02%
-# Density check passed. Deviation: 0.02%
-# Density check passed. Deviation: 0.02%
-# Density check passed. Deviation: 0.02%
-# Density check passed. Deviation: 0.02%
+
 HEADER    UNCLASSIFIED                            26-Nov-24
 TITLE     ALL ATOM STRUCTURE FOR MOLECULE UNL                                   
 AUTHOR    AUTOMATED TOPOLOGY BUILDER (ATB) REVISION 2024-11-20 12:06:25
 AUTHOR   2  https://atb.uq.edu.au
-CRYST1    6.008    6.008    6.008  90.00  90.00  90.00 P 1           1
+      1
 HETATM    1  H14 TMZK    0      -3.314  -0.860   0.887  1.00  0.00           H
 HETATM    2   C6 TMZK    0      -3.225  -0.220   0.000  1.00  0.00           C
 HETATM    3  H12 TMZK    0      -4.080   0.467  -0.003  1.00  0.00           H

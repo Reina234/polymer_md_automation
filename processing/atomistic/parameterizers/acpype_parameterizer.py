@@ -27,7 +27,7 @@ class ACPYPEParameterizer(BaseParameterizer):
         super().__init__(metadata_tracker)
         self.converter = OpenBabelConverter("pdb", "mol2", metadata_tracker)
 
-    def parameterize(self, input_file: str, output_dir: str) -> Dict[str, str]:
+    def parameterize(self, input_file: str, output_dir: str, base_name: str = "POLY") -> Dict[str, str]:
         """
         Parameterize the polymer using ACPYPE.
 
@@ -66,8 +66,6 @@ class ACPYPEParameterizer(BaseParameterizer):
         if not os.path.exists(mol2_file):
             raise FileNotFoundError(f"Conversion to MOL2 failed: {mol2_file}")
 
-        # Step 2: Run ACPYPE
-        base_name = "POLY"
         acpype_command = [
             "acpype",
             "-i", mol2_file,

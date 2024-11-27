@@ -1,9 +1,9 @@
 import os
 
 # Base directories
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # Adjust based on your project structure
-TEMP_DIR = os.path.join(BASE_DIR, "temp")
-SCRIPTS_DIR = os.path.join(BASE_DIR, "scripts")
+#BASE_DIR = os.path.abspath(os.path.dirname(__file__))  # Adjust based on your project structure
+TEMP_DIR = "temp"
+SCRIPTS_DIR = "scripts"
 
 GROMACS_SCRIPTS_DIR = os.path.join(SCRIPTS_DIR, "gromacs")
 GROMACS_TEMPLATES_DIR = os.path.join(GROMACS_SCRIPTS_DIR, "templates")
@@ -34,8 +34,8 @@ SCRIPT_PATHS = {
 }
 
 # Other fixed paths
-SOLVENTS_DIR = os.path.join(BASE_DIR, "solvents")
-LOGS_DIR = os.path.join(BASE_DIR, "logs")
+#SOLVENTS_DIR = os.path.join(BASE_DIR, "solvents")
+#LOGS_DIR = os.path.join(BASE_DIR, "logs")
 
 
 def get_template_path(step: str) -> str:

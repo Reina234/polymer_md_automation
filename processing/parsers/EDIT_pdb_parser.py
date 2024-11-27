@@ -3,6 +3,7 @@ from typing import List, Optional
 import logging
 from config.constants import AVOGADROS_NUMBER, ANGSTROM_TO_CM
 import os 
+import numpy as np
 
 
 #NOTE: having a strict cubic definition could cause issues, e.g. if the pdb file has coords outside of it, is there another way of getting these box coords, like rdkit? 
@@ -19,7 +20,50 @@ class PDBParser(BaseParser):
         self._content = self._read_file()
         self.box_dimensions = self._extract_box_dimensions()
         self.atoms = self._extract_atoms()
-        self.num_molecules = self._count_molecules()
+
+    def calculate_minimum_box(self, padding: float = 1.5) -> List[float]:
+        """
+        Calculate the minimum bounding box dimensions based on atom positions.
+        """
+        coords = np.array([(atom["x"], atom["y"], atom["z"]) for atom in self.atoms])
+        x_min, y_min, z_min = coords.min(axis=0)
+        x_max, y_max, z_max = coords.max(axis=0)
+
+        box_size = [
+            (x_max - x_min) + 2 * padding,
+            (y_max - y_min) + 2 * padding,
+            (z_max - z_min) + 2 * padding,
+        ]
+        logger.info(f"[+] Calculated minimum box size: {box_size}")
+        return box_size
+
+    def adjust_box_for_density(self, solvent_density: float, molecular_weight: float) -> List[float]:
+        """
+        Adjust the bounding box size to achieve the desired solvent density.
+        """
+        current_volume_nm3 = self._calculate_box_volume(self.box_dimensions)
+        target_volume_nm3 = self._calculate_target_volume(solvent_density, molecular_weight)
+
+        scale_factor = (target_volume_nm3 / current_volume_nm3) ** (1/3)
+        adjusted_box_size = [dim * scale_factor for dim in self.box_dimensions]
+        logger.info(f"[+] Adjusted box size to match density: {adjusted_box_size}")
+        return adjusted_box_size
+
+    def _calculate_target_volume(self, solvent_density: float, molecular_weight: float, target_molecules: int = 1000):
+        """
+        Calculate target volume for a specified solvent density.
+        """
+        mass_per_molecule = molecular_weight / AVOGADROS_NUMBER  # g/molecule
+        total_mass = mass_per_molecule * target_molecules  # g
+        volume_cm3 = total_mass / solvent_density
+        return volume_cm3 * ANGSTROM_TO_CM**3  # cm³ to nm³
+
+    def _calculate_box_volume(self, box_dimensions: List[float]) -> float:
+        """
+        Calculate volume of a cubic box from dimensions.
+        """
+        return np.prod(box_dimensions)
+
 
     def _read_file(self) -> List[str]:
         """
@@ -182,7 +226,7 @@ class PDBParser(BaseParser):
             raise ValueError("Cannot calculate density without box dimensions.")
 
         # Total mass = number of molecules * molecular weight
-        num_molecules = self.num_molecules
+        num_molecules = self._count_molecules()
 
         total_mass_g = num_molecules * molecular_weight / AVOGADROS_NUMBER  # mass in grams
 

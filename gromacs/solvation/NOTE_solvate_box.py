@@ -2,13 +2,13 @@ import os
 import subprocess
 from processing.metadata_tracker import MetadataTracker
 from data_models.solvent import Solvent
-
+#NOTE: I've changed solvent method here
 
 class SolvateBox:
     def __init__(self, metadata_tracker: MetadataTracker):
         self.metadata_tracker = metadata_tracker
 
-    def solvate(self, box_file: str, solvent: Solvent, polymer_top_file: str, output_dir: str) -> dict:
+    def solvate(self, box_file: str, solvent_file: str, polymer_top_file: str, output_dir: str) -> dict:
         """
         Add solvent to the box using GROMACS solvate.
 
@@ -26,7 +26,7 @@ class SolvateBox:
         solvate_command = [
             "gmx", "solvate",
             "-cp", box_file,
-            "-cs", solvent.pdb_path,
+            "-cs", solvent_file,
             "-o", solvated_gro_file,
             "-p", polymer_top_file
         ]
@@ -34,7 +34,7 @@ class SolvateBox:
 
         self.metadata_tracker.add_step("Solvation", {
             "box_file": box_file,
-            "solvent_pdb": solvent.pdb_path,
+            "solvent_pdb": solvent_file,
             "solvated_gro_file": solvated_gro_file,
             "topology_file": polymer_top_file
         })
