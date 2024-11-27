@@ -1,0 +1,7 @@
+import os
+
+BASE_OUTPUT_DIR = "output"
+ACPYPE_PARAMETERIZER_OUTPUT_DIR = os.path.join(BASE_OUTPUT_DIR, "acpype_output")
+ACPYPE_BASE_NAME = "POLY"
+
+TEMPORARY_OUTPUT_DIR = "temp"
