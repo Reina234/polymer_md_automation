@@ -4,24 +4,20 @@ from typing import Callable, Dict
 
 class FileCommenter:
     """
-    Utility to add comments/notes to supported file types with enforced registration via decorators.
+    Utility to add comments/notes to supported file types.
     """
     _comment_handlers: Dict[str, Callable] = {}
 
-    @classmethod
-    def register_file_type(cls, extension: str):
-        """
-        Decorator to register a file type and its associated comment handler.
+    def __init__(self):
+        self._register_file_types()
 
-        Args:
-            extension (str): File extension (e.g., ".pdb").
+    def _register_file_types(self):
         """
-        def decorator(func: Callable):
-            if not extension.startswith("."):
-                raise ValueError(f"File extension must start with a dot (e.g., '.pdb'). Got: {extension}")
-            cls._comment_handlers[extension.lower()] = func
-            return func
-        return decorator
+        Explicitly register file types and their handlers.
+        """
+        self._comment_handlers[".pdb"] = self._add_comment_pdb
+        self._comment_handlers[".gro"] = self._add_comment_gro
+        self._comment_handlers[".lmp"] = self._add_comment_lmp
 
     def add_comment(self, file_path: str, comment: str) -> None:
         """
@@ -37,17 +33,14 @@ class FileCommenter:
         if not handler:
             raise ValueError(f"Unsupported file type: {file_extension}. Supported types: {list(self._comment_handlers.keys())}")
 
-        handler(self, file_path, comment)
+        handler(file_path, comment)
 
-    @register_file_type(".pdb")
     def _add_comment_pdb(self, file_path: str, comment: str) -> None:
         self._add_comment_to_file(file_path, comment, "#")
 
-    @register_file_type(".gro")
     def _add_comment_gro(self, file_path: str, comment: str) -> None:
         self._add_comment_to_file(file_path, comment, ";")
 
-    @register_file_type(".lmp")
     def _add_comment_lmp(self, file_path: str, comment: str) -> None:
         self._add_comment_to_file(file_path, comment, "#")
 
@@ -70,20 +63,8 @@ class FileCommenter:
         with open(file_path, "w") as f:
             f.writelines(updated_content)
 
-    @classmethod
-    def supported_file_types(cls):
+    def supported_file_types(self):
         """
         Return all supported file types and their handlers.
         """
-        return list(cls._comment_handlers.keys())
-
-
-# Example Usage
-if __name__ == "__main__":
-    commenter = FileCommenter()
-
-    # Add a comment to a PDB file
-    commenter.add_comment("example.pdb", "This is a PDB file.")
-
-    # List supported file types
-    print("Supported file types:", FileCommenter.supported_file_types())
+        return list(self._comment_handlers.keys())

@@ -4,78 +4,92 @@ from processing.pdb_validators.pdb_utils import add_box_information, calculate_b
 from data_models.solvent import Solvent
 from processing.metadata_tracker import MetadataTracker
 import logging
-
+from processing.file_operations import move_file
+from processing.parsers.EDIT_pdb_parser import PDBParser
+from processing.file_commenter import FileCommenter
+from config.constants import DENSITY_TOLERANCE_PERCENTAGE
 logger = logging.getLogger(__name__)
+
+#NOTE: consider adding renaming functionality 
+
 
 class GROMACSPDBValidator(BasePDBValidator):
     """
-    Validator for GROMACS-compatible PDB files, currently used for solvation box validation.
+    Validator for GROMACS-compatible PDB files, including density checks and fixing.
     """
 
-    def __init__(self, solvent: Solvent, metadata_tracker: Optional[MetadataTracker] = None):
+    def __init__(self, solvent: Solvent, metadata_tracker: Optional[object] = None):
         super().__init__(metadata_tracker)
         self.solvent = solvent
+        self.commenter = FileCommenter()
 
-    def validate(self, file_path: str) -> bool:
+    def validate(
+        self,
+        file_path: str,
+        output_location: Optional[str] = None,
+        move_original: Optional[str] = None,
+        replace_box: bool = False,
+    ) -> bool:
         """
         Validate the PDB file for GROMACS compatibility.
+
         Args:
             file_path (str): Path to the PDB file.
+            output_location (Optional[str]): Directory to save the output file (default is same location).
+            move_original (Optional[str]): Directory to move the original file.
+            replace_box (bool): Whether to replace the box information if density is out of tolerance.
 
         Returns:
-            bool: True if the file is valid, False otherwise.
+            bool: True if the file is valid or fixed, False otherwise.
         """
-        if not self._skeletal_check(file_path):
-            logger.error(f"[!] Skeletal validation failed for {file_path}.")
+        try:
+            parser = PDBParser(file_path)
+        except (FileNotFoundError, ValueError) as e:
+            logger.error(f"[!] {e}")
             return False
 
-        if not self._has_box_information(file_path):
-            logger.warning(f"[!] Box size information (CRYST1) missing in {file_path}.")
-            if self.supports_fixing:
-                try:
-                    logger.info("[+] Attempting to fix the file.")
-                    self._make_valid(file_path)
-                    logger.info(f"[+] File fixed successfully: {file_path}.")
-                    return True
-                except Exception as e:
-                    logger.error(f"[!] Failed to fix the file: {e}")
+        try:
+            if not parser.has_box_information():
+                logger.warning(f"[!] Box information missing in {file_path}.")
+                box_size = calculate_box_size(self.solvent.molecular_weight, self.solvent.density)
+                parser.add_or_replace_box_information(box_size)
+                parser.add_comment("Box information added.")
+            else:
+                # Check for zero dimensions
+                x, y, z = parser.box_dimensions
+                if x == 0 or y == 0 or z == 0:
+                    raise ValueError(f"Box dimensions cannot be zero. Found: x={x}, y={y}, z={z}")
+
+            density = parser.calculate_density(self.solvent.molecular_weight)
+            expected_density = self.solvent.density
+            deviation = abs((density - expected_density) / expected_density) * 100
+
+            if deviation > DENSITY_TOLERANCE_PERCENTAGE:
+                logger.warning(f"[!] Density tolerance exceeded for {file_path}. Deviation: {deviation:.2f}%")
+                if replace_box:
+                    box_size = calculate_box_size(self.solvent.molecular_weight, self.solvent.density)
+                    parser.add_or_replace_box_information(box_size)
+                    parser.add_comment("Box information replaced due to density deviation.")
+                    density = parser.calculate_density(self.solvent.molecular_weight)
+                    deviation = abs((density - expected_density) / expected_density) * 100
+                    logger.info(f"[+] New density: {density:.6f} g/cm³, Deviation: {deviation:.2f}%")
+                else:
+                    logger.warning(f"[!] Density tolerance exceeded for {file_path}. File not fixed.")
+                    parser.add_comment(f"Density tolerance exceeded ({deviation:.2f}%). Box not replaced.")
                     return False
             else:
-                logger.error("[!] Fixing not supported for this validator.")
-                return False
+                logger.info(f"[+] Density check passed for {file_path}. Deviation: {deviation:.2f}%")
+                parser.add_comment(f"Density check passed. Deviation: {deviation:.2f}%")
 
-        logger.info(f"[+] GROMACS validation passed for {file_path}.")
-        return True
+            if move_original:
+                move_file(file_path, move_original)
+                parser.add_comment(f"Original file moved to: {move_original}")
 
-    @property
-    def supports_fixing(self) -> bool:
-        """
-        Indicates that this validator supports fixing.
-        """
-        return True
+            output_file = parser.save(output_location)
+            parser.add_comment(f"File saved to: {output_location}" if output_location else "File overwritten.")
+            logger.info(f"[+] GROMACS validation completed for {output_file}.")
+            return output_file
 
-    def _make_valid(self, file_path: str) -> None:
-        """
-        Fix the PDB file for GROMACS compatibility using solvent properties.
-        Args:
-            file_path (str): Path to the PDB file.
-        """
-        if not self._has_box_information(file_path):
-            box_size = calculate_box_size(self.solvent.molecular_weight, self.solvent.density)
-            add_box_information(file_path, box_size)
-
-        # Revalidate after fixing
-        if not self.validate(file_path):
-            raise RuntimeError(f"[!] PDB file {file_path} could not be fixed.")
-
-    def _has_box_information(self, file_path: str) -> bool:
-        """
-        Check if the PDB file includes box information (CRYST1 line).
-        Args:
-            file_path (str): Path to the PDB file.
-
-        Returns:
-            bool: True if the CRYST1 line is present, False otherwise.
-        """
-        with open(file_path, "r") as file:
-            return any(line.startswith("CRYST1") for line in file)
+        except ValueError as e:
+            logger.error(f"[!] Validation failed: {e}")
+            return None 

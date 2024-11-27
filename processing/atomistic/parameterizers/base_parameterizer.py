@@ -1,8 +1,8 @@
 # File: processing/common/base_parameterizer.py
 
 from abc import ABC, abstractmethod
-from processing.common.metadata_tracker import MetadataTracker
-from processing.common.metadata_tracker import MetadataTracker
+from processing.metadata_tracker import MetadataTracker
+from processing.metadata_tracker import MetadataTracker
 
 
 class BaseParameterizer(ABC):

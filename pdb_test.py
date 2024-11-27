@@ -1,7 +1,7 @@
 # Example: Preparing a PDB file from RDKit
 from pdb_processing.providers.pdb_from_smiles_rdkit import PDBFromSmilesRDKit
 from pdb_processing.managers.pdb_manager import PDBManager
-from solvent.solvent import Solvent
+from data_models.solvent import Solvent
 from solvent.packmol_solvation import PackmolBoxGenerator
 from force_field_handler import   ForceFieldHandler
 # Define solvent

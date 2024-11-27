@@ -1,7 +1,7 @@
 from processing.atomistic.parameterizers.acpype_parameterizer import ACPYPEParameterizer
-from processing.common.metadata_tracker import MetadataTracker
+from processing.metadata_tracker import MetadataTracker
 tracker = MetadataTracker()
 acpype = ACPYPEParameterizer(tracker)
-pdb_path = "hexane.pdb"
+pdb_path = "styrene.pdb"
 
-acpype.parameterize(pdb_path, "test_output")
+acpype.parameterize(pdb_path, "test_output_styrene")

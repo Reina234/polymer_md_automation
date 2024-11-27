@@ -4,8 +4,8 @@ import shutil
 import logging
 from typing import Dict
 from processing.atomistic.parameterizers.base_parameterizer import BaseParameterizer
-from processing.common.metadata_tracker import MetadataTracker
-from processing.common.file_converters.obabel_converter import OpenBabelConverter
+from processing.metadata_tracker import MetadataTracker
+from processing.file_converters.obabel_converter import OpenBabelConverter
 
 # Set up logging
 logging.basicConfig(

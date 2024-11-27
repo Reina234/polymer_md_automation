@@ -1,6 +1,6 @@
-from processing.common.file_converters.REDUNDANT_conversion_service import ConversionService
-from processing.common.file_converters.obabel_converter import OpenBabelConverter
-from processing.common.metadata_tracker import MetadataTracker
+from processing.file_converters.REDUNDANT_conversion_service import ConversionService
+from processing.file_converters.obabel_converter import OpenBabelConverter
+from processing.metadata_tracker import MetadataTracker
 # Example: Preparing a PDB file from RDKit
 from pdb_processing.providers.pdb_from_smiles_rdkit import PDBFromSmilesRDKit
 from pdb_processing.managers.pdb_manager import PDBManager

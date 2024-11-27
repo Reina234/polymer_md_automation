@@ -36,6 +36,3 @@
 
 #include "gromos54a7.ff/forcefield.itp"
 #include "input/solvents/itp/hexane.itp"
-
-#include "gromos54a7.ff/forcefield.itp"
-#include "input/solvents/itp/hexane.itp"
