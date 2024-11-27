@@ -1,11 +1,11 @@
-from preprocessing.pdb_validators.pdb_parser import PDBParser
-from preprocessing.pdb_validators.pdb_utils import (
+from preprocessing.parsers.pdb_parser import PDBParser
+from preprocessing.pdb_utils import (
     calculate_minimum_box_size,
     calculate_density,
     calculate_volume_for_desired_density,
     scale_box_to_desired_volume,
 )
-from preprocessing.pdb_validators.pdb_validators.gromacs_pdb_validator import (
+from preprocessing.validators.pdb_validators.gromacs_pdb_validator import (
     GROMACSPDBValidator,
 )
 from data_models.solvent import Solvent

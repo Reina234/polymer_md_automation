@@ -3,7 +3,7 @@ import logging
 from typing import List, Optional
 from abc import ABC, abstractmethod
 from data_models.solvent import Solvent
-from preprocessing.pdb_validators.pdb_parser import PDBParser
+from preprocessing.parsers.pdb_parser import PDBParser
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

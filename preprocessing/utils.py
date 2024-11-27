@@ -1,4 +1,3 @@
-
 import os
 import shutil
 import logging
@@ -13,18 +12,19 @@ logging.basicConfig(level=logging.ERROR)
 def check_file_exists(input_file_path: str, get_contents: bool = False):
     if not os.path.exists(input_file_path):
         raise FileNotFoundError(f"Input file not found: {input_file_path}")
-    
+
     with open(input_file_path, "r") as file:
         lines = file.readlines()
 
     if not lines:
         raise ValueError(f"PDB file is empty: {input_file_path}")
-    
+
     if not get_contents:
         return
     else:
         return lines
-    
+
+
 def check_file_type(input_file_path: str, expected_file_type: str):
     """
     Validates that the file types of the input match
@@ -34,10 +34,8 @@ def check_file_type(input_file_path: str, expected_file_type: str):
         ValueError: If validation fails.
     """
 
+    input_extension = os.path.splitext(input_file_path)[1].lstrip(".")
 
-    input_extension = os.path.splitext(input_file_path)[1].lstrip('.')
-
-    
     if input_extension != expected_file_type:
         message = (
             f"Validation failed: Expected input file of type "
@@ -47,20 +45,18 @@ def check_file_type(input_file_path: str, expected_file_type: str):
         raise ValueError(message)
 
     # Validation passed
-    logging.info(
-        f"Validation passed: Input file is of type '.{expected_file_type}' "
-    )
-    
+    logging.info(f"Validation passed: Input file is of type '.{expected_file_type}' ")
+
 
 def copy_files(
     files_to_move: List[str],
     source_dir: str,
     dest_dir: str,
-    delete_original: bool = False
+    delete_original: bool = False,
 ):
     """
     Copies specified files from source_dir to dest_dir. Optionally deletes the originals.
-    
+
     Args:
         files_to_move (List[str]): List of specific file names to copy.
         source_dir (str): The directory to copy files from.

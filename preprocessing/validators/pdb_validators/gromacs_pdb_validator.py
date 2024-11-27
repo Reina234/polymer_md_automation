@@ -1,10 +1,10 @@
 import os
 import logging
 from typing import List, Optional
-from preprocessing.pdb_validators.pdb_validators.base_pdb_validator import (
+from preprocessing.validators.pdb_validators.base_pdb_validator import (
     BasePDBValidator,
 )
-from preprocessing.pdb_validators.pdb_utils import (
+from preprocessing.pdb_utils import (
     calculate_minimum_box_size,
     calculate_volume_for_desired_density,
     scale_box_to_desired_volume,
