@@ -1,5 +1,5 @@
 # File: utils/pdb_utils.py
-from config.constants import AVOGADROS_NUMBER, CM_3_TO_NM_3
+from config.constants import AVOGADROS_NUMBER, CM3_TO_NM3
 from typing import List
 # File: utils/pdb_utils.py
 
@@ -27,7 +27,7 @@ def calculate_box_size(molecular_weight: float, density: float, target_molecules
     total_mass = target_molecules * mass_per_molecule  # g
     volume_cm3 = total_mass / density  # cm³
 
-    volume_nm3 = volume_cm3 * CM_3_TO_NM_3 # Convert cm³ to nm³
+    volume_nm3 = volume_cm3 * CM3_TO_NM3 # Convert cm³ to nm³
     side_length = math.cbrt(volume_nm3)  # Cube root to find box side length in nm
 
     return [side_length, side_length, side_length]

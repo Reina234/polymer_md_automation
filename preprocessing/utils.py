@@ -10,9 +10,20 @@ logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.ERROR)
 
 
-def check_file_exists(input_file_path: str):
+def check_file_exists(input_file_path: str, get_contents: bool = False):
     if not os.path.exists(input_file_path):
         raise FileNotFoundError(f"Input file not found: {input_file_path}")
+    
+    with open(input_file_path, "r") as file:
+        lines = file.readlines()
+
+    if not lines:
+        raise ValueError(f"PDB file is empty: {input_file_path}")
+    
+    if not get_contents:
+        return
+    else:
+        return lines
     
 def check_file_type(input_file_path: str, expected_file_type: str):
     """
