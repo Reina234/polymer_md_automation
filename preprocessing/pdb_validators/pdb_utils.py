@@ -41,6 +41,7 @@ def calculate_minimum_box_size(
 def calculate_density(
     molecular_weight: float,
     box_dimensions: List[float],
+    length_units: LengthUnits = LengthUnits.METER,
     mass_units: MassUnits = MassUnits.GRAM,
     num_molecules: int = 1,
 ) -> float:
@@ -58,7 +59,7 @@ def calculate_density(
     if not box_dimensions:
         raise ValueError("Box dimensions must be provided to calculate density.")
 
-    volume_SI = np.prod(box_dimensions)
+    volume_SI = np.prod(box_dimensions) * CONVERSION_FACTORS_TO_M[length_units] ** 3
     molecular_weight_SI = molecular_weight * CONVERSION_FACTORS_TO_KG[mass_units]
     total_mass_SI = (num_molecules * molecular_weight_SI) / AVOGADROS_NUMBER
 
@@ -126,31 +127,4 @@ def scale_box_to_desired_volume(
         for dim in box_dimensions
     ]
 
-    return scaled_dimensions
-
-
-def scale_box_to_desired_volume_nm3(
-    box_dimensions: List[float],
-    desired_volume: float,
-) -> List[float]:
-    """
-    Scale the box dimensions to match the desired volume.
-
-    Args:
-        box_dimensions (List[float]): Initial box dimensions [x, y, z] in nm.
-        desired_volume (float): Desired volume in nm³.
-
-    Returns:
-        List[float]: Scaled box dimensions [x, y, z] in nm.
-    """
-    # Calculate the current volume of the box
-    current_volume = np.prod(box_dimensions)
-
-    # Scale factor to adjust the volume
-    scale_factor = (desired_volume / current_volume) ** (1 / 3)
-
-    # Scale each dimension
-    scaled_dimensions = [dim * scale_factor for dim in box_dimensions]
-
-    print(scale_factor)
     return scaled_dimensions
