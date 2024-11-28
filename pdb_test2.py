@@ -10,6 +10,7 @@ from preprocessing.validators.pdb_validators.gromacs_pdb_validator import (
 )
 from data_models.solvent import Solvent
 from preprocessing.metadata_tracker import MetadataTracker
+from gromacs.solvation.box_creator import BoxCreator
 
 solvent = Solvent(
     "Hexane",
@@ -46,3 +47,16 @@ solvent = Solvent(
 gromacsvalidator = GROMACSPDBValidator(metadata_tracker=MetadataTracker())
 
 gromacsvalidator.validate("TEST.pdb", output_file_path="TEST2.pdb")
+
+solvent = Solvent(
+    "Hexane",
+    86.18,
+    0.660,
+    "input/solvents/itp/hexane.itp",
+    "TEST2.pdb",
+    "gromos54a7.ff",
+)
+
+box_creator = BoxCreator()
+box_creator.create_box("output/acpype_output/test_new_struct/POLY_GMX.gro")
+############## need to sort out file locations
