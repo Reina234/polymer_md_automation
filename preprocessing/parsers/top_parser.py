@@ -14,6 +14,22 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
+import os
+import logging
+from typing import List, Optional
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+
+import os
+import logging
+from typing import List, Optional
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+
 class TOPParser:
     """
     A parser specifically designed to read, restructure, and validate GROMACS .top files.
@@ -38,90 +54,71 @@ class TOPParser:
         return content
 
     @staticmethod
-    def remove_section(content: List[str], section_name: str) -> List[str]:
-        """
-        Remove a specific section from the .top file.
-
-        Args:
-            content (List[str]): Lines from the .top file.
-            section_name (str): Name of the section to remove (e.g., "defaults").
-
-        Returns:
-            List[str]: The modified content with the section removed.
-        """
-        in_section = False
-        updated_content = []
-
-        for line in content:
-            stripped = line.strip()
-            # Detect section start
-            if stripped.startswith(f"[ {section_name} ]"):
-                in_section = True
-                logger.info(f"[+] Removing section: {section_name}")
-                continue
-
-            # Exit the section when encountering a new header
-            if in_section and stripped.startswith("[") and stripped.endswith("]"):
-                in_section = False
-
-            if not in_section:
-                updated_content.append(line)
-
-        return updated_content
-
-    @staticmethod
     def ensure_include_order(
-        content: List[str], includes: List[str], solvent_include: str
+        content: List[str],
+        forcefield_include: str,
+        monomer_include: str,
+        solvent_include: str,
     ) -> List[str]:
         """
         Ensure that includes are in the correct order:
-        - Force fields before .itp files
-        - Solvent topology after position restraints, if any
+        - Force field first.
+        - Monomer parameters next.
+        - Position restraints (if present) before solvent.
+        - Solvent topology last.
 
         Args:
             content (List[str]): Lines from the .top file.
-            includes (List[str]): List of include paths to ensure.
-            solvent_include (str): The include path for the solvent topology.
+            forcefield_include (str): Path to the forcefield include.
+            monomer_include (str): Path to the monomer topology include.
+            solvent_include (str): Path to the solvent topology include.
 
         Returns:
             List[str]: The modified content with includes in the correct order.
         """
-        # Separate includes into force fields, .itp files, and solvent
-        force_field_includes = [inc for inc in includes if inc.endswith(".ff")]
-        itp_includes = [inc for inc in includes if inc.endswith(".itp")]
-        solvent_line = f'#include "{solvent_include}"\n'
+        includes = {
+            "forcefield": f'#include "{forcefield_include}"\n',
+            "monomer": f'#include "{monomer_include}"\n',
+            "solvent": f'#include "{solvent_include}"\n',
+        }
+        posres_block = []
+        in_posres = False
 
-        # Remove all includes from the content
-        content = [line for line in content if not line.strip().startswith("#include")]
+        # Filter out existing include lines and handle POSRES separately
+        updated_content = []
+        for line in content:
+            stripped = line.strip()
+            if stripped.startswith("#include"):
+                # Skip existing includes
+                continue
+            elif stripped.startswith("#ifdef POSRES"):
+                in_posres = True
+                posres_block.append(line)
+            elif in_posres:
+                posres_block.append(line)
+                if stripped.startswith("#endif"):
+                    in_posres = False
+            else:
+                updated_content.append(line)
 
-        # Add force field includes first
-        for include in force_field_includes:
-            content.insert(0, f'#include "{include}"\n')
-
-        # Add .itp files next
-        for include in itp_includes:
-            content.append(f'#include "{include}"\n')
-
-        # Handle solvent include placement
-        for i, line in enumerate(content):
-            if line.strip().startswith("#ifdef POSRES"):
-                # Add the solvent include after the position restraint block
-                for j in range(i + 1, len(content)):
-                    if content[j].strip().startswith("#endif"):
-                        content.insert(j + 1, solvent_line)
-                        break
-                break
-        else:
-            # Add solvent include at the end if no POSRES block
-            content.append(solvent_line)
+        # Insert includes in the correct order
+        ordered_includes = (
+            [
+                includes["forcefield"],
+                includes["monomer"],
+            ]
+            + posres_block
+            + [includes["solvent"]]
+        )
+        updated_content = ordered_includes + updated_content
 
         logger.info("[+] Ensured correct order of includes.")
-        return content
+        return updated_content
 
     @staticmethod
     def handle_posres(content: List[str], posres: bool) -> List[str]:
         """
-        Conditionally remove position restraints if POSRES is false.
+        Conditionally remove the entire POSRES block, including #ifdef and #endif, if POSRES is false.
 
         Args:
             content (List[str]): Lines from the .top file.
@@ -152,31 +149,34 @@ class TOPParser:
         return updated_content
 
     @staticmethod
-    def validate_structure(content: List[str], required_sections: List[str]) -> bool:
+    def remove_section(content: List[str], section_name: str) -> List[str]:
         """
-        Validate that the required sections are present in the correct order.
+        Remove a specific section from the .top file.
 
         Args:
             content (List[str]): Lines from the .top file.
-            required_sections (List[str]): List of required section names.
+            section_name (str): Name of the section to remove (e.g., "defaults").
 
         Returns:
-            bool: True if the structure is valid, False otherwise.
+            List[str]: The modified content with the section removed.
         """
-        section_order = []
+        in_section = False
+        updated_content = []
+
         for line in content:
             stripped = line.strip()
-            if stripped.startswith("[") and stripped.endswith("]"):
-                section_name = stripped[1:-1].strip()
-                section_order.append(section_name)
+            if stripped.startswith(f"[ {section_name} ]"):
+                in_section = True
+                logger.info(f"[+] Removing section: {section_name}")
+                continue
 
-        # Validate the order of sections
-        for section in required_sections:
-            if section not in section_order:
-                logger.error(f"[!] Missing required section: {section}")
-                return False
-        logger.info("[+] File structure is valid.")
-        return True
+            if in_section and stripped.startswith("[") and stripped.endswith("]"):
+                in_section = False
+
+            if not in_section:
+                updated_content.append(line)
+
+        return updated_content
 
     @staticmethod
     def save(output_file_path: str, content: List[str]) -> None:
@@ -187,6 +187,12 @@ class TOPParser:
             output_file_path (str): Path to save the modified file.
             content (List[str]): The modified file content.
         """
+        output_dir = os.path.dirname(output_file_path)
+        if (
+            output_dir
+        ):  # Handle the case where output_file_path is in the current directory
+            os.makedirs(output_dir, exist_ok=True)
+
         with open(output_file_path, "w") as file:
             file.writelines(content)
         logger.info(f"[+] .top file saved to {output_file_path}")

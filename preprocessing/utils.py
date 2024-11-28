@@ -84,11 +84,3 @@ def copy_files(
             logger.warning(f"File not found: {source_file}")
 
     return dest_file
-
-
-def move_and_rename_topol_file(input_top_path, output_dir, output_top_name):
-    top_name = os.path.basename(input_top_path)
-    top_directory = os.path.dirname(input_top_path)
-    topol_file = Path(copy_files([top_name], top_directory, output_dir))
-    topol_file = topol_file.rename(os.path.join(output_dir, output_top_name))
-    return str(topol_file)

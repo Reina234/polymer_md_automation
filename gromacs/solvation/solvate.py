@@ -3,10 +3,10 @@ import subprocess
 from preprocessing.metadata_tracker import MetadataTracker
 from config.paths import GROMACS_OUTPUT_SUBDIR, BASE_OUTPUT_DIR
 from typing import Optional, List
-from preprocessing.pdb_utils import calculate_num_particles
+from preprocessing.calculation_utils import calculate_num_particles
 from config.constants import LengthUnits
 from pathlib import Path
-from preprocessing.utils import move_and_rename_topol_file
+from gromacs.gromacs_utils import move_and_rename_topol_file
 
 # NOTE: add in file type checks
 

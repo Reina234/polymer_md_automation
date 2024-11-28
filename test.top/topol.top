@@ -1,0 +1,14 @@
+#include "input/forcefields/gromos54a7.ff"
+#include "input/solvents/hexane.itp"
+#ifdef POSRES_LIG
+#endif
+#include "output/test_new_struct/acpype_output/POLY_GMX.itp"
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Thu Nov 28 10:49:41 2024
+
+[ system ]
+POLY in water
+
+[ molecules ]
+; Compound        nmols
+ POLY             1     
+UNL               100
