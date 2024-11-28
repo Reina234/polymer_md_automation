@@ -11,7 +11,7 @@ from gromacs.base_gromacs_command import BaseGromacsCommand
 
 
 class SolventInsertion(BaseGromacsCommand):
-    OUTPUT_GRO_NAME = "solvent_box.gro"
+    OUTPUT_NAME = "solvent_box.gro"
 
     def __init__(self, metadata_tracker: Optional[MetadataTracker] = None):
         super().__init__(metadata_tracker)
@@ -26,7 +26,7 @@ class SolventInsertion(BaseGromacsCommand):
         box_size_nm: List[float] = [3.0, 3.0, 3.0],
         additional_notes: Optional[str] = None,
     ) -> str:
-        return self._execute(
+        command, output_gro_path = self._create_editconf_command(
             solvent_pdb_path=solvent_pdb_path,
             run_name=run_name,
             solvent_density=solvent_density,
@@ -35,8 +35,20 @@ class SolventInsertion(BaseGromacsCommand):
             box_size_nm=box_size_nm,
             additional_notes=additional_notes,
         )
+        self._execute(command)
+        if self.metadata_tracker:
+            self._update_metadata(
+                solvent_pdb_path=solvent_pdb_path,
+                run_name=run_name,
+                solvent_density=solvent_density,
+                solvent_molecular_weight=solvent_molecular_weight,
+                output_base_dir=output_base_dir,
+                box_size_nm=box_size_nm,
+                additional_notes=additional_notes,
+            )
+        return output_gro_path
 
-    def _create_subprocess_command(
+    def _create_editconf_command(
         self,
         solvent_pdb_path: str,
         run_name: str,
@@ -53,7 +65,7 @@ class SolventInsertion(BaseGromacsCommand):
             box_units=self.UNITS,
         )
         solvent_box_gro_path = os.path.join(
-            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_GRO_NAME
+            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_NAME
         )
 
         output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
@@ -87,6 +99,6 @@ class SolventInsertion(BaseGromacsCommand):
         return {
             "program(s) used": "GROMACS insert-molecules",
             "details": f"created a solvent box of size {box_size_nm} with units {self.UNITS.value}",
-            "action(s)": f"used molecule at {solvent_pdb_path}, saved at {output_base_dir}/{run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_GRO_NAME}",
+            "action(s)": f"used molecule at {solvent_pdb_path}, saved at {output_base_dir}/{run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
             "additional_notes": additional_notes,
         }

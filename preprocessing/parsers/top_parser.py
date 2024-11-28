@@ -22,14 +22,6 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-import os
-import logging
-from typing import List, Optional
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
-
 class TOPParser:
     """
     A parser specifically designed to read, restructure, and validate GROMACS .top files.
@@ -118,7 +110,7 @@ class TOPParser:
     @staticmethod
     def handle_posres(content: List[str], posres: bool) -> List[str]:
         """
-        Conditionally remove the entire POSRES block, including #ifdef and #endif, if POSRES is false.
+        Conditionally remove position restraints if POSRES is false.
 
         Args:
             content (List[str]): Lines from the .top file.
@@ -187,12 +179,7 @@ class TOPParser:
             output_file_path (str): Path to save the modified file.
             content (List[str]): The modified file content.
         """
-        output_dir = os.path.dirname(output_file_path)
-        if (
-            output_dir
-        ):  # Handle the case where output_file_path is in the current directory
-            os.makedirs(output_dir, exist_ok=True)
-
+        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
         with open(output_file_path, "w") as file:
             file.writelines(content)
         logger.info(f"[+] .top file saved to {output_file_path}")

@@ -29,7 +29,7 @@ MDP_TEMPLATE_PATHS = {
 MDP_FULL_PATHS = {
     "nvt": "gromacs/mdp_scripts/nvt/nvt_{temp}K.mdp",
     "npt": "gromacs/mdp_scripts/npt/npt_{temp}K.mdp",
-    "minim": "gromacs/mdp_scripts/minim/minim.mdp",
+    "minim": "gromacs/mdp_scripts/minim.mdp",
 }
 ###########################################################################
 
@@ -37,3 +37,7 @@ MDP_FULL_PATHS = {
 class TemplatedMdps(Enum):
     NVT = "nvt"
     NPT = "npt"
+    MINIM = "minim"
+
+
+ACPYPE_SOLVENT_OUTPUT_SUBDIR = "acpype_solvent_output"

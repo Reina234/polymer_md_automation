@@ -1,0 +1,20 @@
+; HEX_GMX.top created by acpype (v: 2023.10.27) on Thu Nov 28 17:05:12 2024
+
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+1               2               yes             0.5     0.8333333333
+
+; Include HEX_GMX.itp topology
+#include "HEX_GMX.itp"
+
+; Ligand position restraints
+#ifdef POSRES_LIG
+#include "posre_HEX.itp"
+#endif
+
+[ system ]
+ HEX
+
+[ molecules ]
+; Compound        nmols
+ HEX              1     

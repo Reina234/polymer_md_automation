@@ -8,7 +8,7 @@ from gromacs.base_gromacs_command import BaseGromacsCommand
 
 
 class PolmerBoxResize(BaseGromacsCommand):
-    OUTPUT_GRO_NAME = "polymer_box.gro"
+    OUTPUT_NAME = "polymer_box.gro"
 
     def __init__(self, metadata_tracker: Optional[MetadataTracker] = None):
         self.metadata_tracker = metadata_tracker
@@ -21,15 +21,26 @@ class PolmerBoxResize(BaseGromacsCommand):
         box_size_nm: List[float] = [3.0, 3.0, 3.0],
         additional_notes: Optional[str] = None,
     ) -> str:
-        return self._execute(
+        command, output_gro_path = self._create_editconfig_command(
             input_gro_path=input_gro_path,
             run_name=run_name,
             output_base_dir=output_base_dir,
             box_size_nm=box_size_nm,
             additional_notes=additional_notes,
         )
+        self._execute(command)
+        if self.metadata_tracker:
+            self._update_metadata(
+                input_gro_path=input_gro_path,
+                run_name=run_name,
+                output_base_dir=output_base_dir,
+                box_size_nm=box_size_nm,
+                additional_notes=additional_notes,
+            )
 
-    def _create_subprocess_command(
+        return output_gro_path
+
+    def _create_editconfig_command(
         self,
         input_gro_path: str,
         run_name: str,
@@ -38,7 +49,7 @@ class PolmerBoxResize(BaseGromacsCommand):
         additional_notes: Optional[str] = None,
     ) -> str:
         solute_box_gro_path = os.path.join(
-            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_GRO_NAME
+            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_NAME
         )
         output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
         os.makedirs(output_dir, exist_ok=True)
@@ -70,6 +81,6 @@ class PolmerBoxResize(BaseGromacsCommand):
         return {
             "program(s) used": "GROMACS - editconf",
             "defatils": f"created a polymer box of size {box_size_nm} with units {self.UNITS.value}",
-            "action(s)": f"used molecule at {input_gro_path}, saved at {output_base_dir}/{run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_GRO_NAME}",
+            "action(s)": f"used molecule at {input_gro_path}, saved at {output_base_dir}/{run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
             "additional_notes": additional_notes,
         }

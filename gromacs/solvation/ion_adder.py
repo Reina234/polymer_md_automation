@@ -1,79 +1,127 @@
 import os
 import subprocess
-from processing.metadata_tracker import MetadataTracker
-from config.paths import MDP_FULL_PATHS
+from preprocessing.metadata_tracker import MetadataTracker
+from config.paths import (
+    MDP_FULL_PATHS,
+    TemplatedMdps,
+    BASE_OUTPUT_DIR,
+    GROMACS_OUTPUT_SUBDIR,
+)
 from gromacs.base_gromacs_command import BaseGromacsCommand
+from typing import Optional, List, Tuple
 
 
-class IonAdder:
-    OUTPUT_GRO_NAME = "polymer_neutralized.gro"
+class IonAdder(BaseGromacsCommand):
+    OUTPUT_NAME = "polymer_neutralized.gro"
+    OUTPUT_TPR_NAME = "ions.tpr"
 
     def __init__(self, metadata_tracker: MetadataTracker):
         self.metadata_tracker = metadata_tracker
 
-    def add_ions(
+    def run(
         self,
-        input_gro: str,
-        topology_file: str,
-        output_dir: str,
-        mdp_file: str = GROMACS_ION_SCRIPT,
-    ) -> dict:
-        """
-        Add ions to neutralize the simulation box.
+        solvated_gro_path: str,
+        input_topol_path: str,
+        run_name: str,
+        output_base_dir: str = BASE_OUTPUT_DIR,
+        minim_mdp_path: Optional[str] = None,
+    ):
+        grommp_command, output_tpr_path, output_dir = self._create_grommp_command(
+            solvated_gro_path=solvated_gro_path,
+            input_topol_path=input_topol_path,
+            run_name=run_name,
+            output_base_dir=output_base_dir,
+            minim_mdp_path=minim_mdp_path,
+        )
+        self._execute(grommp_command)
 
-        Args:
-            input_gro (str): Path to the solvated .gro file.
-            topology_file (str): Path to the topology file.
-            mdp_file (str): Path to the ions.mdp file.
-            output_dir (str): Directory to save output files.
+        additional_command, output_gro_path = self._create_genion_command(
+            output_tpr_path=output_tpr_path,
+            output_dir=output_dir,
+            input_topol_path=input_topol_path,
+        )
+        self._execute(additional_command)
+        if self.metadata_tracker:
+            self._update_metadata(
+                solvated_gro_path=solvated_gro_path,
+                input_topol_path=input_topol_path,
+                run_name=run_name,
+                output_base_dir=output_base_dir,
+                minim_mdp_path=minim_mdp_path,
+            )
 
-        Returns:
-            dict: Path to the neutralized .gro file and updated topology file.
-        """
+        return output_gro_path
+
+    def _create_grommp_command(
+        self,
+        solvated_gro_path: str,
+        input_topol_path: str,
+        run_name: str,
+        output_base_dir: str = BASE_OUTPUT_DIR,
+        minim_mdp_path: Optional[str] = None,
+        additional_notes: Optional[str] = None,
+    ) -> Tuple[List, str, str]:
+        output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
         os.makedirs(output_dir, exist_ok=True)
-        tpr_file = os.path.join(output_dir, "ions.tpr")
-        output_gro = os.path.join(output_dir, "polymer_neutralized.gro")
 
-        # Generate .tpr file
+        if not minim_mdp_path:
+            minim_mdp_path = MDP_FULL_PATHS[TemplatedMdps.MINIM.value]
+
+        output_tpr_path = os.path.join(output_dir, self.OUTPUT_TPR_NAME)
+
         grompp_command = [
             "gmx",
             "grompp",
             "-f",
-            mdp_file,
+            minim_mdp_path,
             "-c",
-            input_gro,
+            solvated_gro_path,
             "-p",
-            topology_file,
+            input_topol_path,
             "-o",
-            tpr_file,
+            output_tpr_path,
+            "-maxwarn",
+            "1",
         ]
-        subprocess.run(grompp_command, check=True)
+        return grompp_command, output_tpr_path, output_dir
 
-        # Add ions
+    def _create_genion_command(
+        self,
+        output_tpr_path: str,
+        output_dir: str,
+        input_topol_path: str,
+    ) -> Tuple[List, str]:
+        output_gro_path = os.path.join(output_dir, self.OUTPUT_NAME)
         genion_command = [
             "gmx",
             "genion",
             "-s",
-            tpr_file,
+            output_tpr_path,
             "-o",
-            output_gro,
+            output_gro_path,
             "-p",
-            topology_file,
+            input_topol_path,
             "-pname",
             "NA",
             "-nname",
             "CL",
             "-neutral",
         ]
-        subprocess.run(genion_command, check=True)
 
-        self.metadata_tracker.add_step(
-            "Ion Addition",
-            {
-                "input_gro": input_gro,
-                "topology_file": topology_file,
-                "output_gro": output_gro,
-            },
-        )
+        return genion_command, output_gro_path
 
-        return {"neutralized_gro_file": output_gro, "topology_file": topology_file}
+    def metadata(
+        self,
+        solvated_gro_path: str,
+        input_topol_path: str,
+        run_name: str,
+        output_base_dir: str = BASE_OUTPUT_DIR,
+        minim_mdp_path: Optional[str] = None,
+        additional_notes: Optional[str] = None,
+    ):
+        return {
+            "program(s) used": "GROMACS solvate",
+            "details": f"added ions to {solvated_gro_path} to neutralised",
+            "action(s)": f"saved at {output_base_dir}/{run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
+            "additional_notes": additional_notes,
+        }

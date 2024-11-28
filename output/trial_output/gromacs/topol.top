@@ -1,0 +1,13 @@
+#include "amber99sb-ildn.ff/forcefield.itp"
+#include "/home/reina/polymerpinn/output/test_new_struct/acpype_output/POLY_GMX.itp"
+#ifdef POSRES_LIG
+#endif
+#include "/home/reina/polymerpinn/gromacs/acpype_solvent_output/TMZK_GMX.itp"
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Thu Nov 28 17:51:52 2024
+
+[ system ]
+ POLY
+
+[ molecules ]
+; Compound        nmols
+ POLY             1     
