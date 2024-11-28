@@ -1,6 +1,6 @@
 import os
 import subprocess
-from processing.metadata_tracker import MetadataTracker
+from preprocessing.metadata_tracker import MetadataTracker
 
 
 class BoxCreator:
@@ -23,14 +23,21 @@ class BoxCreator:
         os.makedirs(output_dir, exist_ok=True)
 
         editconf_command = [
-            "gmx", "editconf",
-            "-f", input_gro,
-            "-o", box_file,
+            "gmx",
+            "editconf",
+            "-f",
+            input_gro,
+            "-o",
+            box_file,
             "-c",  # Center the polymer
-            "-d", str(box_size),  # Distance to the box edge
-            "-bt", "cubic"  # Box type
+            "-d",
+            str(box_size),  # Distance to the box edge
+            "-bt",
+            "cubic",  # Box type
         ]
         subprocess.run(editconf_command, check=True)
 
-        self.metadata_tracker.add_step("Box Creation", {"box_file": box_file, "box_size": box_size})
+        self.metadata_tracker.add_step(
+            "Box Creation", {"box_file": box_file, "box_size": box_size}
+        )
         return box_file

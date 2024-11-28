@@ -4,6 +4,7 @@ from typing import List, Optional
 from abc import ABC, abstractmethod
 from data_models.solvent import Solvent
 from preprocessing.parsers.pdb_parser import PDBParser
+from preprocessing.metadata_tracker import MetadataTracker
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -17,14 +18,16 @@ class BasePDBValidator(ABC):
 
     SKELETAL_VALIDATION_PASSED_COMMENT = "Validation passed: Basic skeletal check."
 
-    def __init__(self):
+    def __init__(self, metadata_tracker: Optional[MetadataTracker] = None):
         self.pdb_parser = PDBParser()
+        self.metadata_tracker = metadata_tracker
 
     @abstractmethod
     def validate(
         self,
         input_file_path: str,
         solvent: Solvent,
+        additional_notes: Optional[str] = None,
         output_file_path: Optional[str] = None,
     ) -> bool:
         """
@@ -93,3 +96,27 @@ class BasePDBValidator(ABC):
                         f"[!] Invalid atom coordinates in line: {line.strip()}"
                     )
         return False
+
+    def _update_metadata(
+        self,
+        input_file_path: str,
+        output_dir: str,
+        additional_notes: Optional[str] = None,
+    ) -> None:
+        """
+        Add metadata to the metadata tracker.
+        """
+        metadata = self.metadata(input_file_path, output_dir, additional_notes)
+        self.metadata_tracker.add_step(step_name="validation", details=metadata)
+
+    @abstractmethod
+    def metadata(
+        self,
+        input_file_path: str,
+        output_dir: str,
+        additional_notes: Optional[str] = None,
+    ) -> dict:
+        """
+        Return metadata about the parameterizer.
+        """
+        pass

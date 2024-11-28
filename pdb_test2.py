@@ -9,6 +9,7 @@ from preprocessing.validators.pdb_validators.gromacs_pdb_validator import (
     GROMACSPDBValidator,
 )
 from data_models.solvent import Solvent
+from preprocessing.metadata_tracker import MetadataTracker
 
 solvent = Solvent(
     "Hexane",
@@ -42,6 +43,6 @@ solvent = Solvent(
 # box_dim = scale_box_to_desired_volume(min_box_size, required_volume)
 # print(box_dim)
 
-gromacsvalidator = GROMACSPDBValidator()
+gromacsvalidator = GROMACSPDBValidator(metadata_tracker=MetadataTracker())
 
-gromacsvalidator.validate("TEST.pdb", solvent, output_file_path="TEST.pdb")
+gromacsvalidator.validate("TEST.pdb", solvent, output_file_path="TEST2.pdb")

@@ -13,6 +13,7 @@ from preprocessing.pdb_utils import (
 from data_models.solvent import Solvent
 from config.constants import DENSITY_TOLERANCE_PERCENTAGE
 from config.constants import LengthUnits
+from preprocessing.metadata_tracker import MetadataTracker
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -23,14 +24,19 @@ class GROMACSPDBValidator(BasePDBValidator):
     DENSITY_VALIDATION_PASSED_COMMENT = "Density validation passed."
     DENSITY_VALIDATION_FAILED_COMMENT = "Density validation failed."
 
-    def __init__(self, auto_fix_dimensions: bool = False):
-        super().__init__()
+    def __init__(
+        self,
+        metadata_tracker: Optional[MetadataTracker] = None,
+        auto_fix_dimensions: bool = False,
+    ):
+        super().__init__(metadata_tracker)
         self.auto_fix_dimensions = auto_fix_dimensions
 
     def validate(
         self,
         input_file_path: str,
         solvent: Solvent,
+        additional_notes: Optional[str] = None,
         output_file_path: Optional[str] = None,
     ) -> None:
         """
@@ -53,7 +59,27 @@ class GROMACSPDBValidator(BasePDBValidator):
 
             # Step 2: Proceed with other checks if skeletal validation succeeds
             logger.info("[*] Proceeding with additional GROMACS checks...")
-            self._validate_gromacs_specifics(input_file_path, solvent, output_file_path)
+            default_comment = self._validate_gromacs_specifics(
+                input_file_path, solvent, output_file_path
+            )
+            if self.metadata_tracker:
+                if additional_notes:
+                    default_comment += additional_notes
+                    self._update_metadata(
+                        input_file_path,
+                        output_file_path,
+                        self.metadata(
+                            input_file_path, output_file_path, default_comment
+                        ),
+                    )
+                else:
+                    self._update_metadata(
+                        input_file_path,
+                        output_file_path,
+                        self.metadata(
+                            input_file_path, output_file_path, default_comment
+                        ),
+                    )
 
         except ValueError as e:
             logger.error(f"[!] Validation halted: {e}")
@@ -84,6 +110,7 @@ class GROMACSPDBValidator(BasePDBValidator):
             logger.info(f"No box_dimensions found in the PDB file.")
             box_dimensions, content = self._generate_box_dimensions(solvent, content)
             self.pdb_parser.save(output_file_path, content)
+            default_comments = self.BOX_GENERATED_COMMENT
 
         else:
             logger.info(f"Box dimensions found: {box_dimensions}")
@@ -97,6 +124,9 @@ class GROMACSPDBValidator(BasePDBValidator):
                     solvent, content
                 )
                 self.pdb_parser.save(output_file_path, content)
+                default_comments = (
+                    self.DENSITY_VALIDATION_FAILED_COMMENT + self.BOX_GENERATED_COMMENT
+                )
 
             elif not density_check:
                 content = self.pdb_parser.add_comment(
@@ -106,11 +136,15 @@ class GROMACSPDBValidator(BasePDBValidator):
                 raise ValueError(
                     f"Validation failed: Density check failed for {input_file_path}."
                 )
+
             elif density_check:
                 content = self.pdb_parser.add_comment(
                     content, self.DENSITY_VALIDATION_PASSED_COMMENT
                 )
                 self.pdb_parser.save(output_file_path, content)
+                default_comments = self.DENSITY_VALIDATION_PASSED_COMMENT
+
+        return default_comments
 
     def _generate_box_dimensions(
         self, solvent: Solvent, content: List[str]
@@ -159,3 +193,11 @@ class GROMACSPDBValidator(BasePDBValidator):
             return False
         logger.info(f"Density check passed: {density:.6f} kg/m³")
         return True
+
+    def metadata(self, input_file_path, output_dir, additional_notes=None):
+        return {
+            "program(s) used": "N/A",
+            "defatils": "checked for base pdb structure, and for box size and density match",
+            "action(s)": f"checked validity of file at {input_file_path}, saved to {output_dir}, autofix = {self.auto_fix_dimensions}",
+            "additional_notes": additional_notes,
+        }
