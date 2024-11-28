@@ -7,3 +7,6 @@ GROMACS_OUTPUT_DIR = os.path.join(BASE_OUTPUT_DIR, "gromacs_output")
 
 
 TEMPORARY_OUTPUT_DIR = "temp"
+
+ACPYPE_PARAMETERIZER_OUTPUT_SUBDIR = "acpype_output"
+GROMACS_OUTPUT_SUBDIR = "gromacs"

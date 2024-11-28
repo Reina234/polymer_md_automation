@@ -1,12 +1,14 @@
 import os
 import subprocess
 from preprocessing.metadata_tracker import MetadataTracker
-from config.paths import GROMACS_OUTPUT_DIR
-from typing import Optional, Tuple
+from config.paths import GROMACS_OUTPUT_SUBDIR, BASE_OUTPUT_DIR
+from typing import Optional, List
+from config.constants import LengthUnits
 
 
 class BoxCreator:
     OUTPUT_GRO_NAME = "polymer_box.gro"
+    UNITS = LengthUnits.NANOMETER
 
     def __init__(self, metadata_tracker: Optional[MetadataTracker] = None):
         self.metadata_tracker = metadata_tracker
@@ -14,11 +16,15 @@ class BoxCreator:
     def create_box(
         self,
         input_gro_path: str,
-        output_dir: str = GROMACS_OUTPUT_DIR,
-        box_size_nm: tuple = (2.0, 2.0, 2.0),
+        run_name: str,
+        output_base_dir: str = BASE_OUTPUT_DIR,
+        box_size_nm: List[float] = [3.0, 3.0, 3.0],
         additional_notes: Optional[str] = None,
     ) -> str:
-        output_file_path = os.path.join(output_dir, self.OUTPUT_GRO_NAME)
+        output_file_path = os.path.join(
+            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_GRO_NAME
+        )
+        output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
         os.makedirs(output_dir, exist_ok=True)
         editconf_command = [
             "gmx",
@@ -46,12 +52,12 @@ class BoxCreator:
         self,
         input_file_path: str,
         output_file_path: str,
-        box_size: Tuple[str],
+        box_size: List[float],
         additional_notes=None,
     ) -> dict:
         return {
             "program(s) used": "GROMACS",
-            "defatils": f"created a solvent box of size {box_size}",
+            "defatils": f"created a polymer box of size {box_size}",
             "action(s)": f"used molecule at {input_file_path}, saved at {output_file_path}",
             "additional_notes": additional_notes,
         }
@@ -60,7 +66,7 @@ class BoxCreator:
         self,
         input_file_path: str,
         output_file_path: str,
-        box_size: Tuple[str],
+        box_size: List[float],
         additional_notes: Optional[str] = None,
     ) -> None:
         metadata = self.metadata(

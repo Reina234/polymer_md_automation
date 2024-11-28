@@ -7,9 +7,10 @@ from preprocessing.parameterizers.base_parameterizer import BaseParameterizer
 from preprocessing.metadata_tracker import MetadataTracker
 from preprocessing.utils import check_file_exists, check_file_type, copy_files
 from config.paths import (
-    ACPYPE_PARAMETERIZER_OUTPUT_DIR,
+    ACPYPE_PARAMETERIZER_OUTPUT_SUBDIR,
     ACPYPE_BASE_NAME,
     TEMPORARY_OUTPUT_DIR,
+    BASE_OUTPUT_DIR,
 )
 
 logger = logging.getLogger(__name__)
@@ -36,12 +37,14 @@ class ACPYPEParameterizer(BaseParameterizer):
     def parameterize(
         self,
         input_file_path: str,
-        output_name: str,
-        output_base_dir: str = ACPYPE_PARAMETERIZER_OUTPUT_DIR,
+        run_name: str,
+        output_base_dir: str = BASE_OUTPUT_DIR,
         additional_notes: Optional[str] = None,
     ) -> str:
 
-        output_dir = os.path.join(output_base_dir, output_name)
+        output_dir = os.path.join(
+            output_base_dir, run_name, ACPYPE_PARAMETERIZER_OUTPUT_SUBDIR
+        )
         abs_input_file_path, abs_output_dir = self._prepare_directories(
             input_file_path, output_dir
         )
