@@ -1,24 +1,30 @@
 import os
+import json
 import logging
-from typing import List
+from typing import List, Dict
+from config.paths import SOLVENT_JSON_PATH
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-class SolventAtomtypesManager:
+class AtomtypesManager:
     """
-    Manages solvent atomtypes, including extraction, storage, and retrieval.
+    Manages solvent atomtypes with persistent storage in a JSON file.
     """
 
-    ATOMTYPES_DIR = "solvent_atomtypes"
+    STORAGE_FILE = SOLVENT_JSON_PATH
 
     def __init__(self):
-        os.makedirs(self.ATOMTYPES_DIR, exist_ok=True)
+        # Ensure the JSON file exists
+        if not os.path.exists(self.STORAGE_FILE):
+            with open(self.STORAGE_FILE, "w") as file:
+                json.dump({}, file)
+        logger.info(f"[+] Using storage file: {self.STORAGE_FILE}")
 
     def extract_and_store_atomtypes(self, solvent_file: str, solvent_name: str) -> None:
         """
-        Extracts the [ atomtypes ] section from a solvent file and stores it.
+        Extracts the [ atomtypes ] section from a solvent file and stores it in JSON.
 
         Args:
             solvent_file (str): Path to the solvent .itp file.
@@ -29,15 +35,13 @@ class SolventAtomtypesManager:
         if not atomtypes_section:
             raise ValueError(f"No [ atomtypes ] section found in {solvent_file}.")
 
-        # Save the atomtypes to the solvent_atomtypes directory
-        atomtypes_path = os.path.join(self.ATOMTYPES_DIR, f"{solvent_name}.itp")
-        self._save_file(atomtypes_path, atomtypes_section)
-        logger.info(f"[+] Saved atomtypes for {solvent_name} to {atomtypes_path}.")
+        # Load existing data from JSON
+        storage_data = self._load_storage()
 
-        # Remove the atomtypes section from the original file
-        updated_content = self._remove_section(content, "atomtypes")
-        self._save_file(solvent_file, updated_content)
-        logger.info(f"[+] Removed [ atomtypes ] section from {solvent_file}.")
+        # Store the atomtypes section
+        storage_data[solvent_name] = atomtypes_section
+        self._save_storage(storage_data)
+        logger.info(f"[+] Stored atomtypes for {solvent_name}.")
 
     def retrieve_atomtypes(self, solvent_name: str) -> List[str]:
         """
@@ -49,10 +53,11 @@ class SolventAtomtypesManager:
         Returns:
             List[str]: Lines of the [ atomtypes ] section.
         """
-        atomtypes_path = os.path.join(self.ATOMTYPES_DIR, f"{solvent_name}.itp")
-        if not os.path.exists(atomtypes_path):
-            raise FileNotFoundError(f"Atomtypes for {solvent_name} not found.")
-        return self._read_file(atomtypes_path)
+        storage_data = self._load_storage()
+        if solvent_name not in storage_data:
+            raise ValueError(f"No atomtypes data found for solvent: {solvent_name}")
+        logger.info(f"[+] Retrieved atomtypes for {solvent_name}.")
+        return storage_data[solvent_name]
 
     def _read_file(self, file_path: str) -> List[str]:
         """Helper to read a file."""
@@ -60,12 +65,6 @@ class SolventAtomtypesManager:
             raise FileNotFoundError(f"File not found: {file_path}")
         with open(file_path, "r") as file:
             return file.readlines()
-
-    def _save_file(self, file_path: str, content: List[str]) -> None:
-        """Helper to save content to a file."""
-        with open(file_path, "w") as file:
-            file.writelines(content)
-        logger.info(f"[+] Saved file: {file_path}")
 
     def _extract_section(self, content: List[str], section_name: str) -> List[str]:
         """Helper to extract a specific section."""
@@ -84,20 +83,13 @@ class SolventAtomtypesManager:
                 section_lines.append(line)
         return section_lines
 
-    def _remove_section(self, content: List[str], section_name: str) -> List[str]:
-        """Helper to remove a specific section."""
-        in_section = False
-        updated_content = []
-        for line in content:
-            if line.strip().startswith(f"[ {section_name} ]"):
-                in_section = True
-                logger.info(f"[+] Removing section: {section_name}")
-                continue
-            if in_section:
-                if line.strip().startswith("[") and not line.strip().startswith(
-                    f"[ {section_name} ]"
-                ):
-                    in_section = False
-            if not in_section:
-                updated_content.append(line)
-        return updated_content
+    def _load_storage(self) -> Dict[str, List[str]]:
+        """Helper to load data from the JSON storage."""
+        with open(self.STORAGE_FILE, "r") as file:
+            return json.load(file)
+
+    def _save_storage(self, data: Dict[str, List[str]]) -> None:
+        """Helper to save data to the JSON storage."""
+        with open(self.STORAGE_FILE, "w") as file:
+            json.dump(data, file, indent=4)
+        logger.info(f"[+] Updated storage file: {self.STORAGE_FILE}")

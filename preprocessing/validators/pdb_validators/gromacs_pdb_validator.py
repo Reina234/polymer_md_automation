@@ -30,8 +30,8 @@ class GROMACSPDBValidator(BasePDBValidator):
     def validate(
         self,
         input_file_path: str,
-        additional_notes: Optional[str] = None,
         output_file_path: Optional[str] = None,
+        additional_notes: Optional[str] = None,
     ) -> None:
         """
         Perform a full validation of the PDB file, starting with a skeletal check.

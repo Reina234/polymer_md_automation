@@ -7,6 +7,12 @@ ACPYPE_BASE_NAME = "POLY"
 GROMACS_OUTPUT_DIR = os.path.join(BASE_OUTPUT_DIR, "gromacs_output")
 
 
+class FilesToExtract(Enum):
+    GRO = "gro"
+    TOP = "top"
+    ITP = "itp"
+
+
 TEMPORARY_OUTPUT_DIR = "temp"
 
 ACPYPE_PARAMETERIZER_OUTPUT_SUBDIR = "acpype_output"
@@ -14,9 +20,13 @@ GROMACS_OUTPUT_SUBDIR = "gromacs"
 TOPOL_NAME = "topol.top"
 
 
+SOLVENT_ITP_DIR = "preprocessed_output/solvents/solvent_itp"
+SOLVENT_MOL2_DIR = "preprocessed_output/solvents/solvent_mol2"
+SOLVENT_JSON_PATH = "preprocessed_output/solvents/solvent_atomtypes.json"
+
 MDP_DIRS = {
-    "nvt": "gromacs/mdp_scripts/nvt",
-    "npt": "gromacs/mdp_scripts/npt",
+    "nvt": "preprocessed_output/gromacs/nvt",
+    "npt": "preprocessed_output/gromacs/npt",
 }
 
 MDP_NAMING_SCHEME = "{run_type}_{temp}K.mdp"
@@ -27,9 +37,9 @@ MDP_TEMPLATE_PATHS = {
 
 # NOTE!! THIS IS DEPENDENT ON THE MDP NAMING SCHEME AND MDP DIRS!!########
 MDP_FULL_PATHS = {
-    "nvt": "gromacs/mdp_scripts/nvt/nvt_{temp}K.mdp",
-    "npt": "gromacs/mdp_scripts/npt/npt_{temp}K.mdp",
-    "minim": "gromacs/mdp_scripts/minim.mdp",
+    "nvt": "preprocessed_output/gromacs/nvt/nvt_{temp}K.mdp",
+    "npt": "preprocessed_output/gromacs/npt/npt_{temp}K.mdp",
+    "minim": "preprocessed_output/gromacs/minim.mdp",
 }
 ###########################################################################
 

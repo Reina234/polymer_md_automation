@@ -1,0 +1,9 @@
+{
+    "hexane": [
+        "[ atomtypes ]\n",
+        ";name   bond_type     mass     charge   ptype   sigma         epsilon       Amb\n",
+        " hc       hc          0.00000  0.00000   A     2.60018e-01   8.70272e-02 ; 1.46  0.0208\n",
+        " c3       c3          0.00000  0.00000   A     3.39771e-01   4.51035e-01 ; 1.91  0.1078\n",
+        "\n"
+    ]
+}

@@ -22,6 +22,12 @@ from preprocessing.metadata_tracker import MetadataTracker
 from preprocessing.parameterizers.acpype_parameterizer import ACPYPEParameterizer
 from preprocessing.validators.pdb_validators.base_pdb_validator import BasePDBValidator
 from preprocessing.parsers.pdb_parser import PDBParser
+from preprocessing.parsers.itp_parser import ITPParser
+from config.paths import SOLVENT_ITP_DIR, FilesToExtract
+from preprocessing.solvent_atomtypes_manager import AtomtypesManager
+from gromacs.gromacs_utils import add_atomtypes_to_topology
+
+solvent_files = [FilesToExtract.ITP]
 
 metadata_tracker = MetadataTracker()
 pdbtomol2converter = OpenBabelConverter(metadata_tracker)
@@ -31,23 +37,55 @@ solvent_mol2_path = pdbtomol2converter.convert(solvent.pdb_path, "temp")
 
 solvent_acpype = ACPYPEParameterizer(metadata_tracker, solvent.pdb_molecule_name)
 solvent_itp = solvent_acpype.parameterize(
-    solvent_mol2_path, solvent.pdb_molecule_name, "gromacs", is_solvent=True
+    solvent_mol2_path,
+    SOLVENT_ITP_DIR,
+    solvent_files,
+    "hexane",
 )
 
-trial_output_name = "trial_output"
+solvent_itp = solvent_itp[0]
+manager = AtomtypesManager()
 
-polymer_mol2_path = pdbtomol2converter.convert("styrene.pdb")
+manager.extract_and_store_atomtypes(solvent_itp, "hexane")
+solvent_itp_content = ITPParser.read_file(solvent_itp)
+no_atomtypes = ITPParser.remove_section(solvent_itp_content, "atomtypes")
+ITPParser.save_file(solvent_itp, no_atomtypes)
 
+polymer_pdb = "styrene.pdb"
+polymer_mol2_path = pdbtomol2converter.convert(polymer_pdb, "output/TRIAL")
 acpype = ACPYPEParameterizer(metadata_tracker)
-dir = acpype.parameterize(polymer_mol2_path, trial_output_name)
-forcefield = "amber99sb-ildn.ff/forcefield.itp"
 
-topol_file = prepare_topol_file(
-    "output/trial_output/acpype_output/POLY_GMX.top", "trial_output"
-)
+polymer_files = [FilesToExtract.GRO, FilesToExtract.ITP, FilesToExtract.TOP]
+acpype_path = "output/TRIAL/acpype_output"
+files = acpype.parameterize(polymer_mol2_path, acpype_path, polymer_files, posre=True)
+polymer_gro = files[0]
+polymer_itp = files[1]
+polymer_top = files[2]
+
+
+topol_file = prepare_topol_file("output/TRIAL/acpype_output/POLY_GMX.top", "TRIAL")
+
+forcefield = "amber99sb-ildn.ff/forcefield.itp"
 topol_file = reformat_topol_file(
-    topol_file,
-    "output/test_new_struct/acpype_output/POLY_GMX.itp",
-    solvent_itp,
-    forcefield,
+    topol_file, polymer_itp, solvent_itp, forcefield, "output/TRIAL/gromacs"
 )
+
+add_atomtypes_to_topology("hexane", polymer_itp)
+
+gromacsvalidator = GROMACSPDBValidator(metadata_tracker)
+updated_solvent_pdb = "hexane_edited.pdb"
+gromacsvalidator.validate(solvent.pdb_path, output_file_path=updated_solvent_pdb)
+box_creator = PolmerBoxResize(metadata_tracker)
+box_file = box_creator.run(polymer_gro, "TRIAL")
+
+solvent_box = SolventInsertion(metadata_tracker)
+solvent_box_file = solvent_box.run(
+    updated_solvent_pdb, "TRIAL", solvent.density, solvent.molecular_weight
+)
+
+print(solvent_box_file, box_file, topol_file)
+solute_box = Solvate(metadata_tracker)
+solvated_box = solute_box.run(solvent_box_file, box_file, topol_file, "TRIAL")
+
+ion_adder = IonAdder(metadata_tracker)
+added_ion_box = ion_adder.run(solvated_box, topol_file, "TRIAL")
