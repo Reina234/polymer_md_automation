@@ -18,6 +18,8 @@ TEMPORARY_OUTPUT_DIR = "temp"
 ACPYPE_PARAMETERIZER_OUTPUT_SUBDIR = "acpype_output"
 GROMACS_OUTPUT_SUBDIR = "gromacs"
 TOPOL_NAME = "topol.top"
+EQUILIBRIUM_SUBDIR = "equilibrium"
+# saves to output/runname/gromacs/equilibrium
 
 
 SOLVENT_ITP_DIR = "preprocessed_output/solvents/solvent_itp"

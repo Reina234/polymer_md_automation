@@ -62,9 +62,10 @@ def retrieve_mdps(
     output_path = os.path.join(searched_dir, output_filename)
 
     if not os.path.exists(output_path):
-        raise FileNotFoundError(
-            f"MDP file {output_path} does not exist, run create_mdps() from template_utils"
+        logger.warning(
+            f"MDP file {output_path} does not exist, creating a new one instead."
         )
+        return create_mdps(mdp_type, simulation_temp_k)
 
     logger.info(f"Retrieved MDP file from {output_path}")
     return output_path

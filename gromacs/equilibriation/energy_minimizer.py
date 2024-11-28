@@ -1,6 +1,13 @@
 import os
 from typing import Optional, Tuple, List
-from config.paths import TEMPORARY_OUTPUT_DIR, MDP_FULL_PATHS, TemplatedMdps
+from config.paths import (
+    TEMPORARY_OUTPUT_DIR,
+    MDP_FULL_PATHS,
+    TemplatedMdps,
+    GROMACS_OUTPUT_SUBDIR,
+    EQUILIBRIUM_SUBDIR,
+    BASE_OUTPUT_DIR,
+)
 from gromacs.base_gromacs_command import BaseGromacsCommand
 import logging
 from preprocessing.template_utils import create_mdps, retrieve_mdps
@@ -21,6 +28,7 @@ class EnergyMinimizer(BaseGromacsCommand):
         input_gro: str,
         input_top: str,
         run_name: str,
+        output_base_dir: str = BASE_OUTPUT_DIR,
     ) -> str:
         """
         Run energy minimization for the given input structure and topology.
@@ -36,6 +44,9 @@ class EnergyMinimizer(BaseGromacsCommand):
             str: Path to the minimized structure (`em.gro`).
         """
         minim_mdp_path = MDP_FULL_PATHS[TemplatedMdps.MINIM.value]
+        output_dir = os.path.join(
+            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, EQUILIBRIUM_SUBDIR
+        )
         grompp_command, output_tpr_path, output_dir = self._create_grompp_command(
             input_gro=input_gro,
             input_top=input_top,
@@ -82,7 +93,7 @@ class EnergyMinimizer(BaseGromacsCommand):
         Returns:
             Tuple[List[str], str, str]: grompp command, output .tpr path, and output directory.
         """
-        output_dir = os.path.join(TEMPORARY_OUTPUT_DIR, run_name)
+        output_dir = TEMPORARY_OUTPUT_DIR
         os.makedirs(output_dir, exist_ok=True)
 
         if not minim_mdp_path:

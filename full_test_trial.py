@@ -27,6 +27,7 @@ from config.paths import SOLVENT_ITP_DIR, FilesToExtract
 from preprocessing.solvent_atomtypes_manager import AtomtypesManager
 from gromacs.gromacs_utils import add_atomtypes_to_topology
 from gromacs.equilibriation.energy_minimizer import EnergyMinimizer
+from gromacs.equilibriation.temperature_equilibriation import TemperatureEquilibriation
 
 solvent_files = [FilesToExtract.ITP]
 
@@ -94,5 +95,9 @@ added_ion_box = ion_adder.run(solvated_box, topol_file, "TRIAL")
 energy_minimizer = EnergyMinimizer(metadata_tracker)
 minimized_box = energy_minimizer.run(added_ion_box, topol_file, "TRIAL")
 
+print("!!!!!!!!!!!!!!!!!!!!")
+print(minimized_box)
 ##############
 # consider separating into solvation and equilibriation
+# temp_equilibriator = TemperatureEquilibriation(metadata_tracker)
+# temp_equilibriated_box = temp_equilibriator.run(minimized_box, topol_file, "TRIAL", 300)

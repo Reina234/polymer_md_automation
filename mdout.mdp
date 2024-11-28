@@ -2,7 +2,7 @@
 ;	File 'mdout.mdp' was generated
 ;	By user: unknown (1000)
 ;	On host: LENOVO-PC
-;	At date: Thu Nov 28 19:33:56 2024
+;	At date: Thu Nov 28 19:51:36 2024
 ;
 ;	Created by:
 ;	                     :-) GROMACS - gmx grompp, 2019.5 (-:
@@ -11,7 +11,7 @@
 ;	Data prefix:  /home/reina/miniconda3/envs/lammps_packages
 ;	Working dir:  /home/reina/polymerpinn
 ;	Command line:
-;	  gmx grompp -f preprocessed_output/gromacs/minim.mdp -c output/TRIAL/gromacs/polymer_neutralized.gro -p output/TRIAL/gromacs/topol.top -o temp/TRIAL/em.tpr -maxwarn 1
+;	  gmx grompp -f preprocessed_output/gromacs/minim.mdp -c output/TRIAL/gromacs/polymer_neutralized.gro -p output/TRIAL/gromacs/topol.top -o temp/em.tpr -maxwarn 1
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
