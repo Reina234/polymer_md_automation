@@ -4,12 +4,7 @@ from typing import List, Optional
 from preprocessing.validators.pdb_validators.base_pdb_validator import (
     BasePDBValidator,
 )
-from preprocessing.pdb_utils import (
-    calculate_minimum_box_size,
-    calculate_volume_for_desired_density,
-    scale_box_to_desired_volume,
-    calculate_density,
-)
+from preprocessing.calculation_utils import calculate_minimum_box_size
 from data_models.solvent import Solvent
 from config.constants import DENSITY_TOLERANCE_PERCENTAGE
 from config.constants import LengthUnits
