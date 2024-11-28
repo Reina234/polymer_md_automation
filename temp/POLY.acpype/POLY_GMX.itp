@@ -1,4 +1,4 @@
-; POLY_GMX.itp created by acpype (v: 2023.10.27) on Thu Nov 28 19:16:13 2024
+; POLY_GMX.itp created by acpype (v: 2023.10.27) on Thu Nov 28 19:33:52 2024
 
 [ atomtypes ]
 ;name   bond_type     mass     charge   ptype   sigma         epsilon       Amb
