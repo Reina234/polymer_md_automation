@@ -13,9 +13,8 @@
 #endif
 
 [ system ]
-POLY in water
+ POLY
 
 [ molecules ]
 ; Compound        nmols
  POLY             1     
-UNL               110

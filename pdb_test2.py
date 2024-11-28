@@ -15,6 +15,7 @@ from gromacs.solvation.polymer_box_creator import PolmerBoxResize
 from gromacs.solvation.solvent_box_creator import SolventInsertion
 from config.constants import LengthUnits
 from gromacs.solvation.solvate import Solvate
+from gromacs.gromacs_utils import prepare_topol_file
 
 solvent = Solvent(
     "Hexane",
@@ -71,10 +72,11 @@ solvent_file = solvent_box.run(
     solvent.pdb_path, "test_new_struct", solvent.density, solvent.molecular_weight
 )
 
-solute_box = Solvate()
-solvated_box = solute_box.run(
-    solvent_file,
-    box_file,
-    "output/test_new_struct/acpype_output/POLY_GMX.top",
-    "test_new_struct",
+topol_file = prepare_topol_file(
+    "output/test_new_struct/acpype_output/POLY_GMX.top", "test_new_struct"
 )
+
+solute_box = Solvate()
+solvated_box = solute_box.run(solvent_file, box_file, topol_file, "test_new_struct")
+#    "test_new_struct",
+# )

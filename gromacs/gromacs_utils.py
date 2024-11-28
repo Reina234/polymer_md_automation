@@ -1,9 +1,18 @@
-from config.paths import TOPOL_NAME
+from config.paths import TOPOL_NAME, BASE_OUTPUT_DIR, GROMACS_OUTPUT_SUBDIR
 import os
 from pathlib import Path
 from typing import Optional
 from preprocessing.parsers.top_parser import TOPParser
 from preprocessing.utils import copy_files
+
+
+def prepare_topol_file(
+    input_top_path: str, run_name: str, output_base_dir: str = BASE_OUTPUT_DIR
+):
+    output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
+    os.makedirs(output_dir, exist_ok=True)
+    topol_file = move_and_rename_topol_file(input_top_path, output_dir, TOPOL_NAME)
+    return topol_file
 
 
 def move_and_rename_topol_file(

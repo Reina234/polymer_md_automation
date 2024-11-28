@@ -1,7 +1,8 @@
 import os
 import subprocess
 from processing.metadata_tracker import MetadataTracker
-from config.gromacs_paths import GROMACS_ION_SCRIPT
+from config.paths import MDP_FULL_PATHS
+from gromacs.base_gromacs_command import BaseGromacsCommand
 
 
 class IonAdder:
