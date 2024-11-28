@@ -26,7 +26,6 @@ class BasePDBValidator(ABC):
     def validate(
         self,
         input_file_path: str,
-        solvent: Solvent,
         additional_notes: Optional[str] = None,
         output_file_path: Optional[str] = None,
     ) -> bool:

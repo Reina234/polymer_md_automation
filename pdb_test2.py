@@ -45,4 +45,4 @@ solvent = Solvent(
 
 gromacsvalidator = GROMACSPDBValidator(metadata_tracker=MetadataTracker())
 
-gromacsvalidator.validate("TEST.pdb", solvent, output_file_path="TEST2.pdb")
+gromacsvalidator.validate("TEST.pdb", output_file_path="TEST2.pdb")

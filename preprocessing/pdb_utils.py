@@ -11,8 +11,9 @@ from typing import List
 
 def calculate_minimum_box_size(
     atom_coordinates: List[List[float]],
-    padding: float = 10**-9,
+    padding: float = 0.5 * 10**-9,
     units: LengthUnits = LengthUnits.ANGSTROM,
+    output_units: LengthUnits = LengthUnits.METER,
 ) -> List[float]:
     """
     Calculate the minimum bounding box size based on atom positions.
@@ -35,6 +36,7 @@ def calculate_minimum_box_size(
         (y_max - y_min) + 2 * padding,
         (z_max - z_min) + 2 * padding,
     ]
+    box_size = [dim / CONVERSION_FACTORS_TO_M[output_units] for dim in box_size]
     return box_size
 
 
@@ -128,3 +130,17 @@ def scale_box_to_desired_volume(
     ]
 
     return scaled_dimensions
+
+
+def calculate_num_particles(
+    box_dimensions: List[float],
+    molecular_weight: float,
+    density: float,
+    box_units: LengthUnits = LengthUnits.ANGSTROM,
+    mass_units=MassUnits.GRAM,
+):
+    volume_SI = np.prod(box_dimensions) * CONVERSION_FACTORS_TO_M[box_units] ** 3
+    mass = volume_SI * density
+    molecular_weight_SI = molecular_weight * CONVERSION_FACTORS_TO_KG[mass_units]
+    num_particles = (mass / molecular_weight_SI) * AVOGADROS_NUMBER
+    return num_particles

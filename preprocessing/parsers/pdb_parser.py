@@ -49,15 +49,29 @@ class PDBParser:
         for line in content:
             if line.startswith("CRYST1"):
                 try:
-                    x = float(line[6:15].strip())
-                    y = float(line[15:24].strip())
-                    z = float(line[24:33].strip())
-                    logger.info(f"[+] Extracted box dimensions: {x}, {y}, {z}")
-                    return [x, y, z]
+                    box_dimensions = [
+                        float(line[6:15].strip()),
+                        float(line[15:24].strip()),
+                        float(line[24:33].strip()),
+                    ]
+                    logger.info(f"[+] Extracted box dimensions: {box_dimensions}")
+
+                    if any(
+                        v in {0, None} or not isinstance(v, (int, float))
+                        for v in box_dimensions
+                    ):
+                        logger.warning(
+                            f"[!] Invalid box dimensions in CRYST1 line: {line.strip()}"
+                        )
+                        return None
+
+                    return box_dimensions
                 except ValueError:
                     logger.warning(
                         f"[!] Invalid box dimensions in CRYST1 line: {line.strip()}"
                     )
+                    return None
+
         logger.warning("[!] CRYST1 line not found; box dimensions are unavailable.")
         return None
 

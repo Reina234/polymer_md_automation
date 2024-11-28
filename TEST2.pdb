@@ -1,15 +1,6 @@
-# Density validation passed.
-# Density validation passed.
-# Validation passed: Basic skeletal check.
-# Density validation passed.
-# Validation passed: Basic skeletal check.
-# Density validation passed.
-# Validation passed: Basic skeletal check.
-# Density validation failed.
-# Validation passed: Basic skeletal check.
-# Box dimensions generated based on atom coordinates.
-CRYST1   67.571   61.127   52.496  90.00  90.00  90.00 P 1           1
-# Validation passed: Basic skeletal check.
+# No valid box dimensions found... Box dimensions generated based on atom coordinates.
+CRYST1   17.231   14.634   11.156  90.00  90.00  90.00 P 1           1
+
 HETATM    1  C1  UNL     1       2.837   0.249   0.271  1.00  0.00           C  
 HETATM    2  C2  UNL     1       1.817  -0.611   0.315  1.00  0.00           C  
 HETATM    3  C3  UNL     1       0.392  -0.253   0.090  1.00  0.00           C  
