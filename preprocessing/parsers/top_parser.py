@@ -6,6 +6,14 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
+import os
+import logging
+from typing import List, Optional
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+
 class TOPParser:
     """
     A parser specifically designed to read, restructure, and validate GROMACS .top files.
@@ -28,6 +36,38 @@ class TOPParser:
             content = file.readlines()
         logger.info(f"[+] .top file read successfully: {input_file_path}")
         return content
+
+    @staticmethod
+    def remove_section(content: List[str], section_name: str) -> List[str]:
+        """
+        Remove a specific section from the .top file.
+
+        Args:
+            content (List[str]): Lines from the .top file.
+            section_name (str): Name of the section to remove (e.g., "defaults").
+
+        Returns:
+            List[str]: The modified content with the section removed.
+        """
+        in_section = False
+        updated_content = []
+
+        for line in content:
+            stripped = line.strip()
+            # Detect section start
+            if stripped.startswith(f"[ {section_name} ]"):
+                in_section = True
+                logger.info(f"[+] Removing section: {section_name}")
+                continue
+
+            # Exit the section when encountering a new header
+            if in_section and stripped.startswith("[") and stripped.endswith("]"):
+                in_section = False
+
+            if not in_section:
+                updated_content.append(line)
+
+        return updated_content
 
     @staticmethod
     def ensure_include_order(
@@ -110,6 +150,33 @@ class TOPParser:
                 updated_content.append(line)
 
         return updated_content
+
+    @staticmethod
+    def validate_structure(content: List[str], required_sections: List[str]) -> bool:
+        """
+        Validate that the required sections are present in the correct order.
+
+        Args:
+            content (List[str]): Lines from the .top file.
+            required_sections (List[str]): List of required section names.
+
+        Returns:
+            bool: True if the structure is valid, False otherwise.
+        """
+        section_order = []
+        for line in content:
+            stripped = line.strip()
+            if stripped.startswith("[") and stripped.endswith("]"):
+                section_name = stripped[1:-1].strip()
+                section_order.append(section_name)
+
+        # Validate the order of sections
+        for section in required_sections:
+            if section not in section_order:
+                logger.error(f"[!] Missing required section: {section}")
+                return False
+        logger.info("[+] File structure is valid.")
+        return True
 
     @staticmethod
     def save(output_file_path: str, content: List[str]) -> None:

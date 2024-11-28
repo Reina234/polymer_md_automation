@@ -28,18 +28,18 @@ solvent_gro_path = "test_output/acpype_gmx_files/hexane.gro"
 polymer_gro_file = "test_output_styrene/acpype_gmx_files/styrene.gro"
 polymer_top_file = "test_output_styrene/acpype_gmx_files/styrene.top"
 output_dir = "test_output_styrene"
-from gromacs.solvation.box_creator import BoxCreator
+from gromacs.solvation.polymer_box_creator import PolmerBoxResize
 from gromacs.solvation.NOTE_solvate_box import SolvateBox
 from gromacs.solvation.ion_adder import IonAdder
 
 # Initialize the box preparer
-box_preparer = BoxCreator(metadata_tracker)
+box_preparer = PolmerBoxResize(metadata_tracker)
 
 # NOTE: need to add metadata tracker?
 box_size = 3
 
 print("[INFO] Creating a cubic simulation box...")
-box_file = box_preparer.create_box(
+box_file = box_preparer.run(
     input_gro_path=polymer_gro_file, output_dir=output_dir, box_size=box_size
 )
 print(f"[INFO] Cubic box created: {box_file}")

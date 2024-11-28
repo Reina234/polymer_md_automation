@@ -11,9 +11,10 @@ from preprocessing.validators.pdb_validators.gromacs_pdb_validator import (
 )
 from data_models.solvent import Solvent
 from preprocessing.metadata_tracker import MetadataTracker
-from gromacs.solvation.polymer_box_creator import BoxCreator
-from gromacs.solvation.solvent_box_creator import SolventPlacer
+from gromacs.solvation.polymer_box_creator import PolmerBoxResize
+from gromacs.solvation.solvent_box_creator import SolventInsertion
 from config.constants import LengthUnits
+from gromacs.solvation.solvate import Solvate
 
 solvent = Solvent(
     "Hexane",
@@ -60,12 +61,20 @@ solvent = Solvent(
     "gromos54a7.ff",
 )
 
-box_creator = BoxCreator()
-box_creator.create_box(
-    "output/acpype_output/test_new_struct/POLY_GMX.gro", "test_new_struct"
+box_creator = PolmerBoxResize()
+box_file = box_creator.run(
+    "output/test_new_struct/acpype_output/POLY_GMX.gro", "test_new_struct"
 )
 ############## need to sort out file locations
-solvent_box = SolventPlacer()
-solvent_box.create_box(
+solvent_box = SolventInsertion()
+solvent_file = solvent_box.run(
     solvent.pdb_path, "test_new_struct", solvent.density, solvent.molecular_weight
+)
+
+solute_box = Solvate()
+solvated_box = solute_box.run(
+    solvent_file,
+    box_file,
+    "output/test_new_struct/acpype_output/POLY_GMX.top",
+    "test_new_struct",
 )

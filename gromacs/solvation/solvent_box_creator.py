@@ -9,14 +9,14 @@ from config.constants import LengthUnits
 # NOTE: add in file type checks
 
 
-class SolventPlacer:
+class SolventInsertion:
     OUTPUT_GRO_NAME = "solvent_box.gro"
     UNITS = LengthUnits.NANOMETER
 
     def __init__(self, metadata_tracker: Optional[MetadataTracker] = None):
         self.metadata_tracker = metadata_tracker
 
-    def create_box(
+    def run(
         self,
         solvent_pdb_path: str,
         run_name: str,
@@ -32,7 +32,7 @@ class SolventPlacer:
             solvent_density,
             box_units=self.UNITS,
         )
-        output_file_path = os.path.join(
+        solvent_box_gro_path = os.path.join(
             output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_GRO_NAME
         )
 
@@ -50,14 +50,14 @@ class SolventPlacer:
             str(box_size_nm[1]),
             str(box_size_nm[2]),
             "-o",
-            output_file_path,
+            solvent_box_gro_path,
         ]
         subprocess.run(editconf_command, check=True)
         if self.metadata_tracker:
             self._update_metadata(
-                solvent_pdb_path, output_file_path, box_size_nm, additional_notes
+                solvent_pdb_path, solvent_box_gro_path, box_size_nm, additional_notes
             )
-        return output_file_path
+        return solvent_box_gro_path
 
     def metadata(
         self,
@@ -67,8 +67,8 @@ class SolventPlacer:
         additional_notes=None,
     ) -> dict:
         return {
-            "program(s) used": "GROMACS",
-            "defatils": f"created a solvent box of size {box_size}",
+            "program(s) used": "GROMACS insert-molecules",
+            "details": f"created a solvent box of size {box_size}",
             "action(s)": f"used molecule at {input_file_path}, saved at {output_file_path}",
             "additional_notes": additional_notes,
         }

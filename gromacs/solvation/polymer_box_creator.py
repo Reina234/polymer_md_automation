@@ -6,14 +6,14 @@ from typing import Optional, List
 from config.constants import LengthUnits
 
 
-class BoxCreator:
+class PolmerBoxResize:
     OUTPUT_GRO_NAME = "polymer_box.gro"
     UNITS = LengthUnits.NANOMETER
 
     def __init__(self, metadata_tracker: Optional[MetadataTracker] = None):
         self.metadata_tracker = metadata_tracker
 
-    def create_box(
+    def run(
         self,
         input_gro_path: str,
         run_name: str,
@@ -21,7 +21,7 @@ class BoxCreator:
         box_size_nm: List[float] = [3.0, 3.0, 3.0],
         additional_notes: Optional[str] = None,
     ) -> str:
-        output_file_path = os.path.join(
+        solute_box_gro_path = os.path.join(
             output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_GRO_NAME
         )
         output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
@@ -32,7 +32,7 @@ class BoxCreator:
             "-f",
             input_gro_path,
             "-o",
-            output_file_path,
+            solute_box_gro_path,
             "-box",
             str(box_size_nm[0]),
             str(box_size_nm[1]),
@@ -44,9 +44,9 @@ class BoxCreator:
         subprocess.run(editconf_command, check=True)
         if self.metadata_tracker:
             self._update_metadata(
-                input_gro_path, output_file_path, box_size_nm, additional_notes
+                input_gro_path, solute_box_gro_path, box_size_nm, additional_notes
             )
-        return output_file_path
+        return solute_box_gro_path
 
     def metadata(
         self,
@@ -56,7 +56,7 @@ class BoxCreator:
         additional_notes=None,
     ) -> dict:
         return {
-            "program(s) used": "GROMACS",
+            "program(s) used": "GROMACS - editconf",
             "defatils": f"created a polymer box of size {box_size}",
             "action(s)": f"used molecule at {input_file_path}, saved at {output_file_path}",
             "additional_notes": additional_notes,
