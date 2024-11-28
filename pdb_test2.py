@@ -1,5 +1,5 @@
 from preprocessing.parsers.pdb_parser import PDBParser
-from preprocessing.pdb_utils import (
+from preprocessing.calculation_utils import (
     calculate_minimum_box_size,
     calculate_density,
     calculate_volume_for_desired_density,

@@ -25,6 +25,14 @@ MDP_TEMPLATE_PATHS = {
     "npt": "input/templates/gromacs_mdp/npt.mdp",
 }
 
+# NOTE!! THIS IS DEPENDENT ON THE MDP NAMING SCHEME AND MDP DIRS!!########
+MDP_FULL_PATHS = {
+    "nvt": "gromacs/mdp_scripts/nvt/nvt_{temp}K.mdp",
+    "npt": "gromacs/mdp_scripts/npt/npt_{temp}K.mdp",
+    "minim": "gromacs/mdp_scripts/minim/minim.mdp",
+}
+###########################################################################
+
 
 class TemplatedMdps(Enum):
     NVT = "nvt"
