@@ -1,0 +1,35 @@
+; NPT Equilibration
+integrator    = md               ; Molecular dynamics algorithm
+nsteps        = 100000           ; 200 ps simulation (2 fs time step)
+dt            = 0.002            ; Time step (ps)
+
+; Temperature coupling
+tcoupl        = V-rescale        ; Modified Berendsen thermostat
+tc-grps       = System           ; Coupling group
+tau_t         = 0.5              ; Time constant for coupling (ps)
+ref_t         = 300              ; Target temperature (K)
+
+; Pressure coupling
+pcoupl        = Parrinello-Rahman ; Pressure coupling scheme
+pcoupltype    = isotropic         ; Isotropic pressure coupling
+tau_p         = 2.0               ; Time constant for pressure coupling (ps)
+ref_p         = 1.0               ; Reference pressure (bar)
+compressibility = 4.5e-5          ; Compressibility of water (1/bar)
+
+; Output control
+nstxout       = 500              ; Write coordinates every 500 steps
+nstvout       = 500              ; Write velocities every 500 steps
+nstenergy     = 500              ; Write energies every 500 steps
+nstlog        = 500              ; Write log file every 500 steps
+
+; Neighbor searching
+nstlist       = 20               ; Update neighbor list every 20 steps
+cutoff-scheme = Verlet           ; Use Verlet cutoff scheme
+ns_type       = grid             ; Search grid for neighbor list
+rlist         = 1.0              ; Short-range neighbor list cutoff (nm)
+coulombtype   = PME              ; Particle Mesh Ewald for long-range electrostatics
+rcoulomb      = 1.0              ; Short-range Coulomb cutoff (nm)
+rvdw          = 1.0              ; Short-range van der Waals cutoff (nm)
+
+; Periodic boundary conditions
+pbc           = xyz              ; Periodic boundary conditions in all directions

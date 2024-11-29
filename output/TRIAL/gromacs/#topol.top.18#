@@ -1,0 +1,11 @@
+#include "amber99sb-ildn.ff/forcefield.itp"
+#include "/home/reina/polymerpinn/output/TRIAL/acpype_output/POLY_GMX.itp"
+#include "/home/reina/polymerpinn/preprocessed_output/solvents/solvent_itp/hexane.itp"
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Fri Nov 29 10:04:06 2024
+
+[ system ]
+ POLY
+
+[ molecules ]
+; Compound        nmols
+ POLY             1     
