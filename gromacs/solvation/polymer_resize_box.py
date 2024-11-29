@@ -45,7 +45,7 @@ class PolmerBoxResize(BaseGromacsCommand):
         input_gro_path: str,
         run_name: str,
         output_base_dir: str = BASE_OUTPUT_DIR,
-        box_size_nm: List[float] = [3.0, 3.0, 3.0],
+        box_size_nm: List[float] = [4.0, 4.0, 4.0],
         additional_notes: Optional[str] = None,
     ) -> str:
         solute_box_gro_path = os.path.join(

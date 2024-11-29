@@ -23,7 +23,7 @@ class SolventInsertion(BaseGromacsCommand):
         solvent_density: float,
         solvent_molecular_weight: float,
         output_base_dir: str = BASE_OUTPUT_DIR,
-        box_size_nm: List[float] = [3.0, 3.0, 3.0],
+        box_size_nm: List[float] = [4.0, 4.0, 4.0],
         additional_notes: Optional[str] = None,
     ) -> str:
         command, output_gro_path = self._create_editconf_command(

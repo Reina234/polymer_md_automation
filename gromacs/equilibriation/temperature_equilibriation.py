@@ -1,15 +1,42 @@
 import os
-from typing import Optional, Tuple, List
-from config.paths import TEMPORARY_OUTPUT_DIR, MDP_FULL_PATHS, TemplatedMdps
+import shutil
+from typing import Optional, Tuple, List, Dict
+from config.paths import (
+    TEMPORARY_OUTPUT_DIR,
+    MDP_FULL_PATHS,
+    TemplatedMdps,
+    GROMACS_OUTPUT_SUBDIR,
+    EQUILIBRIUM_SUBDIR,
+    BASE_OUTPUT_DIR,
+)
 from gromacs.base_gromacs_command import BaseGromacsCommand
 import logging
-from preprocessing.template_utils import create_mdps, retrieve_mdps
+from preprocessing.template_utils import retrieve_mdps
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-class TemperatureEquilibriation(BaseGromacsCommand):
+import os
+import shutil
+from typing import Optional, Tuple, List, Dict
+from config.paths import (
+    TEMPORARY_OUTPUT_DIR,
+    MDP_FULL_PATHS,
+    TemplatedMdps,
+    GROMACS_OUTPUT_SUBDIR,
+    EQUILIBRIUM_SUBDIR,
+    BASE_OUTPUT_DIR,
+)
+from gromacs.base_gromacs_command import BaseGromacsCommand
+import logging
+from preprocessing.template_utils import retrieve_mdps
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+
+class TemperatureEquilibration(BaseGromacsCommand):
     OUTPUT_NAME = "nvt.gro"
     OUTPUT_TPR_NAME = "nvt.tpr"
 
@@ -19,74 +46,95 @@ class TemperatureEquilibriation(BaseGromacsCommand):
     def run(
         self,
         em_gro: str,
-        input_topol: str,
+        input_top: str,
         run_name: str,
         simulation_temp_k: float,
+        output_base_dir: str = BASE_OUTPUT_DIR,
+        rdd: Optional[float] = None,
+        ntmpi: Optional[int] = None,
     ) -> str:
         """
-        Run energy minimization for the given input structure and topology.
+        Run NVT equilibration for the given input structure and topology.
 
         Args:
-            input_gro (str): Path to the input .gro file (e.g., solvated structure).
+            em_gro (str): Path to the input structure file (output of energy minimization).
             input_top (str): Path to the input topology file.
             run_name (str): Name of the run (used to organize outputs).
-            minim_mdp_path (Optional[str]): Path to the energy minimization .mdp file.
-                                             If not provided, defaults to the one in MDP_FULL_PATHS.
+            simulation_temp_k (float): Target temperature for the simulation (in K).
+            output_base_dir (str): Base directory for output files.
+            rdd (Optional[float]): Minimum allowed cell size for domain decomposition.
+            ntmpi (Optional[int]): Number of MPI threads to use.
 
         Returns:
-            str: Path to the minimized structure (`em.gro`).
+            str: Path to the equilibrated structure (`nvt.gro`) in the final output directory.
         """
+        # Paths for temporary and final outputs
         nvt_mdp_path = retrieve_mdps(TemplatedMdps.NVT, simulation_temp_k)
-        grompp_command, output_tpr_path, output_dir = self._create_grompp_command(
-            em_gro=em_gro,
-            input_topol=input_topol,
-            run_name=run_name,
+        temp_output_dir = TEMPORARY_OUTPUT_DIR
+        final_output_dir = os.path.join(
+            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, EQUILIBRIUM_SUBDIR
+        )
+
+        # Create commands for GROMACS
+        grompp_command, output_tpr_path, temp_output_dir = self._create_grompp_command(
+            input_gro=em_gro,
+            input_top=input_top,
             nvt_mdp_path=nvt_mdp_path,
         )
         self._execute(grompp_command)
 
-        mdrun_command, em_gro_path = self._create_mdrun_command(
-            output_tpr_path=output_tpr_path, output_dir=output_dir
+        mdrun_command, nvt_gro_temp_path = self._create_mdrun_command(
+            output_tpr_path=output_tpr_path,
+            output_dir=temp_output_dir,
+            rdd=rdd,
+            ntmpi=ntmpi,
         )
         self._execute(mdrun_command)
 
+        # Check if the output exists in the temporary directory
+        if not os.path.exists(nvt_gro_temp_path):
+            raise FileNotFoundError(
+                f"NVT equilibration failed. {nvt_gro_temp_path} not found."
+            )
+
+        # Move `nvt.gro` to the final output directory
+        os.makedirs(final_output_dir, exist_ok=True)
+        nvt_gro_final_path = os.path.join(final_output_dir, self.OUTPUT_NAME)
+        shutil.move(nvt_gro_temp_path, nvt_gro_final_path)
+        logger.info(f"Moved NVT equilibrated structure to {nvt_gro_final_path}")
+
+        # Update metadata
         if self.metadata_tracker:
             self._update_metadata(
                 em_gro=em_gro,
-                input_top=input_topol,
+                input_top=input_top,
                 run_name=run_name,
                 nvt_mdp_path=nvt_mdp_path,
             )
 
-        if not os.path.exists(em_gro_path):
-            raise FileNotFoundError(
-                f"Energy minimization failed. {em_gro_path} not found."
-            )
-        return em_gro_path
+        return nvt_gro_final_path
 
     def _create_grompp_command(
         self,
-        em_gro: str,
-        input_topol: str,
-        run_name: str,
-        nvt_mdp_path: Optional[str] = None,
+        input_gro: str,
+        input_top: str,
+        nvt_mdp_path: str,
     ) -> Tuple[List[str], str, str]:
         """
-        Create the grompp command for preparing the minimization run.
+        Create the grompp command for preparing the NVT equilibration run.
 
         Args:
-            input_gro (str): Path to the input .gro file.
-            input_top (str): Path to the input topology file.
-            run_name (str): Name of the run.
-            minim_mdp_path (Optional[str]): Path to the energy minimization .mdp file.
+            input_gro (str): Path to the input structure file.
+            input_top: Path to the input topology file.
+            nvt_mdp_path: Path to the NVT equilibration .mdp file.
 
         Returns:
             Tuple[List[str], str, str]: grompp command, output .tpr path, and output directory.
         """
-        output_dir = TEMPORARY_OUTPUT_DIR
-        os.makedirs(output_dir, exist_ok=True)
+        temp_output_dir = TEMPORARY_OUTPUT_DIR
+        os.makedirs(temp_output_dir, exist_ok=True)
 
-        output_tpr_path = os.path.join(output_dir, self.OUTPUT_TPR_NAME)
+        output_tpr_path = os.path.join(temp_output_dir, self.OUTPUT_TPR_NAME)
 
         grompp_command = [
             "gmx",
@@ -94,37 +142,49 @@ class TemperatureEquilibriation(BaseGromacsCommand):
             "-f",
             nvt_mdp_path,
             "-c",
-            em_gro,
+            input_gro,
             "-p",
-            input_topol,
+            input_top,
             "-o",
             output_tpr_path,
             "-maxwarn",
             "1",
         ]
-        return grompp_command, output_tpr_path, output_dir
+        return grompp_command, output_tpr_path, temp_output_dir
 
     def _create_mdrun_command(
-        self, output_tpr_path: str, output_dir: str
+        self,
+        output_tpr_path: str,
+        output_dir: str,
+        rdd: Optional[float],
+        ntmpi: Optional[int],
     ) -> Tuple[List[str], str]:
         """
-        Create the mdrun command for performing the minimization.
+        Create the mdrun command for performing the NVT equilibration.
 
         Args:
             output_tpr_path (str): Path to the prepared .tpr file.
-            output_dir (str): Directory to save the output.
+            output_dir (str): Directory to save the temporary output.
+            rdd (Optional[float]): Minimum allowed cell size for domain decomposition.
+            ntmpi (Optional[int]): Number of MPI threads.
 
         Returns:
             Tuple[List[str], str]: mdrun command and output .gro path.
         """
-        em_gro_path = os.path.join(output_dir, self.OUTPUT_NAME)
+        nvt_gro_path = os.path.join(output_dir, self.OUTPUT_NAME)
         mdrun_command = [
             "gmx",
             "mdrun",
             "-deffnm",
-            os.path.join(output_dir, "em"),
+            os.path.join(output_dir, "nvt"),
         ]
-        return mdrun_command, em_gro_path
+
+        if rdd:
+            mdrun_command.extend(["-rdd", str(rdd)])
+        if ntmpi:
+            mdrun_command.extend(["-ntmpi", str(ntmpi)])
+
+        return mdrun_command, nvt_gro_path
 
     def metadata(
         self,
@@ -132,14 +192,51 @@ class TemperatureEquilibriation(BaseGromacsCommand):
         input_top: str,
         run_name: str,
         nvt_mdp_path: Optional[str] = None,
-    ) -> dict:
+    ) -> Dict[str, any]:
+        """
+        Generate metadata for the NVT equilibration process.
 
+        Args:
+            em_gro (str): Path to the input structure file (output of energy minimization).
+            input_top (str): Path to the input topology file.
+            run_name (str): Name of the run.
+            nvt_mdp_path (Optional[str]): Path to the NVT .mdp file.
+
+        Returns:
+            dict: Metadata describing the NVT equilibration process.
+        """
         return {
-            "program(s) used": "GROMACS grompp and mdrun",
-            "details": f"nvt performed using {nvt_mdp_path}",
+            "program_used": "GROMACS",
+            "commands_executed": [
+                {
+                    "type": "grompp",
+                    "description": "Preparation of input files for NVT equilibration",
+                    "mdp_file": nvt_mdp_path,
+                    "input_structure": em_gro,
+                    "input_topology": input_top,
+                },
+                {
+                    "type": "mdrun",
+                    "description": "NVT equilibration",
+                    "input_tpr": os.path.join(
+                        TEMPORARY_OUTPUT_DIR, self.OUTPUT_TPR_NAME
+                    ),
+                    "output_structure": self.OUTPUT_NAME,
+                },
+            ],
             "inputs": {
-                "energy minimised structure": em_gro,
+                "structure": em_gro,
                 "topology": input_top,
+                "mdp_file": nvt_mdp_path,
             },
-            "output": f"{TEMPORARY_OUTPUT_DIR}/{run_name}/{self.OUTPUT_NAME}",
+            "outputs": {
+                "final_structure": os.path.join(
+                    BASE_OUTPUT_DIR,
+                    run_name,
+                    GROMACS_OUTPUT_SUBDIR,
+                    EQUILIBRIUM_SUBDIR,
+                    self.OUTPUT_NAME,
+                ),
+                "temporary_files": TEMPORARY_OUTPUT_DIR,
+            },
         }

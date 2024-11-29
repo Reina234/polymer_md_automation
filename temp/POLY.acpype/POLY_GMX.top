@@ -1,4 +1,4 @@
-; POLY_GMX.top created by acpype (v: 2023.10.27) on Thu Nov 28 19:51:32 2024
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Thu Nov 28 23:32:19 2024
 
 [ defaults ]
 ; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
