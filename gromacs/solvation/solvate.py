@@ -24,7 +24,6 @@ class Solvate(BaseGromacsCommand):
         solute_box_gro_path: str,
         input_topol_path: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         additional_notes: Optional[str] = None,
     ):
         """
@@ -36,7 +35,6 @@ class Solvate(BaseGromacsCommand):
             solute_box_gro_path=solute_box_gro_path,
             input_top_path=input_topol_path,
             run_name=run_name,
-            output_base_dir=output_base_dir,
             additional_notes=additional_notes,
         )
 
@@ -48,7 +46,6 @@ class Solvate(BaseGromacsCommand):
                 solute_box_gro_path=solute_box_gro_path,
                 input_top_path=input_topol_path,
                 run_name=run_name,
-                output_base_dir=output_base_dir,
                 additional_notes=additional_notes,
             )
         return output_gro_path
@@ -59,10 +56,9 @@ class Solvate(BaseGromacsCommand):
         solute_box_gro_path: str,
         input_top_path: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         additional_notes: Optional[str] = None,
     ):
-        output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
+        output_dir = os.path.join(run_name, GROMACS_OUTPUT_SUBDIR)
         os.makedirs(output_dir, exist_ok=True)
         solvated_solute_gro_path = os.path.join(output_dir, self.OUTPUT_NAME)
         solvate_command = [
@@ -85,12 +81,11 @@ class Solvate(BaseGromacsCommand):
         solute_box_gro_path: str,
         input_top_path: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         additional_notes: Optional[str] = None,
     ) -> dict:
         return {
             "program(s) used": "GROMACS solvate",
             "details": f"added solute at {solute_box_gro_path} to {solvent_box_gro_path}",
-            "action(s)": f"saved at {output_base_dir}/{run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
+            "action(s)": f"saved at {run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
             "additional_notes": additional_notes,
         }

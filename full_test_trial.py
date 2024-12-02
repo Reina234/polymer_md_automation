@@ -55,22 +55,22 @@ no_atomtypes = ITPParser.remove_section(solvent_itp_content, "atomtypes")
 ITPParser.save_file(solvent_itp, no_atomtypes)
 
 polymer_pdb = "styrene.pdb"
-polymer_mol2_path = pdbtomol2converter.convert(polymer_pdb, "output/TRIAL")
+polymer_mol2_path = pdbtomol2converter.convert(polymer_pdb, "TRIAL")
 acpype = ACPYPEParameterizer(metadata_tracker)
 
 polymer_files = [FilesToExtract.GRO, FilesToExtract.ITP, FilesToExtract.TOP]
-acpype_path = "output/TRIAL/acpype_output"
+acpype_path = "TRIAL/acpype_output"
 files = acpype.parameterize(polymer_mol2_path, acpype_path, polymer_files, posre=True)
 polymer_gro = files[0]
 polymer_itp = files[1]
 polymer_top = files[2]
 
 
-topol_file = prepare_topol_file("output/TRIAL/acpype_output/POLY_GMX.top", "TRIAL")
+topol_file = prepare_topol_file("TRIAL/acpype_output/POLY_GMX.top", "TRIAL")
 
 forcefield = "amber99sb-ildn.ff/forcefield.itp"
 topol_file = reformat_topol_file(
-    topol_file, polymer_itp, solvent_itp, forcefield, "output/TRIAL/gromacs"
+    topol_file, polymer_itp, solvent_itp, forcefield, "TRIAL/gromacs"
 )
 
 add_atomtypes_to_topology("hexane", polymer_itp)

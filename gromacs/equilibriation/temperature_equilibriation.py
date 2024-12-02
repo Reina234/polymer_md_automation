@@ -50,7 +50,6 @@ class TemperatureEquilibration(BaseGromacsCommand):
         input_top: str,
         run_name: str,
         simulation_temp_k: float,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         rdd: Optional[float] = 1.5,  # Default rdd value
         ntmpi: Optional[int] = 8,  # Default number of MPI ranks
     ) -> str:
@@ -73,7 +72,7 @@ class TemperatureEquilibration(BaseGromacsCommand):
         nvt_mdp_path = retrieve_mdps(TemplatedMdps.NVT, simulation_temp_k)
         temp_output_dir = TEMPORARY_OUTPUT_DIR
         final_output_dir = os.path.join(
-            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, EQUILIBRIUM_SUBDIR
+            run_name, GROMACS_OUTPUT_SUBDIR, EQUILIBRIUM_SUBDIR
         )
 
         # Create commands for GROMACS
@@ -243,7 +242,6 @@ class TemperatureEquilibration(BaseGromacsCommand):
             },
             "outputs": {
                 "final_structure": os.path.join(
-                    BASE_OUTPUT_DIR,
                     run_name,
                     GROMACS_OUTPUT_SUBDIR,
                     EQUILIBRIUM_SUBDIR,

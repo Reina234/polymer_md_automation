@@ -6,22 +6,6 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-import os
-import logging
-from typing import List, Optional
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
-
-import os
-import logging
-from typing import List, Optional
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
-
 class TOPParser:
     """
     A parser specifically designed to read, restructure, and validate GROMACS .top files.
@@ -50,20 +34,19 @@ class TOPParser:
         content: List[str],
         forcefield_include: str,
         monomer_include: str,
-        solvent_include: str,
+        solvent_include: Optional[str] = None,
     ) -> List[str]:
         """
         Ensure that includes are in the correct order:
         - Force field first.
         - Monomer parameters next.
-        - Position restraints (if present) before solvent.
-        - Solvent topology last.
+        - Position restraints (if present) before solvent (if included).
 
         Args:
             content (List[str]): Lines from the .top file.
             forcefield_include (str): Path to the forcefield include.
             monomer_include (str): Path to the monomer topology include.
-            solvent_include (str): Path to the solvent topology include.
+            solvent_include (Optional[str]): Path to the solvent topology include.
 
         Returns:
             List[str]: The modified content with includes in the correct order.
@@ -71,8 +54,10 @@ class TOPParser:
         includes = {
             "forcefield": f'#include "{forcefield_include}"\n',
             "monomer": f'#include "{monomer_include}"\n',
-            "solvent": f'#include "{solvent_include}"\n',
         }
+        if solvent_include:
+            includes["solvent"] = f'#include "{solvent_include}"\n'
+
         posres_block = []
         in_posres = False
 
@@ -94,14 +79,15 @@ class TOPParser:
                 updated_content.append(line)
 
         # Insert includes in the correct order
-        ordered_includes = (
-            [
-                includes["forcefield"],
-                includes["monomer"],
-            ]
-            + posres_block
-            + [includes["solvent"]]
-        )
+        ordered_includes = [
+            includes["forcefield"],
+            includes["monomer"],
+        ]
+        if posres_block:
+            ordered_includes += posres_block
+        if "solvent" in includes:
+            ordered_includes.append(includes["solvent"])
+
         updated_content = ordered_includes + updated_content
 
         logger.info("[+] Ensured correct order of includes.")

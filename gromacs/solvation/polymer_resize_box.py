@@ -18,14 +18,12 @@ class PolmerBoxResize(BaseGromacsCommand):
         self,
         input_gro_path: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         box_size_nm: List[float] = DEFAULT_BOX_SIZE_NM,
         additional_notes: Optional[str] = None,
     ) -> str:
         command, output_gro_path = self._create_grommp_command(
             input_gro_path=input_gro_path,
             run_name=run_name,
-            output_base_dir=output_base_dir,
             box_size_nm=box_size_nm,
             additional_notes=additional_notes,
         )
@@ -34,7 +32,6 @@ class PolmerBoxResize(BaseGromacsCommand):
             self._update_metadata(
                 input_gro_path=input_gro_path,
                 run_name=run_name,
-                output_base_dir=output_base_dir,
                 box_size_nm=box_size_nm,
                 additional_notes=additional_notes,
             )
@@ -45,14 +42,13 @@ class PolmerBoxResize(BaseGromacsCommand):
         self,
         input_gro_path: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         box_size_nm: List[float] = DEFAULT_BOX_SIZE_NM,
         additional_notes: Optional[str] = None,
     ) -> str:
         solute_box_gro_path = os.path.join(
-            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_NAME
+            run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_NAME
         )
-        output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
+        output_dir = os.path.join(run_name, GROMACS_OUTPUT_SUBDIR)
         os.makedirs(output_dir, exist_ok=True)
         editconf_command = [
             "gmx",
@@ -75,13 +71,12 @@ class PolmerBoxResize(BaseGromacsCommand):
         self,
         input_gro_path: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         box_size_nm: List[float] = DEFAULT_BOX_SIZE_NM,
         additional_notes: Optional[str] = None,
     ) -> dict:
         return {
             "program(s) used": "GROMACS - editconf",
             "defatils": f"created a polymer box of size {box_size_nm} with units {self.UNITS.value}",
-            "action(s)": f"used molecule at {input_gro_path}, saved at {output_base_dir}/{run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
+            "action(s)": f"used molecule at {input_gro_path}, saved at {run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
             "additional_notes": additional_notes,
         }

@@ -12,10 +12,8 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-def prepare_topol_file(
-    input_top_path: str, run_name: str, output_base_dir: str = BASE_OUTPUT_DIR
-):
-    output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
+def prepare_topol_file(input_top_path: str, run_name: str):
+    output_dir = os.path.join(run_name, GROMACS_OUTPUT_SUBDIR)
     os.makedirs(output_dir, exist_ok=True)
     topol_file = move_and_rename_topol_file(input_top_path, output_dir, TOPOL_NAME)
     return topol_file
@@ -72,9 +70,9 @@ def move_and_rename_topol_file(
 def reformat_topol_file(
     input_top_path: str,
     solute_itp_path: str,
-    solvent_itp_path: str,
     forcefield_path: str,
     output_dir: Optional[str] = None,
+    solvent_itp_path: Optional[str] = None,
     posres: bool = False,
 ) -> str:
     """
@@ -83,21 +81,18 @@ def reformat_topol_file(
     Args:
         input_top_path (str): Path to the input topology file.
         solute_itp_path (str): Path to the solute .itp file.
-        solvent_itp_path (str): Path to the solvent .itp file.
         forcefield_path (str): Path to the forcefield .itp file.
         output_dir (Optional[str]): Directory to save the reformatted topology file.
+        solvent_itp_path (Optional[str]): Path to the solvent .itp file (if used).
         posres (bool): Whether to include position restraints.
 
     Returns:
         str: Path to the reformatted topology file.
     """
-    # Ensure all paths are strings and resolve absolute paths
-    if isinstance(solute_itp_path, list) or isinstance(solvent_itp_path, list):
-        raise TypeError(
-            "solute_itp_path and solvent_itp_path must be strings, not lists."
-        )
+    # Resolve absolute paths
     solute_itp_path = os.path.abspath(solute_itp_path)
-    solvent_itp_path = os.path.abspath(solvent_itp_path)
+    if solvent_itp_path:
+        solvent_itp_path = os.path.abspath(solvent_itp_path)
 
     parser = TOPParser()
 
@@ -116,7 +111,7 @@ def reformat_topol_file(
 
     # Save the updated topology file
     output_top_path = (
-        os.path.join(output_dir, TOPOL_NAME) if output_dir else input_top_path
+        os.path.join(output_dir, "topol.top") if output_dir else input_top_path
     )
     parser.save(output_top_path, content)
     return output_top_path
@@ -197,3 +192,78 @@ def add_atomtypes_to_topology(
         f"[+] Added {solvent_name} atomtypes to the [ atomtypes ] section of {target_topology}."
     )
     return target_topology
+
+
+def reformat_topol_file_for_solvent(
+    input_top_path: str,
+    forcefield_path: str,
+    solvent_itp_path: str,
+    solvent_name: str,
+    num_molecules: int,
+    output_dir: Optional[str] = None,
+) -> str:
+    """
+    Reformat the topology file for solvent equilibrium by updating the number of solvent molecules.
+
+    Args:
+        input_top_path (str): Path to the input topology file.
+        forcefield_path (str): Path to the forcefield .itp file.
+        solvent_itp_path (str): Path to the solvent .itp file.
+        solvent_name (str): Name of the solvent as specified in the .itp file.
+        num_molecules (int): Number of solvent molecules to add.
+        output_dir (Optional[str]): Directory to save the reformatted topology file.
+
+    Returns:
+        str: Path to the reformatted topology file.
+    """
+    parser = TOPParser()
+
+    # Read the topology file
+    content = parser.read_file(input_top_path)
+
+    # Ensure includes are in the correct order
+    content = parser.ensure_include_order(
+        content,
+        forcefield_include=forcefield_path,
+        monomer_include=None,  # No solute for solvent equilibrium
+        solvent_include=solvent_itp_path,
+    )
+
+    # Update the [ molecules ] section
+    in_molecules_section = False
+    updated_content = []
+    molecule_updated = False
+
+    for line in content:
+        stripped_line = line.strip()
+
+        if stripped_line.startswith("[ molecules ]"):
+            in_molecules_section = True
+            updated_content.append(line)
+            continue
+
+        if in_molecules_section:
+            if stripped_line and not stripped_line.startswith(";"):
+                molecule_data = stripped_line.split()
+                if molecule_data[0] == solvent_name:
+                    updated_content.append(f"{solvent_name} {num_molecules}\n")
+                    molecule_updated = True
+                else:
+                    updated_content.append(line)
+            else:
+                in_molecules_section = False
+
+        if not in_molecules_section:
+            updated_content.append(line)
+
+    # If solvent not found, add it to the [ molecules ] section
+    if not molecule_updated:
+        updated_content.append("\n[ molecules ]\n")
+        updated_content.append(f"{solvent_name} {num_molecules}\n")
+
+    # Save the updated topology file
+    output_top_path = (
+        os.path.join(output_dir, "topol.top") if output_dir else input_top_path
+    )
+    parser.save(output_top_path, updated_content)
+    return output_top_path

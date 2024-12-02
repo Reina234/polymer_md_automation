@@ -23,7 +23,6 @@ class SolventInsertion(BaseGromacsCommand):
         run_name: str,
         solvent_density: float,
         solvent_molecular_weight: float,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         box_size_nm: List[float] = DEFAULT_BOX_SIZE_NM,
         additional_notes: Optional[str] = None,
     ) -> str:
@@ -32,7 +31,6 @@ class SolventInsertion(BaseGromacsCommand):
             run_name=run_name,
             solvent_density=solvent_density,
             solvent_molecular_weight=solvent_molecular_weight,
-            output_base_dir=output_base_dir,
             box_size_nm=box_size_nm,
             additional_notes=additional_notes,
         )
@@ -43,7 +41,6 @@ class SolventInsertion(BaseGromacsCommand):
                 run_name=run_name,
                 solvent_density=solvent_density,
                 solvent_molecular_weight=solvent_molecular_weight,
-                output_base_dir=output_base_dir,
                 box_size_nm=box_size_nm,
                 additional_notes=additional_notes,
             )
@@ -55,7 +52,6 @@ class SolventInsertion(BaseGromacsCommand):
         run_name: str,
         solvent_density: float,
         solvent_molecular_weight: float,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         box_size_nm: List[float] = DEFAULT_BOX_SIZE_NM,
         additional_notes: Optional[str] = None,
     ) -> str:
@@ -66,10 +62,10 @@ class SolventInsertion(BaseGromacsCommand):
             box_units=self.UNITS,
         )
         solvent_box_gro_path = os.path.join(
-            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_NAME
+            run_name, GROMACS_OUTPUT_SUBDIR, self.OUTPUT_NAME
         )
 
-        output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
+        output_dir = os.path.join(run_name, GROMACS_OUTPUT_SUBDIR)
         os.makedirs(output_dir, exist_ok=True)
         editconf_command = [
             "gmx",
@@ -93,13 +89,12 @@ class SolventInsertion(BaseGromacsCommand):
         run_name: str,
         solvent_density: float,
         solvent_molecular_weight: float,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         box_size_nm: List[float] = DEFAULT_BOX_SIZE_NM,
         additional_notes: Optional[str] = None,
     ) -> dict:
         return {
             "program(s) used": "GROMACS insert-molecules",
             "details": f"created a solvent box of size {box_size_nm} with units {self.UNITS.value}",
-            "action(s)": f"used molecule at {solvent_pdb_path}, saved at {output_base_dir}/{run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
+            "action(s)": f"used molecule at {solvent_pdb_path}, saved at {run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
             "additional_notes": additional_notes,
         }

@@ -4,7 +4,6 @@ from preprocessing.metadata_tracker import MetadataTracker
 from config.paths import (
     MDP_FULL_PATHS,
     TemplatedMdps,
-    BASE_OUTPUT_DIR,
     GROMACS_OUTPUT_SUBDIR,
 )
 from gromacs.base_gromacs_command import BaseGromacsCommand
@@ -23,14 +22,12 @@ class IonAdder(BaseGromacsCommand):
         solvated_gro_path: str,
         input_topol_path: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         minim_mdp_path: Optional[str] = None,
     ):
         grommp_command, output_tpr_path, output_dir = self._create_grommp_command(
             solvated_gro_path=solvated_gro_path,
             input_topol_path=input_topol_path,
             run_name=run_name,
-            output_base_dir=output_base_dir,
             minim_mdp_path=minim_mdp_path,
         )
         self._execute(grommp_command)
@@ -46,7 +43,6 @@ class IonAdder(BaseGromacsCommand):
                 solvated_gro_path=solvated_gro_path,
                 input_topol_path=input_topol_path,
                 run_name=run_name,
-                output_base_dir=output_base_dir,
                 minim_mdp_path=minim_mdp_path,
             )
 
@@ -57,11 +53,10 @@ class IonAdder(BaseGromacsCommand):
         solvated_gro_path: str,
         input_topol_path: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         minim_mdp_path: Optional[str] = None,
         additional_notes: Optional[str] = None,
     ) -> Tuple[List, str, str]:
-        output_dir = os.path.join(output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR)
+        output_dir = os.path.join(run_name, GROMACS_OUTPUT_SUBDIR)
         os.makedirs(output_dir, exist_ok=True)
 
         if not minim_mdp_path:
@@ -115,13 +110,12 @@ class IonAdder(BaseGromacsCommand):
         solvated_gro_path: str,
         input_topol_path: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
         minim_mdp_path: Optional[str] = None,
         additional_notes: Optional[str] = None,
     ):
         return {
             "program(s) used": "GROMACS solvate",
             "details": f"added ions to {solvated_gro_path} to neutralised",
-            "action(s)": f"saved at {output_base_dir}/{run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
+            "action(s)": f"saved at {run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.OUTPUT_NAME}",
             "additional_notes": additional_notes,
         }

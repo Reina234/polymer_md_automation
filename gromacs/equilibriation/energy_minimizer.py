@@ -28,7 +28,6 @@ class EnergyMinimizer(BaseGromacsCommand):
         input_gro: str,
         input_top: str,
         run_name: str,
-        output_base_dir: str = BASE_OUTPUT_DIR,
     ) -> str:
         """
         Run energy minimization for the given input structure and topology.
@@ -45,7 +44,7 @@ class EnergyMinimizer(BaseGromacsCommand):
         minim_mdp_path = MDP_FULL_PATHS[TemplatedMdps.MINIM.value]
         temp_output_dir = TEMPORARY_OUTPUT_DIR
         final_output_dir = os.path.join(
-            output_base_dir, run_name, GROMACS_OUTPUT_SUBDIR, EQUILIBRIUM_SUBDIR
+            run_name, GROMACS_OUTPUT_SUBDIR, EQUILIBRIUM_SUBDIR
         )
 
         # Create commands for GROMACS
