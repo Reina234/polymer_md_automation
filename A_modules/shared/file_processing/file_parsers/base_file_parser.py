@@ -11,21 +11,9 @@ class BaseFileParser(ABC):
     A base class to parse files
     """
 
-    @staticmethod
+    @abstractmethod
     def read_file(file_path: str, file_type: str) -> List[str]:
-        """
-        Checks file exists and returns content of file
-
-        :param file_path: Relative or absolute path to file
-        :type file_path: str
-        :return: Content of file
-        :rtype: List[str]
-        """
-
-        file_path = check_file_exists(file_path)
-        check_file_type(file_path, file_type)
-        content = get_file_contents(file_path)
-        return content
+        pass
 
     @abstractmethod
     def add_comment(self, content: List[str], comments: List[str]) -> List[str]:
