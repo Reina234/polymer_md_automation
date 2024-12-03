@@ -67,9 +67,7 @@ def check_directory_exists(
         return directory_path
 
 
-def check_file_contents(
-    file_path: str, get_contents: bool = False
-) -> Optional[List[str]]:
+def get_file_contents(file_path: str, get_contents: bool = True) -> Optional[List[str]]:
     """
     Checks that the contents of a file is not empty, and retrieves contents if :param get_contents: is True
 
@@ -93,6 +91,68 @@ def check_file_contents(
         return None
     else:
         return lines
+
+
+def save_content_to_directory(
+    content: List[str],
+    file_name: str,
+    file_extension: str,
+    output_dir: str,
+    suppress_error: bool = True,
+) -> str:
+    """
+    Saves content to a file
+
+    :param content: Content to save
+    :type content: List[str]
+    :param file_name: Name of the file without the extension
+    :type file_name: str
+    :param file_extension: Name of file extension, accepted format is "pdb", not ".pdb"
+    :type file_extension: str
+    :param output_dir: Directory to save the file
+    :type output_dir: str
+    :param suppress_error: suppresses the error when the file already exists, and logs a warning instead, function will return None, defaults to True
+    :type suppress_error: bool, optional
+    :return: The path to the saved file
+    :rtype: str
+    """
+
+    output_dir = check_directory_exists(output_dir)
+    output_file_path = os.path.join(output_dir, f"{file_name}.{file_extension}")
+    output_file_path = check_file_does_not_exist(
+        output_file_path, suppress_error=suppress_error
+    )
+    os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+    with open(output_file_path, "w") as file:
+        file.writelines(content)
+    logger.info(f"Saved content to {output_file_path}")
+    return output_file_path
+
+
+def save_content_to_path(
+    content: List[str],
+    output_path: str,
+    suppress_error: bool = True,
+) -> str:
+    """
+    Saves content to a file
+
+    :param content: Content to save
+    :type content: List[str]
+    :param output_path: Path to save the file
+    :type output_path: str
+    :param suppress_error: suppresses the error when the file already exists, and logs a warning instead, function will return None, defaults to True
+    :type suppress_error: bool, optional
+    :return: The path to the saved file
+    :rtype: str
+    """
+
+    output_path = check_file_does_not_exist(output_path, suppress_error=suppress_error)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as file:
+        file.writelines(content)
+    logger.info(f"Saved content to {output_path}")
+    return output_path
 
 
 def check_file_type(file_path: str, expected_file_type: str) -> None:
@@ -223,7 +283,9 @@ def batch_rename_to_list(
     return renamed_files
 
 
-def rename_file(file_path: Optional[str], new_name: str) -> Optional[str]:
+def rename_file(
+    file_path: Optional[str], new_name: str, suppress_warning: bool = False
+) -> Optional[str]:
     """
     Renames a file to a new name.
 
@@ -231,6 +293,8 @@ def rename_file(file_path: Optional[str], new_name: str) -> Optional[str]:
     :type file_path: Optional[str]
     :param new_name: The new name for the file
     :type new_name: str
+    :param suppress_warning: If True, suppresses the warning when the file already exists, defaults to False
+    :type suppress_warning: bool, optional
     :return: The new file path
     :rtype: str
     """
@@ -244,10 +308,33 @@ def rename_file(file_path: Optional[str], new_name: str) -> Optional[str]:
     new_name_with_file_extension = new_name + path.suffix
     new_file_path = path.with_name(new_name_with_file_extension)
 
-    if new_file_path.exists():
-        raise FileExistsError(f"A file with the name '{new_file_path}' already exists.")
-
+    check_file_does_not_exist(new_file_path, suppress_error=suppress_warning)
     os.rename(file_path, new_file_path)
 
     logger.info(f"Renamed {file_path} to {new_file_path}")
     return str(new_file_path)
+
+
+def check_file_does_not_exist(
+    file_path: str = None, suppress_error: bool = False
+) -> None:
+    """
+    Checks that a file does not exist in the correct location
+
+    :param file_path: Relative or absolute path to the file
+    :type file_path: str
+    :param suppress_error: If True, suppresses the error when the file already exists, defaults to False
+    :type suppress_error: bool, optional
+    :raises FileExistsError: If the file already exists
+    """
+    if file_path is None:
+        logger.info("File is None, skipping.")
+        return
+
+    if os.path.exists(file_path):
+        if suppress_error:
+            logger.warning(f"A file with the name '{file_path}' already exists.")
+            return
+        raise FileExistsError(f"A file with the name '{file_path}' already exists.")
+
+    logger.info(f"File does not exist: {file_path}")

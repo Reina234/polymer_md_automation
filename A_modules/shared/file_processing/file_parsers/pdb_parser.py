@@ -1,143 +1,100 @@
 import os
 import logging
-from typing import List, Dict, Optional
-from pyparsing import (
-    Word,
-    nums,
-    alphas,
-    Combine,
-    Literal,
-    ParserElement,
-    Optional as PPOptional,
-    ParseException,
+from typing import List, Optional, Dict
+from A_modules.shared.file_processing.file_parsers.base_file_parser import (
+    BaseFileParser,
 )
+from A_modules.shared.utils import check_file_exists, check_file_type, get_file_contents
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+
+PDB_FILE_EXTENSION = "pdb"
+PDB_COMMENT_PREFIX = "#"
 
 
-class PDBParser:
+class PDBParser(BaseFileParser):
     """
-    A parser for PDB files with modular grammar and parsing functionality.
+    A stateless class to parse PDB files and extract relevant information.
     """
-
-    class Grammar:
-        """
-        Encapsulates grammar definitions for parsing PDB files.
-        """
-
-        @staticmethod
-        def atom_line() -> ParserElement:
-            """
-            Grammar for ATOM and HETATM lines.
-            """
-            record_name = Literal("ATOM") | Literal("HETATM")
-            atom_name = Word(alphas + nums, max=4)
-            residue_name = Word(alphas, max=3)
-            x_coord = Combine(Word(nums) + PPOptional("." + Word(nums)))
-            y_coord = Combine(Word(nums) + PPOptional("." + Word(nums)))
-            z_coord = Combine(Word(nums) + PPOptional("." + Word(nums)))
-
-            # Define ATOM/HETATM line parsing
-            return (
-                record_name("record_name")
-                + PPOptional(Word(nums))  # Atom serial (optional for parsing)
-                + atom_name("atom_name")
-                + PPOptional(Word(alphas, exact=1))  # Alternate location
-                + residue_name("residue_name")
-                + x_coord("x")
-                + y_coord("y")
-                + z_coord("z")
-            )
-
-        @staticmethod
-        def cryst1_line() -> ParserElement:
-            """
-            Grammar for CRYST1 lines to extract box dimensions.
-            """
-            keyword = Literal("CRYST1")
-            dimension = Combine(Word(nums) + PPOptional("." + Word(nums)))
-            return keyword + dimension("x") + dimension("y") + dimension("z")
-
-    def __init__(self):
-        self.atom_line_grammar = self.Grammar.atom_line()
-        self.cryst1_grammar = self.Grammar.cryst1_line()
 
     @staticmethod
-    def read_file(input_file_path: str) -> List[str]:
-        """
-        Read the PDB file and return its content as a list of lines.
-
-        Args:
-            input_file_path (str): Path to the PDB file.
-
-        Returns:
-            List[str]: Lines from the PDB file.
-        """
-        if not os.path.exists(input_file_path):
-            raise FileNotFoundError(f"File not found: {input_file_path}")
-        with open(input_file_path, "r") as file:
-            return file.readlines()
-
-    def extract_atoms(self, content: List[str]) -> List[Dict[str, float]]:
-        """
-        Extract atom data from the PDB file content.
-
-        Args:
-            content (List[str]): Lines from the PDB file.
-
-        Returns:
-            List[Dict[str, float]]: List of atoms with their coordinates.
-        """
-        atoms = []
+    def extract_box_dimensions(content: List[str]) -> Optional[List[float]]:
         for line in content:
-            try:
-                parsed = self.atom_line_grammar.parseString(line)
-                atoms.append(
-                    {
-                        "atom_name": parsed.atom_name,
-                        "residue_name": parsed.residue_name,
-                        "x": float(parsed.x),
-                        "y": float(parsed.y),
-                        "z": float(parsed.z),
-                    }
-                )
-            except ParseException:
-                continue  # Skip lines that don't match
-        logger.info(f"[+] Extracted {len(atoms)} atoms from PDB file.")
-        return atoms
+            if line.startswith("CRYST1"):
+                try:
+                    box_dimensions = [
+                        float(line[6:15].strip()),
+                        float(line[15:24].strip()),
+                        float(line[24:33].strip()),
+                    ]
+                    logger.info(f"Extracted box dimensions: {box_dimensions}")
 
-    def extract_box_dimensions(self, content: List[str]) -> Optional[List[float]]:
-        """
-        Extract box dimensions from the CRYST1 line in the PDB file.
+                    if any(
+                        v in {0, None} or not isinstance(v, (int, float))
+                        for v in box_dimensions
+                    ):
+                        logger.warning(
+                            f"Invalid box dimensions in CRYST1 line: {line.strip()}"
+                        )
+                        return None
 
-        Args:
-            content (List[str]): Lines from the PDB file.
+                    return box_dimensions
+                except ValueError:
+                    logger.warning(
+                        f"Invalid box dimensions in CRYST1 line: {line.strip()}"
+                    )
+                    return None
 
-        Returns:
-            Optional[List[float]]: Box dimensions [x, y, z] in nm, or None if not found.
-        """
-        for line in content:
-            try:
-                parsed = self.cryst1_grammar.parseString(line)
-                box_dimensions = [float(parsed.x), float(parsed.y), float(parsed.z)]
-                logger.info(f"[+] Extracted box dimensions: {box_dimensions}")
-                return box_dimensions
-            except ParseException:
-                continue
-        logger.warning("[!] CRYST1 line not found; box dimensions are unavailable.")
+        logger.warning("CRYST1 line not found; box dimensions are unavailable.")
         return None
 
     @staticmethod
-    def save(output_file_path: str, content: List[str]) -> None:
-        """
-        Save the PDB content to a file.
+    def extract_atoms(content: List[str]) -> List[Dict[str, float]]:
+        atoms = []
+        for line in content:
+            if line.startswith(("ATOM", "HETATM")):
+                try:
+                    atom = {
+                        "x": float(line[30:38].strip()),
+                        "y": float(line[38:46].strip()),
+                        "z": float(line[46:54].strip()),
+                    }
+                    atoms.append(atom)
+                except ValueError:
+                    logger.warning(f"[!] Invalid atom data in line: {line.strip()}")
+        logger.info(f"Extracted {len(atoms)} atoms from PDB file.")
+        return atoms
 
-        Args:
-            output_file_path (str): Path to save the file.
-            content (List[str]): PDB content to save.
-        """
-        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
-        with open(output_file_path, "w") as file:
-            file.writelines(content)
-        logger.info(f"[+] Saved PDB file to {output_file_path}")
+    @staticmethod
+    def get_atom_coordinates(atoms: List[Dict[str, float]]) -> List[List[float]]:
+        return [[atom["x"], atom["y"], atom["z"]] for atom in atoms]
+
+    @staticmethod
+    def add_or_replace_box_dimensions(
+        content: List[str], box_dimensions: List[float]
+    ) -> List[str]:
+        new_cryst1_line = f"CRYST1{box_dimensions[0]:9.3f}{box_dimensions[1]:9.3f}{box_dimensions[2]:9.3f}  90.00  90.00  90.00 P 1           1\n"
+        modified_content = []
+        cryst1_replaced = False
+
+        for line in content:
+            if line.startswith("CRYST1"):
+                logger.info(
+                    f"Replacing existing CRYST1 line with new dimensions: {box_dimensions}"
+                )
+                modified_content.append(new_cryst1_line)
+                cryst1_replaced = True
+            else:
+                modified_content.append(line)
+
+        if not cryst1_replaced:
+            logger.info(f"Adding CRYST1 line with dimensions: {box_dimensions}")
+            modified_content.insert(0, new_cryst1_line)  # Add CRYST1 line at the top
+
+        return modified_content
+
+    @staticmethod
+    def add_comment(content: List[str], comment: str) -> List[str]:
+        formatted_comment = f"{PDB_COMMENT_PREFIX} {comment.strip()}\n"
+        logger.info(f"Adding comment to PDB content: {comment}")
+        return [formatted_comment] + content
