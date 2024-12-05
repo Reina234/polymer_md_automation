@@ -1,0 +1,18 @@
+top_file = (comment | preprocessor_directive | section | empty_line)+ ;
+
+comment = ";" /[^\n]*/ NEWLINE ;                // Comment line
+empty_line = NEWLINE ;                          // Blank line
+preprocessor_directive = "#" directive (space condition)? content? ;
+
+directive = "include" | "ifdef" | "ifndef" | "endif" ;  // Supported preprocessor directives
+condition = /[A-Za-z_][A-Za-z0-9_]*/ ;          // Preprocessor condition
+content = /[^\n]*/ ;                            // Remaining content
+
+section = "[" section_name "]" NEWLINE section_content ;
+
+section_name = /[A-Za-z_][A-Za-z0-9_]*/ ;       // Section name
+section_content = (data_line | comment)+ ;
+
+data_line = /[^\n;#][^\n]*/ NEWLINE ;           // A line of data
+NEWLINE = /\n+/ ;                               // Newline character(s)
+space = /\s+/ ;                                 // Whitespace

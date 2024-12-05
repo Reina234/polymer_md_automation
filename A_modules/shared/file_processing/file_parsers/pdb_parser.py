@@ -18,7 +18,7 @@ class PDBParser(BaseFileParser):
     """
 
     @staticmethod
-    def read_file(file_path: str, file_type=PDB_COMMENT_PREFIX) -> List[str]:
+    def read_file(file_path: str, file_type=PDB_FILE_EXTENSION) -> List[str]:
         file_path = check_file_exists(file_path)
         check_file_type(file_path, file_type)
         content = get_file_contents(file_path)
