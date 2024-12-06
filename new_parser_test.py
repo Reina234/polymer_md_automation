@@ -23,3 +23,13 @@ handler.process(test_section)
 print(handler.content)
 print(handler.top_line)
 tester2_section = handler.export()
+
+from ZZZ_parser.constants import get_handler_new
+
+# NOTE: get handler might be more readable
+handler = get_handler_new(test_section.handler_type)
+handler.process(test_section)
+
+print(handler.content)
+print(handler.top_line)
+tester2_section = handler.export()

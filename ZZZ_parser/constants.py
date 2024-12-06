@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional, Type, Union
 from dataclasses import dataclass
 from ZZZ_parser.handlers.base_handler import BaseHandler
 from ZZZ_parser.handlers.section_handler import SectionHandler
@@ -13,17 +13,28 @@ SECTION_HANDLER = "SectionHandler"
 DEFAULT_HANDLER = "DefaultHandler"
 
 
-HANDLERS = {
+HANDLERS: Dict[str, BaseHandler] = {
     CONDITIONAL_HANDLER: ConditionalIfHandler,
     INCLUDE_HANDLER: IncludesHandler,
     SECTION_HANDLER: SectionHandler,
 }
 
 
+def get_handler(
+    handler_name: str, handler_list: Dict[str, BaseHandler] = HANDLERS
+) -> BaseHandler:
+    if handler_name in handler_list:
+        return handler_list[handler_name]()
+    else:
+        raise ValueError(
+            f"Handler '{handler_name}' not found in handler list. Available handlers: {list(handler_list.keys())}"
+        )
+
+
 @dataclass
 class GROMACSConstructs:
     pattern: re.Pattern
-    handler: Type[BaseHandler]
+    handler: str
     suppress: Optional[List[str]]
 
 
