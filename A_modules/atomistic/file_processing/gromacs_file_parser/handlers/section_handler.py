@@ -1,6 +1,12 @@
-from ZZZ_parser.handlers.base_handler import BaseHandler
-from ZZZ_parser.section import Section
-from ZZZ_parser.section_registry import SectionRegistry
+from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.base_handler import (
+    BaseHandler,
+)
+from A_modules.atomistic.file_processing.gromacs_file_parser.section_processing.section import (
+    Section,
+)
+from A_modules.atomistic.file_processing.gromacs_file_parser.section_processing.registry.section_registry import (
+    SectionRegistry,
+)
 import re
 import pandas as pd
 from typing import List, Dict

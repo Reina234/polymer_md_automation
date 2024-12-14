@@ -1,5 +1,7 @@
 from typing import List, Optional
-from ZZZ_parser.section import Section  # Assuming Section is a predefined class
+from A_modules.atomistic.file_processing.gromacs_file_parser.section_processing.section import (
+    Section,
+)  # Assuming Section is a predefined class
 import re
 
 

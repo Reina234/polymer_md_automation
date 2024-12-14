@@ -1,9 +1,18 @@
 from collections import OrderedDict
-from ZZZ_parser.section import Section
-from ZZZ_parser.handlers.base_handler import BaseHandler
-from ZZZ_parser.handlers.default_handler import DefaultHandler
+from A_modules.atomistic.file_processing.gromacs_file_parser.section_processing.section import (
+    Section,
+)
+from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.base_handler import (
+    BaseHandler,
+)
+from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.default_handler import (
+    DefaultHandler,
+)
 from typing import Dict, List, Optional, Tuple, OrderedDict
-from ZZZ_parser.handler_registry import HandlerRegistry, handler_registry
+from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.registry.handler_registry import (
+    HandlerRegistry,
+    handler_registry,
+)
 
 
 class FileSplitter:

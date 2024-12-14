@@ -1,4 +1,6 @@
-from ZZZ_parser.handlers.base_handler import BaseHandler
+from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.base_handler import (
+    BaseHandler,
+)
 from typing import List
 import re
 

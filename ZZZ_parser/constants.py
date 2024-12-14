@@ -38,7 +38,7 @@ class GROMACSConstructs:
     suppress: Optional[List[str]]
 
 
-GROMACS_CONSTRUCTS = {
+GROMACS_CONSTRUCTS2 = {
     "section": GROMACSConstructs(
         pattern=re.compile(r"^\s*\[\s*(.+?)\s*\]\s*$"),
         handler=SECTION_HANDLER,
