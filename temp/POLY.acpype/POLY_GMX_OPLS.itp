@@ -1,4 +1,4 @@
-; POLY_GMX_OPLS.itp created by acpype (v: 2023.10.27) on Sun Dec 15 22:27:37 2024
+; POLY_GMX_OPLS.itp created by acpype (v: 2023.10.27) on Sun Dec 15 22:42:41 2024
 
 ; For OPLS atomtypes manual fine tuning
 ; AC_at:OPLS_at:OPLScode: Possible_Alternatives (see ffoplsaa.atp and ffoplsaanb.itp)

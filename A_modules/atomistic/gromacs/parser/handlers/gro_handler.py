@@ -109,7 +109,7 @@ class GroHandler(BaseHandler):
         residue_field = tokens.pop(0)
 
         # Regex to handle combined formats (e.g., 1UNL)
-        match = re.match(r"(\d+)([A-Za-z]*)", residue_field)
+        match = re.match(r"^(\d+)([A-Za-z]+)$", residue_field)
         if match:
             residue_number = int(match.group(1))
             residue_name = match.group(2)
@@ -122,7 +122,6 @@ class GroHandler(BaseHandler):
                 raise ValueError(
                     f"Invalid residue field or missing residue name: {residue_field}. Details: {e}"
                 )
-
         return residue_number, residue_name, tokens
 
     def _parse_atom_field(self, tokens: List[str]) -> Tuple[str, int, List[str]]:
