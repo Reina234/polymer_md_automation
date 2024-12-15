@@ -17,6 +17,9 @@ from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.conditiona
 from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.default_handler import (
     DefaultHandler,
 )
+from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.gro_handler import (
+    GroHandler,
+)
 
 
 class HandlerRegistry:
@@ -42,7 +45,8 @@ class HandlerRegistry:
 
 # Initialize and populate the registry
 handler_registry = HandlerRegistry()
-# handler_registry.register_handler(DefaultHandler)
+handler_registry.register_handler(DefaultHandler)
 handler_registry.register_handler(SectionHandler)
 handler_registry.register_handler(IncludesHandler)
 handler_registry.register_handler(ConditionalIfHandler)
+handler_registry.register_handler(GroHandler)

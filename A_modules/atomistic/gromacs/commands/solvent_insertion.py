@@ -1,10 +1,8 @@
 import os
-import subprocess
-from config.paths import GROMACS_OUTPUT_SUBDIR, BASE_OUTPUT_DIR
-from config.constants import DEFAULT_BOX_SIZE_NM
+from A_config.paths import GROMACS_OUTPUT_SUBDIR
+from A_config.constants import DEFAULT_BOX_SIZE_NM
 from typing import Optional, List
-from preprocessing.calculation_utils import calculate_num_particles
-from config.constants import LengthUnits
+from A_modules.shared.utils.calculation_utils import calculate_num_particles
 from A_modules.shared.metadata_tracker import MetadataTracker
 from A_modules.shared.command_line_operation import CommandLineOperation
 import logging
@@ -31,24 +29,7 @@ class SolventInsertion(CommandLineOperation):
         tolerance: float = 0.05,
         additional_notes: Optional[str] = None,
     ) -> str:
-        """
-        Iteratively inserts solvent molecules until the desired number of particles
-        is achieved or the maximum iterations are reached. Retains previously added
-        molecules in subsequent iterations.
 
-        Args:
-            solvent_pdb_path (str): Path to the solvent PDB file.
-            run_name (str): Name of the run for output files.
-            solvent_density (float): Desired solvent density (g/cm³).
-            solvent_molecular_weight (float): Solvent molecular weight (g/mol).
-            box_size_nm (List[float]): Dimensions of the box (nm).
-            num_iterations_max (int): Maximum number of iterations allowed.
-            tolerance (float): Acceptable deviation from the desired number of particles.
-            additional_notes (Optional[str]): Additional metadata notes.
-
-        Returns:
-            str: Path to the final solvent box `.gro` file.
-        """
         output_dir = os.path.join(run_name, GROMACS_OUTPUT_SUBDIR)
         os.makedirs(output_dir, exist_ok=True)
 

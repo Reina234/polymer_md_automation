@@ -60,7 +60,7 @@ class BaseHandler:
         Processes a Section object and populates the handler's variables.
         """
         self.section = section
-        lines = section.lines[:]  # Copy to avoid modifying the original
+        lines = [line.strip() for line in section.lines if line.strip()]
 
         # Handle the top line if applicable
         if self.store_top_line and lines:

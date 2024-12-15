@@ -20,9 +20,19 @@ class FileSplitter:
         self.handler_registry = handler_registry
         self.suppressed_constructs: Optional[List[str]] = None
 
+    # NOTE: make this more robust
     def split_file(self, filepath: str) -> OrderedDict[str, Section]:
+        if filepath.endswith(".gro"):
+            construct_type = "gro_file"
+            handler_name = "gro"
+        else:
+            construct_type = None
+            handler_name = "default"
+
         sections: OrderedDict[str, Section] = OrderedDict()
-        current_section = Section(construct_type=None, handler_name="default")
+        current_section = Section(
+            construct_type=construct_type, handler_name=handler_name
+        )
 
         with open(filepath, "r") as file:
             for line in file:
@@ -71,6 +81,9 @@ class FileSplitter:
     def _match_line(self, line: str) -> Tuple[str, str, str]:
         """Matches a line to a construct and returns its type, name, and handler name."""
         for handler_name, handler_class in self.handler_registry._handlers.items():
+            if handler_class.re_pattern is None:
+                continue
+
             match = handler_class.re_pattern.match(line)
             if match:
                 name = match.group(1) if match.groups() else None
