@@ -19,3 +19,4 @@ print(tester.content)
 
 test2 = tester.export()
 print(test2.lines)
+print(tester.box_dimensions)

@@ -154,7 +154,7 @@ class GroHandler(BaseHandler):
                 lines.append(content)
 
         # Add box dimensions at the end
-        if self.box_dimensions:
-            lines.append(" ".join(f"{dim:.6f}" for dim in self.box_dimensions))
+        if self._box_dimensions:
+            lines.append(" ".join(f"{dim:.6f}" for dim in self._box_dimensions))
 
         return lines

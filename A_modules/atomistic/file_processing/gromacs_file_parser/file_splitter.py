@@ -5,6 +5,9 @@ from A_modules.atomistic.file_processing.gromacs_file_parser.section_processing.
 from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.base_handler import (
     BaseHandler,
 )
+from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.gro_handler import (
+    GroHandler,
+)
 from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.default_handler import (
     DefaultHandler,
 )
@@ -23,31 +26,31 @@ class FileSplitter:
     # NOTE: make this more robust
     def split_file(self, filepath: str) -> OrderedDict[str, Section]:
         if filepath.endswith(".gro"):
-            construct_type = "gro_file"
-            handler_name = "gro"
+            construct_name = "gro_file"
+            handler_name = GroHandler.construct_name
         else:
-            construct_type = None
-            handler_name = "default"
+            construct_name = None
+            handler_name = DefaultHandler.construct_name
 
         sections: OrderedDict[str, Section] = OrderedDict()
         current_section = Section(
-            construct_type=construct_type, handler_name=handler_name
+            construct_name=construct_name, handler_name=handler_name
         )
 
         with open(filepath, "r") as file:
             for line in file:
                 line = line.rstrip("\n")
 
-                construct_type, name, handler_name = self._match_line(line)
+                construct_name, handler_name, name = self._match_line(line)
 
-                if construct_type:
+                if construct_name:
                     key = self._generate_key(
-                        sections, current_section.construct_type, current_section.name
+                        sections, current_section.construct_name, current_section.name
                     )
                     sections[key] = current_section
 
                     current_section = Section(
-                        construct_type=construct_type,
+                        construct_name=construct_name,
                         handler_name=handler_name,
                         name=name,
                     )
@@ -56,7 +59,7 @@ class FileSplitter:
 
         if current_section.lines:
             key = self._generate_key(
-                sections, current_section.construct_type, current_section.name
+                sections, current_section.construct_name, current_section.name
             )
             sections[key] = current_section
 
@@ -88,7 +91,7 @@ class FileSplitter:
             if match:
                 name = match.group(1) if match.groups() else None
                 self.suppressed_constructs = handler_class.suppress
-                return handler_class.construct_name, name, handler_name
+                return handler_class.construct_name, handler_name, name
 
         # Fallback to DefaultHandler
-        return None, None, DefaultHandler.construct_name
+        return None, DefaultHandler.construct_name, None
