@@ -6,6 +6,12 @@ import re
 from typing import List, Optional, Tuple
 
 
+from A_modules.atomistic.gromacs.parser.handlers.base_handler import BaseHandler
+import pandas as pd
+import re
+from typing import List, Optional, Tuple
+
+
 class GroHandler(BaseHandler):
     re_pattern = None
     construct_name = "gro"
@@ -24,7 +30,6 @@ class GroHandler(BaseHandler):
             "In-line comments",
         ],
     ):
-
         super().__init__(store_top_line=True)  # Store the top line
         self.expected_columns = expected_columns
         self.num_atoms = 0
@@ -33,18 +38,21 @@ class GroHandler(BaseHandler):
 
     @property
     def box_dimensions(self) -> List[float]:
+        """
+        Returns the box dimensions as a list of three floats.
+        """
         if self._box_dimensions is None:
             raise ValueError("Box dimensions have not been set.")
         return self._box_dimensions
 
     @box_dimensions.setter
-    def box_dimensions(self, value: str):
-        tokens = value.split()
-        if len(tokens) != 3:
-            raise ValueError(
-                "Box dimensions must contain exactly three values (x, y, z)."
-            )
-        self._box_dimensions = [float(dim) for dim in tokens]
+    def box_dimensions(self, box_dimensions: List[float]):
+        """
+        Sets the box dimensions. Validates that the input is a list of three floats.
+        """
+        if len(box_dimensions) != 3:
+            raise ValueError("Box dimensions must be a list of three floats.")
+        self._box_dimensions = [float(dim) for dim in box_dimensions]
 
     def process(self, section):
         """
@@ -64,7 +72,8 @@ class GroHandler(BaseHandler):
                 normalized_tokens = self._normalize_atom_line(line)
                 self.atom_data.append(normalized_tokens)
             else:
-                self.box_dimensions = line
+                # Parse box dimensions
+                self.box_dimensions = self._parse_box_dimensions(line)
 
     def _normalize_atom_line(self, line: str) -> List:
         """
@@ -98,12 +107,6 @@ class GroHandler(BaseHandler):
     def _parse_residue_field(self, tokens: List[str]) -> Tuple[int, str, List[str]]:
         """
         Parse residue number and residue name, handling both combined and separate formats.
-
-        Args:
-            tokens (List[str]): List of tokens from the atom line.
-
-        Returns:
-            Tuple[int, str, List[str]]: Parsed residue number, residue name, and the remaining tokens.
         """
         # Extract the first token as the residue field
         residue_field = tokens.pop(0)
@@ -132,6 +135,20 @@ class GroHandler(BaseHandler):
         atom_index = int(tokens.pop(0))  # Assume atom index is always the next token
         return atom_name, atom_index, tokens
 
+    def _parse_box_dimensions(self, line: str) -> List[float]:
+        """
+        Parse box dimensions from the last line of the .gro file.
+        """
+        try:
+            tokens = line.split()
+            if len(tokens) != 3:
+                raise ValueError(
+                    f"Expected exactly 3 values for box dimensions, got {len(tokens)}."
+                )
+            return [float(dim) for dim in tokens]
+        except ValueError as e:
+            raise ValueError(f"Error parsing box dimensions: {line}. Details: {e}")
+
     @property
     def content(self) -> pd.DataFrame:
         """
@@ -158,7 +175,10 @@ class GroHandler(BaseHandler):
                 content += f" ; {row[7]}"
             lines.append(content)
 
-        # Add box dimensions
+        # Add formatted box dimensions
         if self._box_dimensions:
             lines.append(" ".join(f"{dim:.6f}" for dim in self._box_dimensions))
         return lines
+
+
+# NOTE: formatting issues exist for the box dims part, so editconf is recommended instead :(

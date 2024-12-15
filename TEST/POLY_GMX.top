@@ -1,4 +1,4 @@
-; POLY_GMX.top created by acpype (v: 2023.10.27) on Sun Dec 15 22:42:41 2024
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Sun Dec 15 23:15:31 2024
 
 [ defaults ]
 ; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
@@ -13,8 +13,9 @@
 #endif
 
 [ system ]
- POLY
+POLY in water
 
 [ molecules ]
 ; Compound        nmols
  POLY             1     
+UNL               292

@@ -111,35 +111,62 @@ from A_modules.atomistic.gromacs.parser.registries.handler_registry import (
 
 file_splitter = GromacsParser()
 sections = file_splitter.parse(gro)
-test_section = next(iter(sections.values()))
-tester = handler_registry.get_handler(test_section.handler_name)()
-tester.process(test_section)
+test_section_key = next(iter(sections))  # Get the key of the first section
+test_section = sections[test_section_key]  # Retrieve the corresponding Section object
 
-print(tester.content)
-box_size = calculate_minimum_box_size_from_df(tester.content, padding=0.1)
-print(f"Calculated box size: {box_size} nm")
+tester = handler_registry.get_handler(
+    test_section.handler_name
+)()  # Initialize the handler
+tester.process(test_section)  # Process the section
+
+# Step 3: Modify the section (e.g., update box dimensions)
+print(tester.content)  # Print the content for verification
+box_size = calculate_minimum_box_size_from_df(
+    tester.content, padding=0.1
+)  # Calculate new box size
+
+####################
+# tester.box_dimensions = box_size  # Update the box dimensions in the handler
+# new_section = tester.export()  # Export the modified section
+# print(f"Calculated box size: {box_size} nm")
+
+# Step 4: Replace the section in the OrderedDict
+# sections[test_section_key] = new_section  # Update the OrderedDict with the new section
+
+# Step 5: Export the updated sections back to a .gro file (optional)
+# output_gro = "output.gro"
+# file_splitter.export(sections, output_gro)
+# print(f"Updated .gro file written to {output_gro}")
+
 from A_modules.atomistic.gromacs.commands.editconf import Editconf
 
-# editconf = Editconf()
-# output_box_gro_path = editconf.run(
-#    gro,
-#    "TEST",
-#    [5, 5, 5],
-#    output_name="edited_box.gro",
-# )
+editconf = Editconf()
+edited_solvent = editconf.run(
+    gro,
+    "TEST",
+    box_size_nm=box_size,
+    output_name="edited_solvent_box.gro",
+)
 
-# from A_modules.atomistic.gromacs.commands.solvate import Solvate
+output_box_gro_path = editconf.run(
+    gro,
+    "TEST",
+    [5, 5, 5],
+    output_name="edited_box.gro",
+)
+
+from A_modules.atomistic.gromacs.commands.solvate import Solvate
 
 # print(type(updated_path), type(output_box_gro_path), type(top))
 # print(output_box_gro_path)
-# solvate = Solvate()
-# solvate.run(
-#    output_box_gro_path,
-#    gro,
-#    top,
-#    "TEST",
-#    output_name="solvated.gro",
-# )
+solvate = Solvate()
+solvate.run(
+    output_box_gro_path,
+    edited_solvent,
+    top,
+    "TEST",
+    output_name="solvated.gro",
+)
 
 # from gromacs.solvation.NEW_solvent_insertion import SolventInsertion
 
