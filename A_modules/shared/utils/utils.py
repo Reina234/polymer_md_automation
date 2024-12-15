@@ -1,7 +1,7 @@
 import os
 import shutil
 import logging
-from typing import List, Callable
+from typing import List, Callable, TypeVar, Any, ParamSpec
 from pathlib import Path
 from functools import wraps
 from typing import Optional
@@ -333,15 +333,12 @@ def determine_file_name(
     :rtype: str
     """
     path = Path(file_path)
-    if new_file_extension:
-        file_extension = "." + new_file_extension
-    else:
-        file_extension = path.suffix
 
-    if new_file_name:
-        file_name = new_file_name
-    else:
-        file_name = os.path.basename(file_path)
+    # Use the provided new file extension or fallback to the original one
+    file_extension = f".{new_file_extension}" if new_file_extension else path.suffix
+
+    # Use the provided new file name or fallback to the original stem (name without extension)
+    file_name = new_file_name if new_file_name else path.stem
 
     return file_name + file_extension
 
@@ -371,7 +368,14 @@ def check_file_does_not_exist(
     logger.info(f"File does not exist: {file_path}")
 
 
-def directory_exists_check_wrapper(dir_arg_index: int, make_dirs: bool = True):
+# Define type variables for the input parameters and return type of the wrapped function
+P = ParamSpec("P")  # Represents the parameters of the wrapped function
+R = TypeVar("R")  # Represents the return type of the wrapped function
+
+
+def directory_exists_check_wrapper(
+    dir_arg_index: int, make_dirs: bool = True
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
     """
     A wrapper to ensure a directory exists, optionally creating it if missing.
 
@@ -379,11 +383,13 @@ def directory_exists_check_wrapper(dir_arg_index: int, make_dirs: bool = True):
     :type dir_arg_index: int
     :param make_dirs: If True, create the directory if it does not exist. Defaults to True.
     :type make_dirs: bool
+    :return: A decorator that wraps the provided function.
+    :rtype: Callable[[Callable], Callable]
     """
 
-    def decorator(func: Callable):
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             dir_path = (
                 args[dir_arg_index]
                 if len(args) > dir_arg_index
@@ -413,7 +419,7 @@ def directory_exists_check_wrapper(dir_arg_index: int, make_dirs: bool = True):
 
 def file_does_not_exist_check_wrapper(
     file_arg_index: int, suppress_error: bool = False
-):
+) -> Callable[[Callable[P, R]], Callable[P, R | None]]:
     """
     A wrapper to ensure a file does not exist before calling the wrapped function.
 
@@ -421,11 +427,13 @@ def file_does_not_exist_check_wrapper(
     :type file_arg_index: int
     :param suppress_error: If True, suppress the error when the file already exists. Defaults to False.
     :type suppress_error: bool
+    :return: A decorator that wraps the provided function.
+    :rtype: Callable[[Callable], Callable]
     """
 
-    def decorator(func: Callable):
+    def decorator(func: Callable[P, R]) -> Callable[P, R | None]:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R | None:
             file_path = (
                 args[file_arg_index]
                 if len(args) > file_arg_index
@@ -451,7 +459,9 @@ def file_does_not_exist_check_wrapper(
     return decorator
 
 
-def file_exists_check_wrapper(file_arg_index: int, suppress_error: bool = False):
+def file_exists_check_wrapper(
+    file_arg_index: int, suppress_error: bool = False
+) -> Callable[[Callable[P, R]], Callable[P, R | None]]:
     """
     A wrapper to check if a file exists before calling the wrapped function.
 
@@ -460,11 +470,13 @@ def file_exists_check_wrapper(file_arg_index: int, suppress_error: bool = False)
     :param suppress_error: If True, suppresses the FileNotFound error when the file doesn't exist,
                            logs a warning instead, and skips calling the wrapped function. Defaults to False.
     :type suppress_error: bool
+    :return: A decorator that wraps the provided function.
+    :rtype: Callable[[Callable], Callable]
     """
 
-    def decorator(func: Callable):
+    def decorator(func: Callable[P, R]) -> Callable[P, R | None]:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R | None:
             file_path = (
                 args[file_arg_index]
                 if len(args) > file_arg_index
@@ -483,6 +495,53 @@ def file_exists_check_wrapper(file_arg_index: int, suppress_error: bool = False)
                 raise FileNotFoundError(message)
 
             logger.info(f"File found: {file_path}")
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def file_type_check_wrapper(
+    file_arg_index: int, expected_file_type: str
+) -> Callable[[Callable[P, R]], Callable[P, R]]:
+    """
+    A wrapper to validate the file type of a specific argument before calling the function.
+
+    :param file_arg_index: The index of the file path argument in the wrapped function's arguments.
+    :type file_arg_index: int
+    :param expected_file_type: The expected file type (e.g., 'mol2', 'pdb').
+    :type expected_file_type: str
+    :return: A decorator that wraps the provided function.
+    :rtype: Callable[[Callable], Callable]
+    """
+
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
+        @wraps(func)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            file_path = (
+                args[file_arg_index]
+                if len(args) > file_arg_index
+                else kwargs.get("file_path")
+            )
+            if file_path is None:
+                logger.error("File path argument not provided.")
+                raise ValueError("File path argument not provided.")
+
+            # Check file extension
+            observed_file_type = os.path.splitext(file_path)[1].lstrip(".")
+            if observed_file_type != expected_file_type:
+                message = (
+                    f"Validation failed: Expected input file of type "
+                    f"'{expected_file_type}', but got '{observed_file_type}'."
+                )
+                logger.error(message)
+                raise ValueError(message)
+
+            logger.info(
+                f"Validation passed: Input file is of type '.{expected_file_type}'"
+            )
+
             return func(*args, **kwargs)
 
         return wrapper
@@ -527,9 +586,57 @@ def construct_output_file_path(
         output_dir = new_output_dir
     else:
         output_dir = os.path.dirname(file_path)
+    check_directory_exists(output_dir)
 
     output_file_name = determine_file_name(file_path, new_file_name, new_file_extension)
     output_file_path = os.path.join(output_dir, output_file_name)
 
     check_file_does_not_exist(output_file_path, suppress_error=suppress_warning)
     return output_file_path
+
+
+def overwrite_directory(directory_path: str) -> None:
+    if os.path.exists(directory_path):
+        shutil.rmtree(directory_path)
+    os.makedirs(directory_path, exist_ok=True)
+
+
+import os
+from typing import Dict
+
+
+def generate_file_from_template(
+    template_path: str,
+    output_path: str,
+    replacements: Dict[str, str],
+    overwrite: bool = False,
+) -> None:
+    """
+    Reads a template file, replaces placeholders with provided values,
+    and writes the modified content to an output file.
+
+    :param template_path: Path to the template file to read.
+    :type template_path: str
+    :param output_path: Path to the output file to write.
+    :type output_path: str
+    :param replacements: A dictionary of placeholder strings to their replacement values ["placeholder" : "replacement].
+    :type replacements: Dict[str, str]
+    :param overwrite: If True, overwrite the output file if it already exists. Defaults to False.
+    :type overwrite: bool, optional
+    """
+    file_exists = check_file_exists(output_path, suppress_error=True)
+
+    if file_exists and not overwrite:
+        logger.info(f"Output file already exists at {output_path}, skipping creation.")
+        return
+
+    with open(template_path, "r") as file:
+        content = file.read()
+
+    for placeholder, value in replacements.items():
+        content = content.replace(f"{{{placeholder}}}", str(value))
+
+    with open(output_path, "w") as file:
+        file.write(content)
+
+    logger.info(f"Created file from template at {output_path}")

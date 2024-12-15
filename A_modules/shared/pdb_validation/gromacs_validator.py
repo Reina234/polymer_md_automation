@@ -1,10 +1,10 @@
 import os
 import logging
 from typing import List, Optional
-from A_modules.shared.file_processing.pdb_validation.base_pdb_validator import (
+from A_modules.shared.pdb_validation.base_pdb_validator import (
     BasePDBValidator,
 )
-from A_modules.shared.calculation_utils import calculate_minimum_box_size
+from A_modules.shared.utils.calculation_utils import calculate_minimum_box_size
 from data_models.solvent import Solvent
 from config.constants import DENSITY_TOLERANCE_PERCENTAGE
 from config.constants import LengthUnits

@@ -2,7 +2,7 @@
 
 import os
 import json
-from A_modules.shared.utils import check_directory_exists
+from A_modules.shared.utils.utils import check_directory_exists
 import logging
 
 logger = logging.getLogger(__name__)

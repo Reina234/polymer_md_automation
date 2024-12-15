@@ -4,7 +4,10 @@ from A_modules.shared.file_conversion.converters.base_converter import (
     BaseConverter,
 )
 from A_modules.shared.metadata_tracker import MetadataTracker
-from A_modules.shared.utils.utils import construct_output_file_path
+from A_modules.shared.utils.utils import (
+    construct_output_file_path,
+    file_type_check_wrapper,
+)
 from typing import Optional, List, Tuple
 
 
@@ -36,7 +39,7 @@ class OBabelPDBtoMOL2Converter(BaseConverter):
         ]
         return command, output_file_path
 
-    def run(
+    def _run_impl(
         self,
         input_file_path: str,
         output_dir: Optional[str] = None,
