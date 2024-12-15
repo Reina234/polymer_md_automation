@@ -4,19 +4,26 @@ import os
 from A_config.constants import DEFAULT_BOX_SIZE_NM
 from typing import Optional, List
 from A_modules.shared.utils.calculation_utils import calculate_num_particles
-from A_modules.shared.utils.utils import directory_exists_check_wrapper
+from A_modules.shared.utils.utils import (
+    directory_exists_check_wrapper,
+    check_file_does_not_exist,
+)
 from A_modules.shared.metadata_tracker import MetadataTracker
-from A_modules.shared.command_line_operation import CommandLineOperation
+from A_modules.atomistic.gromacs.commands.base_gromacs_command import BaseGromacsCommand
 import logging
 from typing import Tuple
+from A_config.constants import MassUnits2
 import subprocess
+from A_modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
+from A_modules.atomistic.gromacs.parser.handlers.gro_handler import GroHandler
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-class SolventInsertion(CommandLineOperation):
+class SolventInsertion(BaseGromacsCommand):
     output_name = "solvent_box.gro"
+    default_mass_units = MassUnits2.GRAM
 
     def __init__(self, metadata_tracker: Optional[MetadataTracker] = None):
         super().__init__(metadata_tracker)
@@ -29,7 +36,7 @@ class SolventInsertion(CommandLineOperation):
         desired_density: float,
         molecular_weight: float,
         box_size_nm: List[float] = DEFAULT_BOX_SIZE_NM,
-        num_iterations_max: int = 5,
+        num_iterations_max: int = 10,
         tolerance: float = 0.05,
         additional_notes: Optional[str] = None,
         verbose: bool = False,
@@ -39,6 +46,7 @@ class SolventInsertion(CommandLineOperation):
         )
 
         gro_path = os.path.join(output_dir, self.output_name)
+        check_file_does_not_exist(gro_path, suppress_error=True, delete_file=True)
 
         target_num_particles = self._calculate_target_particles(
             box_size_nm, molecular_weight, desired_density, verbose
@@ -80,8 +88,8 @@ class SolventInsertion(CommandLineOperation):
         desired_density: float,
         molecular_weight: float,
         iteration: int,
-        box_size_nm: List[float] = DEFAULT_BOX_SIZE_NM,
-        additional_notes: Optional[str] = None,
+        box_size_nm: List[float],
+        additional_notes: Optional[str],
     ) -> dict:
         return {
             "program(s) used": "GROMACS insert-molecules",
@@ -99,8 +107,9 @@ class SolventInsertion(CommandLineOperation):
         target_num_particles = calculate_num_particles(
             box_size_nm,
             molecular_weight=molecular_weight,
-            density=desired_density,
+            density_SI=desired_density,
             box_units=self.default_units,
+            mass_units=self.default_mass_units,
         )
         if verbose:
             logger.info(f"Target number of particles: {round(target_num_particles)}")
@@ -139,14 +148,45 @@ class SolventInsertion(CommandLineOperation):
         """
         Adds remaining particles to the system by executing the insert command.
         """
+        # Check if the output file exists
+        append = os.path.exists(gro_path)
+
+        # Create the command with or without the append flag
         command, _ = self._create_insert_command(
-            solvent_pdb_path=input_pdb_path,
+            input_pdb_path=input_pdb_path,
             box_size_nm=box_size_nm,
             num_particles=remaining_particles,
             output_path=gro_path,
-            append=True,  # Allow appending to the existing box
+            append=append,  # Only append if the file exists
         )
         self._execute(command, verbose=verbose)
+
+    def _create_insert_command(
+        self,
+        input_pdb_path: str,
+        box_size_nm: List[float],
+        num_particles: int,
+        output_path: str,
+        append: bool = False,
+    ) -> Tuple[List[str], str]:
+        command = [
+            "gmx",
+            "insert-molecules",
+            "-ci",
+            input_pdb_path,
+            "-nmol",
+            str(num_particles),
+            "-box",
+            str(box_size_nm[0]),
+            str(box_size_nm[1]),
+            str(box_size_nm[2]),
+            "-o",
+            output_path,
+        ]
+        if append:
+            command.append("-f")
+            command.append(output_path)  # Append to the existing file
+        return command, output_path
 
     def _validate_parameters(
         self,
@@ -164,33 +204,6 @@ class SolventInsertion(CommandLineOperation):
         if not (0 < tolerance < 1):
             raise ValueError("Tolerance must be between 0 and 1.")
 
-    def _create_insert_command(
-        self,
-        solvent_pdb_path: str,
-        box_size_nm: List[float],
-        num_particles: int,
-        output_path: str,
-        append: bool = False,
-    ) -> Tuple[List[str], str]:
-        command = [
-            "gmx",
-            "insert-molecules",
-            "-ci",
-            solvent_pdb_path,
-            "-nmol",
-            str(num_particles),
-            "-box",
-            str(box_size_nm[0]),
-            str(box_size_nm[1]),
-            str(box_size_nm[2]),
-            "-o",
-            output_path,
-        ]
-        if append:
-            command.append("-f")
-            command.append(output_path)  # Append to the existing file
-        return command, output_path
-
     def _count_particles(self, gro_file: str) -> int:
         """
         Count the number of molecules (particles) in a .gro file.
@@ -199,40 +212,19 @@ class SolventInsertion(CommandLineOperation):
             gro_file (str): Path to the `.gro` file.
 
         Returns:
-            int: Number of molecules in the file.
+            int: Number of unique molecules (residues) in the file.
         """
         if not os.path.exists(gro_file):
             return 0
 
-        with open(gro_file, "r") as file:
-            lines = file.readlines()
+        # Use FileSplitter and GroHandler to parse the .gro file
+        parser = GromacsParser()
+        sections = parser.parse(gro_file)
 
-        # Second line of .gro file contains the total number of ATOMS
-        try:
-            num_atoms = int(lines[1].strip())
-        except (IndexError, ValueError) as e:
-            raise ValueError(f"Error reading atom count from {gro_file}: {e}")
+        # Assuming the `.gro` file content is the first section
+        gro_section = next(iter(sections.values()))
+        gro_handler = GroHandler()
+        gro_handler.process(gro_section)
 
-        # Count unique residue/molecule IDs (first 5 characters of each line with atomic data)
-        residue_ids = set()
-        for line in lines[2 : 2 + num_atoms]:  # Only iterate over atomic data lines
-            residue_id = line[:5].strip()
-            residue_ids.add(residue_id)
-
-        return len(residue_ids)
-
-    def metadata(
-        self,
-        solvent_pdb_path: str,
-        run_name: str,
-        solvent_density: float,
-        solvent_molecular_weight: float,
-        box_size_nm: List[float] = DEFAULT_BOX_SIZE_NM,
-        additional_notes: Optional[str] = None,
-    ) -> dict:
-        return {
-            "program(s) used": "GROMACS insert-molecules",
-            "details": f"Created solvent box of size {box_size_nm} (nm) with target density {solvent_density} g/cm³",
-            "action(s)": f"Inserted solvent molecules from {solvent_pdb_path} to {run_name}/{GROMACS_OUTPUT_SUBDIR}/{self.output_name}",
-            "additional_notes": additional_notes,
-        }
+        residue_numbers = gro_handler.content["Residue Number"].unique()
+        return len(residue_numbers)
