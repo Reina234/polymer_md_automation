@@ -1,23 +1,23 @@
 from typing import Dict, Type
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.base_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
     BaseHandler,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.base_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
     BaseHandler,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.section_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.section_handler import (
     SectionHandler,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.includes_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.includes_handler import (
     IncludesHandler,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.conditional_if_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.conditional_if_handler import (
     ConditionalIfHandler,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.default_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.default_handler import (
     DefaultHandler,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.gro_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.gro_handler import (
     GroHandler,
 )
 

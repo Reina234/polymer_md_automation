@@ -138,9 +138,9 @@ def calculate_num_particles(
     density: float,
     box_units: LengthUnits = LengthUnits.ANGSTROM,
     mass_units=MassUnits.GRAM,
-):
+) -> int:
     volume_SI = np.prod(box_dimensions) * CONVERSION_FACTORS_TO_M[box_units] ** 3
     mass = volume_SI * density
     molecular_weight_SI = molecular_weight * CONVERSION_FACTORS_TO_KG[mass_units]
     num_particles = (mass / molecular_weight_SI) * AVOGADROS_NUMBER
-    return num_particles
+    return round(int(num_particles))

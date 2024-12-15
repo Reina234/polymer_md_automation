@@ -1,10 +1,10 @@
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.base_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
     BaseHandler,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.section_processing.section import (
+from A_modules.atomistic.gromacs.parser.section import (
     Section,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.section_processing.registry.section_registry import (
+from A_modules.atomistic.gromacs.parser.registries.section_registry import (
     SectionRegistry,
 )
 import re

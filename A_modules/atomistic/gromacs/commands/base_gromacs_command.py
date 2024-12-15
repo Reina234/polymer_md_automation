@@ -5,7 +5,7 @@ from A_modules.shared.command_line_operation import CommandLineOperation
 
 class BaseGromacsCommand(CommandLineOperation, ABC):
     output_name: str
-    units: LengthUnits = LengthUnits.NANOMETER
+    default_units: LengthUnits = LengthUnits.NANOMETER
 
     def __init_subclass__(cls):
         super().__init_subclass__()

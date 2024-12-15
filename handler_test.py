@@ -1,7 +1,7 @@
-from A_modules.atomistic.file_processing.gromacs_file_parser.file_splitter import (
+from A_modules.atomistic.gromacs.parser.file_splitter import (
     FileSplitter,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.registry.handler_registry import (
+from A_modules.atomistic.gromacs.parser.registries.handler_registry import (
     handler_registry,
 )
 

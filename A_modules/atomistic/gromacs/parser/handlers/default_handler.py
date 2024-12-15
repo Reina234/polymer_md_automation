@@ -1,4 +1,4 @@
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.base_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
     BaseHandler,
 )
 import pandas as pd

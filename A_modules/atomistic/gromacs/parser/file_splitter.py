@@ -1,18 +1,18 @@
 from collections import OrderedDict
-from A_modules.atomistic.file_processing.gromacs_file_parser.section_processing.section import (
+from A_modules.atomistic.gromacs.parser.section import (
     Section,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.base_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
     BaseHandler,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.gro_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.gro_handler import (
     GroHandler,
 )
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.default_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.default_handler import (
     DefaultHandler,
 )
 from typing import Dict, List, Optional, Tuple, OrderedDict
-from A_modules.atomistic.file_processing.gromacs_file_parser.handlers.registry.handler_registry import (
+from A_modules.atomistic.gromacs.parser.registries.handler_registry import (
     HandlerRegistry,
     handler_registry,
 )

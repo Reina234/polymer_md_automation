@@ -1,5 +1,5 @@
 from typing import List, Dict
-from A_modules.atomistic.file_processing.gromacs_file_parser.section_processing.registry.prebuilt_registries import (
+from A_modules.atomistic.gromacs.parser.registries.prebuilt_section_registries import (
     acpype_generated_sections,
 )
 
