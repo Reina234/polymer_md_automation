@@ -3,7 +3,7 @@ from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
 )
 import pandas as pd
 import re
-from typing import List
+from typing import List, Optional, Tuple
 
 
 class GroHandler(BaseHandler):
@@ -24,186 +24,142 @@ class GroHandler(BaseHandler):
             "In-line comments",
         ],
     ):
-        self.expected_columns = expected_columns
+
         super().__init__(store_top_line=True)  # Store the top line
-        self.num_atoms = 0  # Number of atoms
-        self.atom_data = []  # To store atom rows
-        self._box_dimensions = None  # To store box dimensions as a string
+        self.expected_columns = expected_columns
+        self.num_atoms = 0
+        self.atom_data = []
+        self._box_dimensions = None
 
     @property
     def box_dimensions(self) -> List[float]:
-        """
-        Returns the box dimensions as a list of floats.
-        """
         if self._box_dimensions is None:
             raise ValueError("Box dimensions have not been set.")
         return self._box_dimensions
 
     @box_dimensions.setter
     def box_dimensions(self, value: str):
-        """
-        Validates and sets the box dimensions from a space-separated string.
-        The input must be in the format: "x y z".
-
-        :param value: A space-separated string representing the box dimensions.
-        :type value: str
-        """
         tokens = value.split()
         if len(tokens) != 3:
             raise ValueError(
                 "Box dimensions must contain exactly three values (x, y, z)."
             )
-
-        try:
-            self._box_dimensions = [float(dim) for dim in tokens]
-        except ValueError:
-            raise ValueError("Box dimensions must be valid floating-point numbers.")
+        self._box_dimensions = [float(dim) for dim in tokens]
 
     def process(self, section):
         """
-        Extends the process method to handle the box dimensions (bottom line).
+        Process a section of a .gro file to parse atom lines and extract box dimensions.
         """
         self.section = section
-
-        # Filter out empty lines
         lines = [line.strip() for line in section.lines if line.strip()]
 
-        # Handle the top line
-        if self.store_top_line and lines:
-            self.top_line = lines.pop(0)
+        # Top line (title)
+        self.top_line = lines.pop(0)
 
-        # Handle number of atoms
-        if lines:
-            self.num_atoms = int(
-                lines.pop(0)
-            )  # First remaining line is number of atoms
+        # Number of atoms
+        self.num_atoms = int(lines.pop(0))
 
-        # Handle atom data and box dimensions
         for line in lines:
             if len(self.atom_data) < self.num_atoms:
-                self.atom_data.append(self._parse_atom_line(line))
+                normalized_tokens = self._normalize_atom_line(line)
+                self.atom_data.append(normalized_tokens)
             else:
-                # Last line after atom data is box dimensions
                 self.box_dimensions = line
 
-    def _parse_atom_line(self, line: str) -> List:
+    def _normalize_atom_line(self, line: str) -> List:
         """
-        Parses a single line of atom data in the .gro file, handling variable spacing,
-        combined or separate residue number and name, and in-line comments.
-
-        :param line: A line of atom data from the .gro file.
-        :type line: str
-        :return: Parsed atom data as a list.
-        :rtype: List
+        Normalize a `.gro` atom line into separate tokens.
+        Handles combined or separate residue number/name and atom name/index formats.
         """
-        # Handle in-line comments
+        comment = None
         if ";" in line:
             content, comment = line.split(";", 1)
             line = content.strip()
             comment = comment.strip()
-        else:
-            comment = None
 
-        # Regex to extract the different parts of the line
-        match = re.match(
-            r"(?P<residue>[0-9]+[A-Za-z]*)\s+(?P<atom>[A-Za-z0-9]+)\s*(?P<index>[0-9]+)\s+"
-            r"(?P<x>[0-9.+-]+)\s+(?P<y>[0-9.+-]+)\s+(?P<z>[0-9.+-]+)",
-            line,
-        )
+        tokens = line.split()
 
-        if not match:
+        # Handle minimum token count
+        if len(tokens) < 5:
             raise ValueError(f"Invalid atom line format: {line}")
 
-        # Extract groups from the regex match
-        residue_number_and_name = match.group("residue")
-        atom_name = match.group("atom")
-        atom_index = int(match.group("index"))
-        x = float(match.group("x"))
-        y = float(match.group("y"))
-        z = float(match.group("z"))
+        # Determine if fields are combined or split
+        residue_number, residue_name, tokens = self._parse_residue_field(tokens)
+        atom_name, atom_index, tokens = self._parse_atom_field(tokens)
 
-        # Separate residue number and residue name
-        residue_number = int("".join(filter(str.isdigit, residue_number_and_name)))
-        residue_name = "".join(filter(str.isalpha, residue_number_and_name))
+        # Extract coordinates (last 3 tokens)
+        try:
+            x, y, z = map(float, tokens[:3])
+        except ValueError as e:
+            raise ValueError(f"Invalid coordinate format in line: {line}. Details: {e}")
 
         return [residue_number, residue_name, atom_name, atom_index, x, y, z, comment]
+
+    def _parse_residue_field(self, tokens: List[str]) -> Tuple[int, str, List[str]]:
+        """
+        Parse residue number and residue name, handling both combined and separate formats.
+
+        Args:
+            tokens (List[str]): List of tokens from the atom line.
+
+        Returns:
+            Tuple[int, str, List[str]]: Parsed residue number, residue name, and the remaining tokens.
+        """
+        # Extract the first token as the residue field
+        residue_field = tokens.pop(0)
+
+        # Regex to handle combined formats (e.g., 1UNL)
+        match = re.match(r"(\d+)([A-Za-z]*)", residue_field)
+        if match:
+            residue_number = int(match.group(1))
+            residue_name = match.group(2)
+        else:
+            # Handle separate formats (e.g., "1 UNL")
+            try:
+                residue_number = int(residue_field)
+                residue_name = tokens.pop(0)  # Next token is the residue name
+            except (ValueError, IndexError) as e:
+                raise ValueError(
+                    f"Invalid residue field or missing residue name: {residue_field}. Details: {e}"
+                )
+
+        return residue_number, residue_name, tokens
+
+    def _parse_atom_field(self, tokens: List[str]) -> Tuple[str, int, List[str]]:
+        """
+        Parse atom name and atom index, handling combined or separate formats.
+        """
+        atom_name = tokens.pop(0)
+        atom_index = int(tokens.pop(0))  # Assume atom index is always the next token
+        return atom_name, atom_index, tokens
 
     @property
     def content(self) -> pd.DataFrame:
         """
-        Returns the atom data as a DataFrame.
+        Return atom data as a Pandas DataFrame.
         """
-        columns = self.expected_columns
-        return pd.DataFrame(self.atom_data, columns=columns)
+        return pd.DataFrame(self.atom_data, columns=self.expected_columns)
 
     @content.setter
     def content(self, new_content: pd.DataFrame):
-        """
-        Updates atom data using a DataFrame.
-        """
-        expected_columns = self.expected_columns
-        if list(new_content.columns) != expected_columns:
+        if list(new_content.columns) != self.expected_columns:
             raise ValueError(
-                "Columns of the DataFrame do not match the expected atom data format."
+                "Columns of the DataFrame do not match the expected format."
             )
         self.atom_data = new_content.values.tolist()
 
     def _export_content(self) -> List[str]:
         """
-        Exports the .gro file content as a list of lines, including box dimensions.
+        Export content to `.gro` format lines.
         """
         lines = []
-
-        # Atom data
         for row in self.atom_data:
             content = f"{row[0]:5}{row[1]:>5}{row[2]:>5}{row[3]:5}{row[4]:8.3f}{row[5]:8.3f}{row[6]:8.3f}"
-            inline_comment = row[7] if len(row) > 7 else None
-            if inline_comment:
-                lines.append(f"{content} ; {inline_comment}")
-            else:
-                lines.append(content)
+            if row[7]:
+                content += f" ; {row[7]}"
+            lines.append(content)
 
-        # Add box dimensions at the end
+        # Add box dimensions
         if self._box_dimensions:
             lines.append(" ".join(f"{dim:.6f}" for dim in self._box_dimensions))
-
         return lines
-
-
-def _parse_atom_line(self, line: str) -> List:
-    """
-    Parses a single line of atom data in the .gro file, handling variable spacing and in-line comments.
-
-    Args:
-        line (str): A line of atom data from the .gro file.
-
-    Returns:
-        List: Parsed atom data.
-    """
-    # Handle in-line comments
-    if ";" in line:
-        content, comment = line.split(";", 1)
-        line = content.strip()
-        comment = comment.strip()
-    else:
-        comment = None
-
-    # Split the line by whitespace
-    tokens = line.split()
-
-    if len(tokens) < 7:
-        raise ValueError(f"Invalid atom line format: {line}")
-
-    # Parse tokens into fields
-    residue_number_and_name = tokens[0]  # Combined residue number and name
-    atom_name = tokens[1]  # Atom name
-    atom_index = int(tokens[2])  # Atom index
-    x = float(tokens[3])  # X coordinate
-    y = float(tokens[4])  # Y coordinate
-    z = float(tokens[5])  # Z coordinate
-
-    # Separate residue number and residue name
-    residue_number = int("".join(filter(str.isdigit, residue_number_and_name)))
-    residue_name = "".join(filter(str.isalpha, residue_number_and_name))
-
-    return [residue_number, residue_name, atom_name, atom_index, x, y, z, comment]

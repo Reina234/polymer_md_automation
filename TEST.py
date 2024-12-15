@@ -8,6 +8,7 @@ from A_modules.shared.utils.utils import check_directory_exists
 
 test = ConverterFactory().get_converter("pdb", "mol2")
 mol2_file = test.run("input/solvents/pdb/hexane.pdb", "TEST", verbose=True)
+import pandas as pd
 
 print("!!!" + mol2_file)
 from A_modules.atomistic.acpype_parameterizer.acpype_config import AcpypeOutputConfig
@@ -67,6 +68,39 @@ def calculate_minimum_box_size(
     return box_size.tolist()
 
 
+def calculate_minimum_box_size_from_df(
+    atom_df: pd.DataFrame, padding: float = 0.1
+) -> List[float]:
+    """
+    Helper function to calculate the minimum bounding box dimensions for the molecule
+    based on the atom coordinates in a DataFrame.
+
+    Args:
+        atom_df (pd.DataFrame): DataFrame containing atom data, including 'X', 'Y', and 'Z' columns for coordinates.
+        padding (float): Padding to add to each dimension (in nm).
+
+    Returns:
+        List[float]: [x, y, z] dimensions for the minimum bounding box in nm.
+    """
+    if atom_df.empty:
+        raise ValueError("Atom data is empty. Cannot calculate bounding box size.")
+
+    # Ensure the required columns are present
+    required_columns = ["X", "Y", "Z"]
+    if not all(col in atom_df.columns for col in required_columns):
+        raise ValueError(
+            f"DataFrame must contain columns: {', '.join(required_columns)}"
+        )
+
+    # Calculate min and max for each dimension
+    min_coords = atom_df[["X", "Y", "Z"]].min().values
+    max_coords = atom_df[["X", "Y", "Z"]].max().values
+
+    # Add padding and calculate box size
+    box_size = (max_coords - min_coords) + 2 * padding
+    return box_size.tolist()
+
+
 from A_modules.atomistic.gromacs.parser.gromacs_parser import (
     GromacsParser,
 )
@@ -81,7 +115,8 @@ test_section = next(iter(sections.values()))
 tester = handler_registry.get_handler(test_section.handler_name)()
 tester.process(test_section)
 
-box_size = calculate_minimum_box_size(tester.atom_data, padding=0.1)
+print(tester.content)
+box_size = calculate_minimum_box_size_from_df(tester.content, padding=0.1)
 print(f"Calculated box size: {box_size} nm")
 from A_modules.atomistic.gromacs.commands.editconf import Editconf
 

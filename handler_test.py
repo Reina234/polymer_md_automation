@@ -6,7 +6,7 @@ from A_modules.atomistic.gromacs.parser.registries.handler_registry import (
 )
 
 file_splitter = GromacsParser()
-sections = file_splitter.parse("TEST/POLY_GMX.gro")
+sections = file_splitter.parse("TEST/solvated.gro")
 print(sections)
 
 test_section = next(iter(sections.values()))
@@ -14,7 +14,9 @@ test_section = next(iter(sections.values()))
 print(test_section.lines)
 
 tester = handler_registry.get_handler(test_section.handler_name)()
+print("!!!!!")
 tester.process(test_section)
+print(tester.section)
 print(tester.content)
 
 test2 = tester.export()

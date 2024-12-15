@@ -59,6 +59,7 @@ class BaseHandler:
         """
         Processes a Section object and populates the handler's variables.
         """
+
         self.section = section
         lines = [line.strip() for line in section.lines if line.strip()]
 
