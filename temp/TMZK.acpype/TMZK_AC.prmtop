@@ -1,4 +1,4 @@
-%VERSION  VERSION_STAMP = V0001.000  DATE = 11/29/24  13:22:56                  
+%VERSION  VERSION_STAMP = V0001.000  DATE = 12/15/24  14:33:57                  
 %FLAG TITLE                                                                     
 %FORMAT(20a4)                                                                   
 input/solvents/pdb/hexane.pdb                                                   

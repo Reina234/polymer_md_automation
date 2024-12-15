@@ -1,5 +1,5 @@
 from typing import List, Optional
-from A_modules.atomistic.gromacs.parser.section import (
+from A_modules.atomistic.gromacs.parser.data_models.section import (
     Section,
 )  # Assuming Section is a predefined class
 import re

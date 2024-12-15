@@ -2,6 +2,7 @@ from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
     BaseHandler,
 )
 import pandas as pd
+import re
 from typing import List
 
 
@@ -87,13 +88,15 @@ class GroHandler(BaseHandler):
 
     def _parse_atom_line(self, line: str) -> List:
         """
-        Parses a single line of atom data in the .gro file, handling variable spacing and in-line comments.
+        Parses a single line of atom data in the .gro file, handling variable spacing,
+        combined or separate residue number and name, and in-line comments.
 
         :param line: A line of atom data from the .gro file.
         :type line: str
         :return: Parsed atom data as a list.
         :rtype: List
         """
+        # Handle in-line comments
         if ";" in line:
             content, comment = line.split(";", 1)
             line = content.strip()
@@ -101,20 +104,27 @@ class GroHandler(BaseHandler):
         else:
             comment = None
 
-        # Split the line by whitespace
-        tokens = line.split()
+        # Regex to extract the different parts of the line
+        match = re.match(
+            r"(?P<residue>[0-9]+[A-Za-z]*)\s+(?P<atom>[A-Za-z0-9]+)\s*(?P<index>[0-9]+)\s+"
+            r"(?P<x>[0-9.+-]+)\s+(?P<y>[0-9.+-]+)\s+(?P<z>[0-9.+-]+)",
+            line,
+        )
 
-        if len(tokens) < 7:
+        if not match:
             raise ValueError(f"Invalid atom line format: {line}")
 
-        # Parse the tokens
-        residue_number = int(tokens[0])  # Residue number
-        residue_name = tokens[1]  # Residue name
-        atom_name = tokens[2]  # Atom name
-        atom_index = int(tokens[3])  # Atom index
-        x = float(tokens[4])  # X coordinate
-        y = float(tokens[5])  # Y coordinate
-        z = float(tokens[6])  # Z coordinate
+        # Extract groups from the regex match
+        residue_number_and_name = match.group("residue")
+        atom_name = match.group("atom")
+        atom_index = int(match.group("index"))
+        x = float(match.group("x"))
+        y = float(match.group("y"))
+        z = float(match.group("z"))
+
+        # Separate residue number and residue name
+        residue_number = int("".join(filter(str.isdigit, residue_number_and_name)))
+        residue_name = "".join(filter(str.isalpha, residue_number_and_name))
 
         return [residue_number, residue_name, atom_name, atom_index, x, y, z, comment]
 
@@ -158,3 +168,42 @@ class GroHandler(BaseHandler):
             lines.append(" ".join(f"{dim:.6f}" for dim in self._box_dimensions))
 
         return lines
+
+
+def _parse_atom_line(self, line: str) -> List:
+    """
+    Parses a single line of atom data in the .gro file, handling variable spacing and in-line comments.
+
+    Args:
+        line (str): A line of atom data from the .gro file.
+
+    Returns:
+        List: Parsed atom data.
+    """
+    # Handle in-line comments
+    if ";" in line:
+        content, comment = line.split(";", 1)
+        line = content.strip()
+        comment = comment.strip()
+    else:
+        comment = None
+
+    # Split the line by whitespace
+    tokens = line.split()
+
+    if len(tokens) < 7:
+        raise ValueError(f"Invalid atom line format: {line}")
+
+    # Parse tokens into fields
+    residue_number_and_name = tokens[0]  # Combined residue number and name
+    atom_name = tokens[1]  # Atom name
+    atom_index = int(tokens[2])  # Atom index
+    x = float(tokens[3])  # X coordinate
+    y = float(tokens[4])  # Y coordinate
+    z = float(tokens[5])  # Z coordinate
+
+    # Separate residue number and residue name
+    residue_number = int("".join(filter(str.isdigit, residue_number_and_name)))
+    residue_name = "".join(filter(str.isalpha, residue_number_and_name))
+
+    return [residue_number, residue_name, atom_name, atom_index, x, y, z, comment]

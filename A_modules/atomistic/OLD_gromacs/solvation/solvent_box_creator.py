@@ -2,15 +2,17 @@ import os
 from config.paths import GROMACS_OUTPUT_SUBDIR, BASE_OUTPUT_DIR
 from config.constants import DEFAULT_BOX_SIZE_NM
 from typing import Optional, List
-from preprocessing.calculation_utils import calculate_num_particles
+from A_modules.shared.utils.calculation_utils import calculate_num_particles
 from A_modules.shared.metadata_tracker import MetadataTracker
 from A_modules.shared.command_line_operation import CommandLineOperation
+from A_config.constants import LengthUnits2
 
 # NOTE: add in file type checks
 
 
 class SolventInsertion(CommandLineOperation):
     output_name = "solvent_box.gro"
+    default_units = LengthUnits2.NANOMETER
 
     def __init__(self, metadata_tracker: Optional[MetadataTracker] = None):
         super().__init__(metadata_tracker)
@@ -57,7 +59,7 @@ class SolventInsertion(CommandLineOperation):
             box_size_nm,
             solvent_molecular_weight,
             solvent_density,
-            box_units=self.UNITS,
+            box_units=self.default_units,
         )
         solvent_box_gro_path = os.path.join(
             run_name, GROMACS_OUTPUT_SUBDIR, self.output_name

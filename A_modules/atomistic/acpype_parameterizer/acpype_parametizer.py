@@ -74,7 +74,7 @@ class ACPYPEParameterizer(CommandLineOperation):
         new_file_name: Optional[str] = None,
         additional_notes: Optional[str] = None,
         verbose: bool = False,
-    ):
+    ) -> AcpypePaths:
         input_file_path = os.path.abspath(input_file_path)
         command = self.acpype_command(input_file_path=input_file_path)
         overwrite_directory(self.raw_output_dir)
@@ -95,6 +95,8 @@ class ACPYPEParameterizer(CommandLineOperation):
 
         if self.metadata_tracker:
             self._update_metadata(input_file_path, final_acpype_paths, additional_notes)
+
+        return final_acpype_paths
 
     def metadata(
         self,

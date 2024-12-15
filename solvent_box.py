@@ -63,19 +63,8 @@ gromacsvalidator.validate(solvent.pdb_path, output_file_path=updated_solvent_pdb
 solvent_box = SolventInsertion(metadata_tracker)
 solvent_box_file = solvent_box.run(
     updated_solvent_pdb,
-    "solvent_trial",
+    "solvent_trial_2",
     solvent.density,
     solvent.molecular_weight,
     box_size_nm=[5, 5, 5],
 )
-
-topol_file = prepare_topol_file(solvent_topol, "solvent_trial/gromacs")
-
-forcefield = "amber99sb-ildn.ff/forcefield.itp"
-topol_file = reformat_topol_file(
-    topol_file, solvent_itp, forcefield, "solvent_trial/gromacs"
-)
-
-
-energy_minimizer = EnergyMinimizer(metadata_tracker)
-minimized_box = energy_minimizer.run(solvent_box_file, topol_file, "solvent_trial")

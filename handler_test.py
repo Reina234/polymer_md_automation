@@ -1,12 +1,12 @@
-from A_modules.atomistic.gromacs.parser.file_splitter import (
-    FileSplitter,
+from A_modules.atomistic.gromacs.parser.gromacs_parser import (
+    GromacsParser,
 )
 from A_modules.atomistic.gromacs.parser.registries.handler_registry import (
     handler_registry,
 )
 
-file_splitter = FileSplitter()
-sections = file_splitter.split_file("TEST/POLY_GMX.gro")
+file_splitter = GromacsParser()
+sections = file_splitter.parse("TEST/POLY_GMX.gro")
 print(sections)
 
 test_section = next(iter(sections.values()))

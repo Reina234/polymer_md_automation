@@ -1,7 +1,7 @@
 from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
     BaseHandler,
 )
-from A_modules.atomistic.gromacs.parser.section import (
+from A_modules.atomistic.gromacs.parser.data_models.section import (
     Section,
 )
 from A_modules.atomistic.gromacs.parser.registries.section_registry import (

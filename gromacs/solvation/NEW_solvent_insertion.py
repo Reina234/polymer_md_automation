@@ -75,7 +75,7 @@ class SolventInsertion(BaseGromacsCommand):
             logger.info(
                 f"Iteration {iteration}: Current particles: {current_num_particles}, Remaining: {remaining_particles}"
             )
-
+            append = os.path.exists(current_gro_path)
             if remaining_particles <= target_num_particles * tolerance:
                 logger.info(f"Target achieved with {current_num_particles} particles.")
                 if self.metadata_tracker:
@@ -95,7 +95,7 @@ class SolventInsertion(BaseGromacsCommand):
                 box_size_nm=box_size_nm,
                 num_particles=remaining_particles,
                 output_path=current_gro_path,
-                append=True,  # Allow appending to the existing box
+                append=append,  # Allow appending to the existing box
             )
             self._execute(command)
 

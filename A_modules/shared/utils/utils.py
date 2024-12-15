@@ -344,7 +344,7 @@ def determine_file_name(
 
 
 def check_file_does_not_exist(
-    file_path: str = None, suppress_error: bool = False
+    file_path: str = None, suppress_error: bool = False, delete_file: bool = False
 ) -> None:
     """
     Checks that a file does not exist in the correct location
@@ -362,6 +362,9 @@ def check_file_does_not_exist(
     if os.path.exists(file_path):
         if suppress_error:
             logger.warning(f"A file with the name '{file_path}' already exists.")
+            if delete_file:
+                os.remove(file_path)
+                logger.info(f"Deleted existing file: {file_path}")
             return
         raise FileExistsError(f"A file with the name '{file_path}' already exists.")
 

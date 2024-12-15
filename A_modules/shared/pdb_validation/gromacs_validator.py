@@ -6,8 +6,8 @@ from A_modules.shared.pdb_validation.base_pdb_validator import (
 )
 from A_modules.shared.utils.calculation_utils import calculate_minimum_box_size
 from data_models.solvent import Solvent
-from config.constants import DENSITY_TOLERANCE_PERCENTAGE
-from config.constants import LengthUnits
+from A_config.constants import DENSITY_TOLERANCE_PERCENTAGE
+from A_config.constants import LengthUnits2
 from A_modules.shared.metadata_tracker import MetadataTracker
 from config.constants import LengthUnits
 
@@ -32,6 +32,7 @@ class GROMACSPDBValidator(BasePDBValidator):
         input_file_path: str,
         output_file_path: Optional[str] = None,
         additional_notes: Optional[str] = None,
+        padding: Optional[float] = 10**-10,
     ) -> None:
         """
         Perform a full validation of the PDB file, starting with a skeletal check.
@@ -53,7 +54,11 @@ class GROMACSPDBValidator(BasePDBValidator):
 
             # Step 2: Proceed with other checks if skeletal validation succeeds
             logger.info("[*] Proceeding with additional GROMACS checks...")
-            self._validate_gromacs_specifics(input_file_path, output_file_path)
+            self._validate_gromacs_specifics(
+                input_file_path,
+                padding,
+                output_file_path,
+            )
             if self.metadata_tracker:
                 self._update_metadata(
                     input_file_path, output_file_path, additional_notes
@@ -66,6 +71,7 @@ class GROMACSPDBValidator(BasePDBValidator):
     def _validate_gromacs_specifics(
         self,
         input_file_path: str,
+        padding: float,
         output_file_path: Optional[str] = None,
     ):
         """
@@ -85,7 +91,7 @@ class GROMACSPDBValidator(BasePDBValidator):
 
         if not box_dimensions:
             logger.info(f"No valid box_dimensions found in the PDB file.")
-            box_dimensions, content = self._generate_box_dimensions(content)
+            box_dimensions, content = self._generate_box_dimensions(content, padding)
             self.pdb_parser.save(output_file_path, content)
 
         else:
@@ -93,7 +99,11 @@ class GROMACSPDBValidator(BasePDBValidator):
             content = self.pdb_parser.add_comment(content, self.BOX_DIMENSIONS_FOUND)
             self.pdb_parser.save(output_file_path, content)
 
-    def _generate_box_dimensions(self, content: List[str]) -> List[float]:
+    def _generate_box_dimensions(
+        self,
+        content: List[str],
+        padding: str,
+    ) -> List[float]:
         """
         Generate box dimensions if not found in the PDB file.
 
@@ -107,7 +117,7 @@ class GROMACSPDBValidator(BasePDBValidator):
         atoms = self.pdb_parser.extract_atoms(content)
         atom_coordinates = self.pdb_parser.get_atom_coordinates(atoms)
         box_dimensions = calculate_minimum_box_size(
-            atom_coordinates, padding=self.padding, output_units=LengthUnits.ANGSTROM
+            atom_coordinates, padding=padding, output_units=LengthUnits2.ANGSTROM
         )
         content = self.pdb_parser.add_or_replace_box_dimensions(content, box_dimensions)
         content = self.pdb_parser.add_comment(content, self.BOX_GENERATED_COMMENT)

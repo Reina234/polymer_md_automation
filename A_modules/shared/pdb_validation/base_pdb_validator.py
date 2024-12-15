@@ -28,6 +28,7 @@ class BasePDBValidator(ABC):
         input_file_path: str,
         output_file_path: Optional[str] = None,
         additional_notes: Optional[str] = None,
+        **kwargs,
     ) -> bool:
         """
         Validate the PDB file.

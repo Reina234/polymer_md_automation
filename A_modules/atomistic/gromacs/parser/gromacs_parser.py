@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from A_modules.atomistic.gromacs.parser.section import (
+from A_modules.atomistic.gromacs.parser.data_models.section import (
     Section,
 )
 from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
@@ -18,13 +18,13 @@ from A_modules.atomistic.gromacs.parser.registries.handler_registry import (
 )
 
 
-class FileSplitter:
+class GromacsParser:
     def __init__(self, handler_registry: HandlerRegistry = handler_registry):
         self.handler_registry = handler_registry
         self.suppressed_constructs: Optional[List[str]] = None
 
     # NOTE: make this more robust
-    def split_file(self, filepath: str) -> OrderedDict[str, Section]:
+    def parse(self, filepath: str) -> OrderedDict[str, Section]:
         if filepath.endswith(".gro"):
             construct_name = "gro_file"
             handler_name = GroHandler.construct_name
