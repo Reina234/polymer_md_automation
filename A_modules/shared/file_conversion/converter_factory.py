@@ -5,6 +5,9 @@ from A_modules.shared.file_conversion.converters.obabel_pdb_to_mol2_converter im
 from A_modules.shared.file_conversion.converters.base_converter import (
     BaseConverter,
 )
+from A_modules.shared.file_conversion.converters.editconf_pdb_to_gro import (
+    EditconfPDBtoGROConverter,
+)
 
 
 class ConverterFactory:
@@ -24,3 +27,4 @@ class ConverterFactory:
 
 
 ConverterFactory.register_converter(OBabelPDBtoMOL2Converter)
+ConverterFactory.register_converter(EditconfPDBtoGROConverter)
