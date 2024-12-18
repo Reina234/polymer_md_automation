@@ -4,7 +4,7 @@ from A_modules.shared.file_conversion.converters.obabel_pdb_to_mol2_converter im
 from A_modules.shared.file_conversion.converter_factory import ConverterFactory
 
 
-from A_modules.shared.utils.utils import check_directory_exists
+from A_modules.shared.utils.file_utils import check_directory_exists
 
 test = ConverterFactory().get_converter("pdb", "mol2")
 mol2_file = test.run("input/solvents/pdb/hexane.pdb", "TEST", verbose=True)
@@ -138,36 +138,29 @@ box_size = calculate_minimum_box_size_from_df(
 # file_splitter.export(sections, output_gro)
 # print(f"Updated .gro file written to {output_gro}")
 
-from A_modules.atomistic.gromacs.commands.editconf import Editconf
+from A_modules.atomistic.gromacs.utils.utils import create_solvated_box
+from data_models.solvent import Solvent
 
-editconf = Editconf()
-edited_solvent = editconf.run(
+solvent_pdb_path = "input/solvents/pdb/hexane.pdb"
+
+print(gro)
+print(top)
+solvent = Solvent("Hexane", 86.18, 660, solvent_pdb_path, "TMZK")
+refined_box = create_solvated_box(
     gro,
-    "TEST",
-    box_size_nm=box_size,
-    output_name="edited_solvent_box.gro",
-)
-
-output_box_gro_path = editconf.run(
-    gro,
-    "TEST",
-    [5, 5, 5],
-    output_name="edited_box.gro",
-)
-
-from A_modules.atomistic.gromacs.commands.solvate import Solvate
-
-# print(type(updated_path), type(output_box_gro_path), type(top))
-# print(output_box_gro_path)
-solvate = Solvate()
-solvate.run(
-    output_box_gro_path,
-    edited_solvent,
     top,
-    "TEST",
-    output_name="solvated.gro",
+    final_box_size=[5, 5, 5],
+    solvent=solvent,
+    output_dir="TESTTT",
+    max_attempts=20,
+    initial_box_factor=1,
 )
 
+print("finished?")
+
+from A_modules.atomistic.gromacs.commands.insert_molecules import InsertMolecules
+
+# InsertMolecules().run(gro, "output.gro", 10, "test/output2.gro")
 # from gromacs.solvation.NEW_solvent_insertion import SolventInsertion
 
 # from A_modules.atomistic.gromacs.commands.solvent_insertion import SolventInsertion
@@ -184,3 +177,16 @@ solvate.run(
 
 
 # NEED TO RUN SOLVATE FIRST, AND THEN DEAL WITH INSERTION
+from A_modules.atomistic.gromacs.commands.editconf import Editconf
+
+# Editconf().run(
+#    gro,
+#    "TEST",
+#    box_size,
+#    output_name="editconf_box_dim.gro",
+##)
+#
+#
+# from A_modules.atomistic.gromacs.utils.utils import validate_solute_gro_with_editconf
+
+# validate_solute_gro_with_editconf("output.gro", "TESTER")

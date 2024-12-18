@@ -1,5 +1,5 @@
 import os
-from A_modules.shared.utils.utils import copy_file, rename_file
+from A_modules.shared.utils.file_utils import copy_file, rename_file
 from A_modules.atomistic.acpype_parameterizer.acpype_config import (
     AcpypeOutputConfig,
     AcpypePaths,

@@ -4,7 +4,7 @@ import os
 from A_config.constants import DEFAULT_BOX_SIZE_NM
 from typing import Optional, List
 from A_modules.shared.utils.calculation_utils import calculate_num_particles
-from A_modules.shared.utils.utils import (
+from A_modules.shared.utils.file_utils import (
     directory_exists_check_wrapper,
     check_file_does_not_exist,
 )

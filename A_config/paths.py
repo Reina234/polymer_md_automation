@@ -3,7 +3,7 @@ from enum import Enum
 import dataclasses
 from typing import Optional
 
-TEMPORARY_OUTPUT_DIR = "temp"
+TEMP_DIR = "temp"
 TOPOL_NAME = "topol.top"
 
 

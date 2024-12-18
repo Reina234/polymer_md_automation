@@ -1,5 +1,5 @@
 from A_modules.shared.file_conversion.converter_factory import ConverterFactory
-from A_modules.shared.utils.utils import (
+from A_modules.shared.utils.file_utils import (
     overwrite_directory,
     file_exists_check_wrapper,
     directory_exists_check_wrapper,
@@ -14,7 +14,7 @@ from A_modules.atomistic.acpype_parameterizer.acpype_utils import (
     copy_acpype_files,
     rename_acpype_paths,
 )
-from A_config.paths import ACPYPE_POLYMER_NAME, TEMPORARY_OUTPUT_DIR
+from A_config.paths import ACPYPE_POLYMER_NAME, TEMP_DIR
 import os
 from typing import Optional
 
@@ -25,7 +25,7 @@ class ACPYPEParameterizer(CommandLineOperation):
         self,
         metadata_tracker=None,
         acpype_molecule_name: str = ACPYPE_POLYMER_NAME,
-        temp_dir: str = TEMPORARY_OUTPUT_DIR,
+        temp_dir: str = TEMP_DIR,
     ):
         self.molecule_name = acpype_molecule_name
         self._temp_dir = temp_dir

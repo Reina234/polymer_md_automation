@@ -1,6 +1,6 @@
 from A_modules.shared.metadata_tracker import MetadataTracker
 from A_modules.atomistic.gromacs.commands.base_gromacs_command import BaseGromacsCommand
-from A_modules.shared.utils.utils import (
+from A_modules.shared.utils.file_utils import (
     file_exists_check_wrapper,
     directory_exists_check_wrapper,
 )

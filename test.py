@@ -1,4 +1,4 @@
-from A_modules.shared.file_processing.file_parsers.pdb_parser import PDBParser
+from A_modules.shared.file_conversion.converters. import PDBParser
 from A_modules.shared.utils import check_file_exists, get_file_contents
 
 

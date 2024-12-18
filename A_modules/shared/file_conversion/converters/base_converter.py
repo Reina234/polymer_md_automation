@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from A_modules.shared.command_line_operation import CommandLineOperation
-from A_modules.shared.utils.utils import check_file_type
+from A_modules.shared.utils.file_utils import check_file_type
 from A_modules.shared.metadata_tracker import MetadataTracker
 from typing import Optional
 import logging

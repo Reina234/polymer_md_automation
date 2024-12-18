@@ -643,3 +643,47 @@ def generate_file_from_template(
         file.write(content)
 
     logger.info(f"Created file from template at {output_path}")
+
+
+def prepare_output_file_path(
+    input_file: str,
+    output_extension: str,
+    output_dir: Optional[str] = None,
+    output_name: Optional[str] = None,
+) -> str:
+    """
+    Constructs an output file path based on the input file path, output directory, and new output name.
+
+    :param input_file: Path to the input file.
+    :param output_dir: Directory to save the output file. If None, uses input file directory.
+    :param output_name: New file name without extension. If None, uses input file name.
+    :return: Full path to the output file with the specified extension.
+    """
+    input_path = Path(input_file)
+    output_dir = Path(output_dir) if output_dir else input_path.parent
+    output_name = output_name if output_name else input_path.stem
+    output_file_path = (
+        output_dir / f"{output_name}.{output_extension}"
+    )  # Correct concatenation
+    check_directory_exists(str(output_dir))  # Ensure output directory exists
+    return str(output_file_path)
+
+
+def add_suffix_to_filename(
+    file_path: str, suffix: str, return_full_path: bool = True
+) -> str:
+    """
+    Adds a suffix to the base name of a file, preserving the directory and extension.
+
+    :param file_path: The original file path (e.g., "path/to/file.extension").
+    :param suffix: The suffix to add to the base name (e.g., "_value").
+    :param return_full_path: If True, returns the full path; if False, returns only the base name.
+    :return: Modified file path or base name with the suffix.
+    """
+    path = Path(file_path)
+    new_name = f"{path.stem}_{suffix}{path.suffix}"
+
+    if return_full_path:
+        return str(path.with_name(new_name))
+    else:
+        return new_name

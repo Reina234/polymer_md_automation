@@ -4,7 +4,7 @@ from A_modules.shared.file_conversion.converters.base_converter import (
     BaseConverter,
 )
 from A_modules.shared.metadata_tracker import MetadataTracker
-from A_modules.shared.utils.utils import (
+from A_modules.shared.utils.file_utils import (
     construct_output_file_path,
     file_type_check_wrapper,
 )

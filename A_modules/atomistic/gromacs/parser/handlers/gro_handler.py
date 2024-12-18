@@ -4,12 +4,9 @@ from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
 import pandas as pd
 import re
 from typing import List, Optional, Tuple
+import logging
 
-
-from A_modules.atomistic.gromacs.parser.handlers.base_handler import BaseHandler
-import pandas as pd
-import re
-from typing import List, Optional, Tuple
+logger = logging.getLogger(__name__)
 
 
 class GroHandler(BaseHandler):
@@ -41,22 +38,27 @@ class GroHandler(BaseHandler):
         """
         Returns the box dimensions as a list of three floats.
         """
-        if self._box_dimensions is None:
-            raise ValueError("Box dimensions have not been set.")
         return self._box_dimensions
 
     @box_dimensions.setter
-    def box_dimensions(self, box_dimensions: List[float]):
+    def box_dimensions(self, box_dimensions: Optional[List[float]]):
         """
         Sets the box dimensions. Validates that the input is a list of three floats.
+        Allows setting to None.
         """
-        if len(box_dimensions) != 3:
+        if box_dimensions is None:
+            self._box_dimensions = None
+            return
+
+        if not isinstance(box_dimensions, list) or len(box_dimensions) != 3:
             raise ValueError("Box dimensions must be a list of three floats.")
+
         self._box_dimensions = [float(dim) for dim in box_dimensions]
 
     def process(self, section):
         """
         Process a section of a .gro file to parse atom lines and extract box dimensions.
+        Handles cases where box dimensions are missing or malformed.
         """
         self.section = section
         lines = [line.strip() for line in section.lines if line.strip()]
@@ -64,16 +66,40 @@ class GroHandler(BaseHandler):
         # Top line (title)
         self.top_line = lines.pop(0)
 
-        # Number of atoms
-        self.num_atoms = int(lines.pop(0))
+        # Validate and parse number of atoms
+        if not lines:
+            raise ValueError("Missing number of atoms line in the .gro file.")
 
-        for line in lines:
+        try:
+            self.num_atoms = int(lines.pop(0))
+        except ValueError as e:
+            raise ValueError(
+                f"Expected an integer for number of atoms. Found: '{lines[0]}'. Details: {e}"
+            )
+
+        # Parse atom data and box dimensions
+        for i, line in enumerate(lines):
+            # Check if we've reached the expected number of atoms
             if len(self.atom_data) < self.num_atoms:
                 normalized_tokens = self._normalize_atom_line(line)
                 self.atom_data.append(normalized_tokens)
             else:
-                # Parse box dimensions
-                self.box_dimensions = self._parse_box_dimensions(line)
+                # Assume the remaining line is box dimensions
+                box_dims = self._parse_box_dimensions(line)
+
+                if box_dims:
+                    self.box_dimensions = box_dims
+                    break  # Stop processing after finding box dimensions
+                else:
+                    logger.warning(
+                        f"Invalid box dimensions: {line}. Assuming no box dimensions."
+                    )
+                    self.box_dimensions = None
+                    break
+
+        # Check if box dimensions were parsed; if not, log a warning
+        if self.box_dimensions is None:
+            logger.warning("No valid box dimensions found in the .gro file.")
 
     def _normalize_atom_line(self, line: str) -> List:
         """
@@ -135,19 +161,23 @@ class GroHandler(BaseHandler):
         atom_index = int(tokens.pop(0))  # Assume atom index is always the next token
         return atom_name, atom_index, tokens
 
-    def _parse_box_dimensions(self, line: str) -> List[float]:
+    def _parse_box_dimensions(self, line: str) -> Optional[List[float]]:
         """
         Parse box dimensions from the last line of the .gro file.
+        Returns None if the line does not contain valid box dimensions.
         """
         try:
             tokens = line.split()
-            if len(tokens) != 3:
-                raise ValueError(
-                    f"Expected exactly 3 values for box dimensions, got {len(tokens)}."
-                )
-            return [float(dim) for dim in tokens]
+
+            # Box dimensions must contain exactly 3 numeric tokens
+            if len(tokens) == 3 and all(self._is_float(dim) for dim in tokens):
+                return [float(dim) for dim in tokens]
+
+            # If not valid, assume it's not a box dimensions line
+            return None
         except ValueError as e:
-            raise ValueError(f"Error parsing box dimensions: {line}. Details: {e}")
+            logger.warning(f"Error parsing box dimensions: {line}. Details: {e}")
+            return None
 
     @property
     def content(self) -> pd.DataFrame:
@@ -179,6 +209,17 @@ class GroHandler(BaseHandler):
         if self._box_dimensions:
             lines.append(" ".join(f"{dim:.6f}" for dim in self._box_dimensions))
         return lines
+
+    @staticmethod
+    def _is_float(value: str) -> bool:
+        """
+        Check if a string can be converted to a float.
+        """
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
 
 
 # NOTE: formatting issues exist for the box dims part, so editconf is recommended instead :(

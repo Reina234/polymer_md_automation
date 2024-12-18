@@ -1,5 +1,5 @@
 from A_modules.atomistic.gromacs.gromacs_config import MDP_NAMING_SCHEME, TemplatedMdps
-from A_modules.shared.utils.utils import (
+from A_modules.shared.utils.file_utils import (
     directory_exists_check_wrapper,
     generate_file_from_template,
 )
