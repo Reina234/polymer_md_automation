@@ -350,31 +350,49 @@ def add_missing_molecules(
     box_gro_file: str,
     solvent_gro_file: str,
     target_num_particles: int,
+    tolerance: float,  # 1% tolerance by default
+    max_attempts: int = 10,
     insert_molecules: InsertMolecules = InsertMolecules(),
 ) -> str:
     """
-    Adds remaining molecules to the box until the target particle count is reached.
+    Adds remaining molecules iteratively until the target particle count is reached within tolerance.
 
     :param box_gro_file: Path to the box .gro file.
     :param solvent_gro_file: Path to the solvent .gro file.
     :param target_num_particles: Desired number of particles.
+    :param tolerance: Tolerance for the number of particles (default: 1%).
+    :param max_attempts: Maximum number of attempts to add molecules.
     :return: Path to the updated box .gro file.
     """
-    gro_handler = get_gro_handler(box_gro_file)
-    remaining_particles = get_remaining_particles(
-        gro_handler, target_num_particles, suppress_error=False
-    )
+    attempt = 0
 
-    if remaining_particles > 0:
-        logger.info(f"Adding {remaining_particles} remaining molecules to the box.")
-        return insert_molecules.run(
-            box_gro_file,
-            solvent_gro_file,
-            remaining_particles,
+    while attempt < max_attempts:
+        attempt += 1
+        logger.info(f"Attempt {attempt}: Checking remaining particles...")
+
+        gro_handler = get_gro_handler(box_gro_file)
+        remaining_particles = get_remaining_particles(
+            gro_handler, target_num_particles, suppress_error=False
         )
 
-    logger.info("No additional molecules needed. Box is valid.")
-    return box_gro_file
+        if is_target_achieved(remaining_particles, target_num_particles, tolerance):
+            logger.info("Target number of particles achieved within tolerance.")
+            return box_gro_file
+
+        if remaining_particles > 0:
+            logger.info(f"Adding {remaining_particles} molecules to the box.")
+            box_gro_file = insert_molecules.run(
+                box_gro_file,
+                solvent_gro_file,
+                num_molecules=remaining_particles,
+            )
+        else:
+            logger.warning("No remaining particles to add. Stopping early.")
+            break
+
+    raise RuntimeError(
+        f"Failed to achieve target particle count within {max_attempts} attempts."
+    )
 
 
 def refine_solvated_box(
@@ -383,9 +401,10 @@ def refine_solvated_box(
     final_box_size: List[float],
     target_num_particles: int,
     output_dir: str,
-    initial_box_factor: float = 0.9,
-    safety_margin: float = 0.95,
-    max_attempts: int = 5,
+    initial_box_factor: float,
+    tolerance: float,
+    safety_margin: float,
+    max_attempts: int,
 ) -> str:
     """
     Refines a solvated box to meet the target particle count.
@@ -418,6 +437,7 @@ def refine_solvated_box(
         box_gro_file=box_gro_path,
         solvent_gro_file=solvent_gro_file,
         target_num_particles=target_num_particles,
+        tolerance=tolerance,
     )
 
     # Step 3: Return the final refined box
@@ -432,6 +452,7 @@ def create_solvated_box(
     solvent: Solvent,
     output_dir: str,
     initial_box_factor: float = 0.9,
+    tolerance: float = 0.01,
     safety_margin: float = 0.95,
     max_attempts: int = 5,
 ) -> str:
@@ -454,6 +475,7 @@ def create_solvated_box(
         target_num_particles=target_num_particles,
         output_dir=output_dir,
         initial_box_factor=initial_box_factor,
+        tolerance=tolerance,
         safety_margin=safety_margin,
         max_attempts=max_attempts,
     )
