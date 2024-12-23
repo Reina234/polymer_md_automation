@@ -1,7 +1,7 @@
 ; NPT Equilibration
 integrator      = md
 nsteps          = 50000
-dt              = 0.002
+dt              = 0.0001
 nstxout         = 5000
 nstvout         = 5000
 nstenergy       = 5000

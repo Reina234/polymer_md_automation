@@ -44,7 +44,8 @@ from A_modules.shared.file_conversion.converters.editconf_pdb_to_gro import (
 
 converter = EditconfPDBtoGROConverter()
 output_gro = converter.run(result, "ZZZZZ", "test_output.gro")
-
+print("!!!!!!")
+print(output_gro)
 
 from A_modules.atomistic.gromacs.equilibriation.mdp_cache import MDPCache
 from A_modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow import (
@@ -65,20 +66,20 @@ workflow = FullEquilibrationWorkflow(mdp_cache)
 workflow.add_step(
     workflow_step=NptWorkflowStep(Grompp(), MDrun()),
     template_path="A_modules/atomistic/gromacs/equilibriation/templates/em.mdp",
-    base_params=None,
+    base_params={},
 )
 
 # List of varying parameters
-# varying_params_list = [{"temp": str(temp), "pressure_tau": "2.0"} for temp in [300]]
+varying_params_list = [{"nsteps": "1000"}]
 
 # Run workflow
 workflow.run(
     input_gro_path=output_gro,
-    input_topol_path="/temp/TMZK.acpype/TMZK_GMX.top",
+    input_topol_path="temp/TMZK.acpype/TMZK_GMX.top",
     temp_output_dir="temp_outputs",
     main_output_dir="final_outputs",
     keep_files=["gro", "log"],
-    varying_params_list=None,
+    varying_params_list=varying_params_list,
     verbose=True,
 )
 

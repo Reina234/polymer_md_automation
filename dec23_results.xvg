@@ -1,0 +1,35 @@
+# This file was created Mon Dec 23 19:07:24 2024
+# Created by:
+#                :-) GROMACS - gmx energy, 2024.4-conda_forge (-:
+# 
+# Executable:   /home/reina/miniconda3/envs/lammps_packages/bin.AVX2_256/gmx
+# Data prefix:  /home/reina/miniconda3/envs/lammps_packages
+# Working dir:  /home/reina/polymerpinn
+# Command line:
+#   gmx energy -f temp_outputs/step_output.edr -o dec23_results.xvg
+# gmx energy is part of G R O M A C S:
+#
+# Giant Rising Ordinary Mutants for A Clerical Setup
+#
+@    title "GROMACS Energies"
+@    xaxis  label "Time (ps)"
+@    yaxis  label "(kg/m^3)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "Density"
+    0.000000  660.512573
+   10.000000  571.261475
+   20.000000  622.560059
+   30.000000  639.323914
+   40.000000  642.937744
+   50.000000  652.020264
+   60.000000  647.554565
+   70.000000  646.915588
+   80.000000  643.676392
+   90.000000  649.745239
+  100.000000  648.522339

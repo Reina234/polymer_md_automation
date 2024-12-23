@@ -95,6 +95,8 @@ class BaseWorkflowStep:
             verbose=verbose,
         )
 
+        print("!!!!!!!!!!!1")
+        print(mdp_template_path)
         # Run MDrun
         mdrun_outputs = self.mdrun.run(
             input_tpr_path=grompp_output,
@@ -106,6 +108,9 @@ class BaseWorkflowStep:
         files_to_keep = [
             mdrun_outputs[ext] for ext in keep_files if ext in mdrun_outputs
         ]
-        batch_copy_file(files_to_keep, main_output_dir, delete_original=True)
+        output_files = batch_copy_file(
+            files_to_keep, main_output_dir, delete_original=True
+        )
 
         logger.info(f"Workflow step completed. Output files saved to {main_output_dir}")
+        return output_files

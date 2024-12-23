@@ -1,0 +1,9 @@
+tolerance 2.0
+filetype pdb
+
+output ZZZZZ/test3_solvent_box.pdb
+
+structure ZZZZZ/test_output.pdb
+  number 577
+  inside box 0.0 0.0 0.0 50.0 50.0 50.0
+end structure

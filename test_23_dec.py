@@ -56,16 +56,16 @@ top = parametized.top_path
 
 
 converter = EditconfGROtoPDBConverter()
-box_size_nm = [10, 10, 10]
+box_size_nm = [5, 5, 5]
 # may need to fix file extensions on converters
-output_pdb = converter.run(gro, "ZZZZZ", "test_output.pdb")
+output_pdb = converter.run(gro, "ZZZZZ", output_name="test_output.pdb")
 
 
 # Path to a valid solvent PDB file
 output_dir = "test_output"
-output_file = "test2_solvent_box.pdb"
+output_file = "test3_solvent_box.pdb"
 # Example box size in nanometers
-solvent = Solvent("Hexane", 186.18, 660, output_pdb, "TMZK")
+solvent = Solvent("Hexane", 86, 660, output_pdb, "TMZK")
 
 # Create an instance of PackmolSolventBox
 packmol_operation = PackmolSolventBox()
@@ -83,7 +83,9 @@ result = packmol_operation.run(
 assert os.path.exists(result), f"Output file not found: {result}"
 
 converter = EditconfPDBtoGROConverter()
-output_gro = converter.run(result, "ZZZZZ", "test_output.gro", box_size_nm=box_size_nm)
+output_gro = converter.run(
+    result, "ZZZZZ", box_size_nm=box_size_nm, output_name="test_output.gro"
+)
 
 print(result)
 
@@ -95,9 +97,16 @@ workflow = FullEquilibrationWorkflow(mdp_cache)
 
 workflow.add_step(
     workflow_step=NptWorkflowStep(Grompp(), MDrun()),
-    template_path="A_modules/atomistic/gromacs/equilibriation/templates/npt.mdp",
-    base_params={"pressure": "1.0", "compressibility": "4.5e-5"},
+    template_path="A_modules/atomistic/gromacs/equilibriation/templates/em.mdp",
+    base_params={"nsteps": "50000"},
 )
+
+workflow.add_step(
+    workflow_step=NptWorkflowStep(Grompp(), MDrun()),
+    template_path="A_modules/atomistic/gromacs/equilibriation/templates/em_2.mdp",
+    base_params={"nsteps": "50000"},
+)
+
 
 workflow.add_step(
     workflow_step=NptWorkflowStep(Grompp(), MDrun()),
@@ -111,7 +120,7 @@ varying_params_list = [{"temp": str(temp), "pressure_tau": "2.0"} for temp in [3
 # Run workflow
 workflow.run(
     input_gro_path=output_gro,
-    input_topol_path="/temp/TMZK.acpype/TMZK_GMX.top",
+    input_topol_path="temp/TMZK.acpype/TMZK_GMX.top",
     temp_output_dir="temp_outputs",
     main_output_dir="final_outputs",
     keep_files=["gro", "log"],
