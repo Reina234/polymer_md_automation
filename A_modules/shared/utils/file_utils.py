@@ -147,7 +147,7 @@ def save_content_to_path(
     :rtype: str
     """
 
-    output_path = check_file_does_not_exist(output_path, suppress_error=suppress_error)
+    check_file_does_not_exist(output_path, suppress_error=suppress_error)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as file:
         file.writelines(content)
@@ -687,3 +687,14 @@ def add_suffix_to_filename(
         return str(path.with_name(new_name))
     else:
         return new_name
+
+
+def create_temp_directory(base_dir: str, sub_dir: str) -> str:
+    temp_dir = os.path.join(base_dir, sub_dir)
+    os.makedirs(temp_dir, exist_ok=True)
+    return temp_dir
+
+
+def cleanup_directory(directory: str) -> None:
+    if os.path.exists(directory):
+        shutil.rmtree(directory)

@@ -31,7 +31,7 @@ class InsertMolecules(BaseGromacsCommand):
             output_dir=output_dir,
             output_name=output_name,
         )
-        command, output_path = self._create_insert_molecules_command(
+        command, output_path = self._create_command(
             input_box_gro_path=input_box_gro_path,
             solvent_gro_path=solvent_gro_path,
             num_molecules=num_molecules,
@@ -50,7 +50,7 @@ class InsertMolecules(BaseGromacsCommand):
 
         return output_path
 
-    def _create_insert_molecules_command(
+    def _create_command(
         self,
         input_box_gro_path: str,
         solvent_gro_path: str,

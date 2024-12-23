@@ -57,8 +57,7 @@ class GroHandler(BaseHandler):
 
     def process(self, section):
         """
-        Process a section of a .gro file to parse atom lines and extract box dimensions.
-        Handles cases where box dimensions are missing or malformed.
+        Process a .gro file section to parse atom lines and extract box dimensions.
         """
         self.section = section
         lines = [line.strip() for line in section.lines if line.strip()]
@@ -66,40 +65,37 @@ class GroHandler(BaseHandler):
         # Top line (title)
         self.top_line = lines.pop(0)
 
-        # Validate and parse number of atoms
+        # Parse number of atoms
         if not lines:
             raise ValueError("Missing number of atoms line in the .gro file.")
-
         try:
             self.num_atoms = int(lines.pop(0))
-        except ValueError as e:
-            raise ValueError(
-                f"Expected an integer for number of atoms. Found: '{lines[0]}'. Details: {e}"
-            )
+        except ValueError:
+            raise ValueError("Expected an integer for the number of atoms.")
 
         # Parse atom data and box dimensions
         for i, line in enumerate(lines):
-            # Check if we've reached the expected number of atoms
             if len(self.atom_data) < self.num_atoms:
                 normalized_tokens = self._normalize_atom_line(line)
                 self.atom_data.append(normalized_tokens)
             else:
-                # Assume the remaining line is box dimensions
-                box_dims = self._parse_box_dimensions(line)
-
-                if box_dims:
+                # Parse box dimensions
+                box_dims = self.parse_box_dimensions(line)
+                if self.validate_box_dimensions(box_dims):
                     self.box_dimensions = box_dims
-                    break  # Stop processing after finding box dimensions
                 else:
-                    logger.warning(
-                        f"Invalid box dimensions: {line}. Assuming no box dimensions."
-                    )
-                    self.box_dimensions = None
-                    break
+                    logger.warning(f"Invalid box dimensions: {line}")
+                break
 
-        # Check if box dimensions were parsed; if not, log a warning
+        # Validate that all atoms and box dimensions are parsed correctly
+        if len(self.atom_data) != self.num_atoms:
+            logger.error(
+                f"Expected {self.num_atoms} atoms but parsed {len(self.atom_data)}."
+            )
+            raise ValueError("Mismatch between expected and parsed number of atoms.")
+
         if self.box_dimensions is None:
-            logger.warning("No valid box dimensions found in the .gro file.")
+            logger.warning("No valid box dimensions found.")
 
     def _normalize_atom_line(self, line: str) -> List:
         """
@@ -196,18 +192,27 @@ class GroHandler(BaseHandler):
 
     def _export_content(self) -> List[str]:
         """
-        Export content to `.gro` format lines.
+        Export the parsed content to `.gro` format lines.
         """
         lines = []
+
+        # Export atom data
         for row in self.atom_data:
-            content = f"{row[0]:5}{row[1]:>5}{row[2]:>5}{row[3]:5}{row[4]:8.3f}{row[5]:8.3f}{row[6]:8.3f}"
+            content = (
+                f"{row[0]:5}{row[1]:>5}{row[2]:>5}{row[3]:5}"
+                f"{row[4]:8.3f}{row[5]:8.3f}{row[6]:8.3f}"
+            )
             if row[7]:
                 content += f" ; {row[7]}"
             lines.append(content)
 
-        # Add formatted box dimensions
-        if self._box_dimensions:
-            lines.append(" ".join(f"{dim:.6f}" for dim in self._box_dimensions))
+        # Export box dimensions if valid
+        if self.validate_box_dimensions(self.box_dimensions):
+            lines.append(" ".join(f"{dim:.6f}" for dim in self.box_dimensions))
+        else:
+            logger.error("Cannot export .gro file without valid box dimensions.")
+            raise ValueError("Invalid or missing box dimensions during export.")
+
         return lines
 
     @staticmethod
@@ -220,6 +225,32 @@ class GroHandler(BaseHandler):
             return True
         except ValueError:
             return False
+
+    # NOTE: replace with the one in the utils functions !
+    @staticmethod
+    def parse_box_dimensions(line: str) -> Optional[List[float]]:
+        """
+        Parse a line containing box dimensions.
+        Returns:
+            List[float]: Parsed box dimensions if valid.
+            None: If the line does not contain valid box dimensions.
+        """
+        try:
+            tokens = line.split()
+            if len(tokens) == 3 and all(GroHandler._is_float(dim) for dim in tokens):
+                return [float(dim) for dim in tokens]
+        except ValueError:
+            pass
+        return None
+
+    @staticmethod
+    def validate_box_dimensions(box_dimensions: Optional[List[float]]) -> bool:
+        """
+        Validate that box dimensions are a list of three positive floats.
+        """
+        if not box_dimensions or len(box_dimensions) != 3:
+            return False
+        return all(isinstance(dim, float) and dim > 0 for dim in box_dimensions)
 
 
 # NOTE: formatting issues exist for the box dims part, so editconf is recommended instead :(

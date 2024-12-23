@@ -34,6 +34,7 @@ class BaseConverter(CommandLineOperation, ABC):
         output_dir: Optional[str] = None,
         additional_notes: Optional[str] = None,
         verbose: bool = False,
+        **kwargs,
     ) -> str:
         """
         Runs the conversion process after ensuring file type validation.
@@ -56,6 +57,7 @@ class BaseConverter(CommandLineOperation, ABC):
             output_dir=output_dir,
             additional_notes=additional_notes,
             verbose=verbose,
+            **kwargs,
         )
 
     @abstractmethod
@@ -65,6 +67,7 @@ class BaseConverter(CommandLineOperation, ABC):
         output_dir: Optional[str] = None,
         additional_notes: Optional[str] = None,
         verbose: bool = False,
+        **kwargs,
     ) -> str:
         """
         Subclass-specific implementation of the conversion process.

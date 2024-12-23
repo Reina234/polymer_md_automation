@@ -15,3 +15,11 @@ class BaseGromacsCommand(CommandLineOperation, ABC):
     @property
     def step_name(self) -> str:
         return "gromacs"
+
+    @abstractmethod
+    def run(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def _create_command(self, *args, **kwargs):
+        pass

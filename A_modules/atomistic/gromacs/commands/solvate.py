@@ -28,7 +28,7 @@ class Solvate(BaseGromacsCommand):
     ):
         output_gro_path = os.path.join(output_dir, output_name)
 
-        command = self._create_solvate_command(
+        command = self._create_command(
             solute_gro_path=solute_gro_path,
             solvent_gro_path=solvent_gro_path,
             input_topol_path=input_topol_path,
@@ -48,7 +48,7 @@ class Solvate(BaseGromacsCommand):
             )
         return output_gro_path
 
-    def _create_solvate_command(
+    def _create_command(
         self,
         solute_gro_path: str,
         solvent_gro_path: str,

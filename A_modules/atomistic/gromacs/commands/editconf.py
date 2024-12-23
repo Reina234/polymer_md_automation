@@ -24,7 +24,7 @@ class Editconf(BaseGromacsCommand):
     ):
         output_gro_path = os.path.join(output_dir, output_name)
 
-        command = self._create_editconf_command(
+        command = self._create_command(
             input_gro_or_pdb_path=input_gro_or_pdb_path,
             output_gro_path=output_gro_path,
             box_size_nm=box_size_nm,
@@ -42,7 +42,7 @@ class Editconf(BaseGromacsCommand):
             )
         return output_gro_path
 
-    def _create_editconf_command(
+    def _create_command(
         self,
         input_gro_or_pdb_path: str,
         output_gro_path: str,
