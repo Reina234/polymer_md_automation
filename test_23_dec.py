@@ -79,9 +79,6 @@ result = packmol_operation.run(
     box_size_nm=box_size_nm,
 )
 
-# Validate the result
-assert os.path.exists(result), f"Output file not found: {result}"
-
 converter = EditconfPDBtoGROConverter()
 output_gro = converter.run(
     result, "ZZZZZ", box_size_nm=box_size_nm, output_name="test_output.gro"

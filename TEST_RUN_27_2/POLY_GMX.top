@@ -1,0 +1,10 @@
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Sat Dec 28 00:05:17 2024
+
+; Ligand position restraints
+#include "/home/reina/polymerpinn/TEST_RUN_27_2/POLY_GMX.itp"
+[ system ]
+ POLY
+
+[ molecules ]
+; Compound        nmols
+TMZK 577

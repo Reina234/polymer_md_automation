@@ -624,8 +624,6 @@ def create_solvated_box(
     validated_solvent_gro_file = validate_solute_gro_with_editconf(
         gro_file=solvent_gro_file, output_dir=output_dir
     )
-    print("!!!!!")
-    print(validated_solvent_gro_file)
     target_num_particles = calculate_num_particles(
         box_dimensions=final_box_size,
         molecular_weight=solvent.molecular_weight,
@@ -647,3 +645,45 @@ def create_solvated_box(
 
     print("NUM_MOLECULES")
     return solvated_box
+
+
+def prepare_solvent_box_name(solvent: Solvent, extension: str):
+    return f"{solvent.name.lower()}_solvent_box.{extension}"
+
+
+from A_modules.shared.file_conversion.converters.base_converter import BaseConverter
+from A_modules.shared.file_conversion.converters.editconf_gro_to_pdb import (
+    EditconfGROtoPDBConverter,
+)
+from A_modules.shared.file_conversion.converters.editconf_pdb_to_gro import (
+    EditconfPDBtoGROConverter,
+)
+from A_modules.shared.packmol.solvent_box import PackmolSolventBox
+
+
+def create_solvent_box_gro(
+    input_gro_file,
+    output_dir: str,
+    box_size_nm: List[float],
+    solvent: Solvent,
+    output_name: Optional[str] = None,
+    temp_dir: str = TEMP_DIR,
+    gro_to_pdb_converter: BaseConverter = EditconfGROtoPDBConverter(),
+    pdb_to_gro_converter: BaseConverter = EditconfPDBtoGROConverter(),
+    packmol_operation: PackmolSolventBox = PackmolSolventBox(),
+) -> str:
+    output_pdb = gro_to_pdb_converter.run(input_gro_file, temp_dir)
+    if not output_name:
+        output_name = prepare_solvent_box_name(solvent, "gro")
+
+    packmol_output = packmol_operation.run(
+        output_pdb,
+        output_dir=temp_dir,
+        solvent=solvent,
+        box_size_nm=box_size_nm,
+    )
+    print(packmol_output)
+    output_gro = pdb_to_gro_converter.run(
+        packmol_output, output_dir, box_size_nm=box_size_nm, output_name=output_name
+    )
+    return output_gro

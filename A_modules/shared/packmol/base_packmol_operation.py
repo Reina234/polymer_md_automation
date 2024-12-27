@@ -98,29 +98,17 @@ class BasePackmolOperation(CommandLineOperation, ABC):
     def run(
         self,
         input_pdb: str,
-        output_file: str,
+        output_name: Optional[str] = None,
         output_dir: str = TEMP_DIR,
         temp_output_dir: str = TEMP_DIR,
         template_path: Optional[str] = None,
         verbose: bool = False,
         **kwargs,
     ) -> str:
-        """
-        Main entry point for executing the Packmol operation. Automatically generates
-        the input script, runs Packmol, and validates output.
-
-        Args:
-            input_pdb (str): Path to the input PDB file.
-            output_file (str): Path to the final output file (PDB or other specified format).
-            output_dir (str): Directory to store the final output file.
-            temp_output_dir (str): Directory to store the temporary input script.
-            template_path (Optional[str]): Path to a custom template file (if any).
-            verbose (bool): If True, enables verbose logging for Packmol execution.
-            **kwargs: Additional arguments for generating template parameters.
-
-        Returns:
-            str: Path to the generated output file.
-        """
+        if not output_name:
+            output_name = (
+                f"{os.path.splitext(os.path.basename(input_pdb))[0]}_packed.pdb"
+            )
         logger.info(f"Starting Packmol operation: {self.__class__.__name__}")
 
         # Ensure the output directory exists
@@ -129,7 +117,7 @@ class BasePackmolOperation(CommandLineOperation, ABC):
         # Step 1: Generate template parameters
         template_params = self.generate_template_params(
             input_pdb=input_pdb,
-            output_file=os.path.join(output_dir, output_file),
+            output_file=os.path.join(output_dir, output_name),
             **kwargs,
         )
         logger.debug(f"Generated template parameters: {template_params}")
@@ -138,7 +126,7 @@ class BasePackmolOperation(CommandLineOperation, ABC):
         input_script = self.generate_input_script(
             template_params=template_params,
             temp_output_dir=temp_output_dir,
-            output_name=os.path.splitext(os.path.basename(output_file))[0],
+            output_name=os.path.splitext(os.path.basename(output_name))[0],
             template_path=template_path,
         )
         logger.debug(f"Generated Packmol input script: {input_script}")
@@ -152,7 +140,7 @@ class BasePackmolOperation(CommandLineOperation, ABC):
 
         #############################################
         # Step 4: Validate output file existence
-        final_output_path = os.path.join(output_dir, output_file)
+        final_output_path = os.path.join(output_dir, output_name)
         if not os.path.exists(final_output_path):
             logger.error(
                 f"Packmol failed to generate the output file: {final_output_path}"

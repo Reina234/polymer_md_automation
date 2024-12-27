@@ -2,7 +2,7 @@
 ;	File 'mdout.mdp' was generated
 ;	By user: unknown (1000)
 ;	On host: LENOVO-PC
-;	At date: Mon Dec 23 18:53:46 2024
+;	At date: Sat Dec 28 00:11:06 2024
 ;
 ;	Created by:
 ;	               :-) GROMACS - gmx grompp, 2024.4-conda_forge (-:
@@ -11,7 +11,7 @@
 ;	Data prefix:  /home/reina/miniconda3/envs/lammps_packages
 ;	Working dir:  /home/reina/polymerpinn
 ;	Command line:
-;	  gmx grompp -f cache/22ff3cfdd5eb98ccf3450c3afb29e155.mdp -c final_outputs/step_output.gro -p temp/TMZK.acpype/TMZK_GMX.top -o temp_outputs/step.tpr
+;	  gmx grompp -f cache/22ff3cfdd5eb98ccf3450c3afb29e155.mdp -c output_27_dec/minim.gro -p TEST_RUN_27/POLY_GMX.top -o temp/npt.tpr
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
@@ -175,7 +175,7 @@ annealing-temp           =
 ; GENERATE VELOCITIES FOR STARTUP RUN
 gen_vel                  = no
 gen-temp                 = 300
-gen-seed                 = 2080077567
+gen-seed                 = -4327503
 
 ; OPTIONS FOR BONDS    
 constraints              = all-bonds

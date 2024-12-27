@@ -62,8 +62,21 @@ class GroHandler(BaseHandler):
         self.section = section
         lines = section.lines  # Do not strip lines to preserve fixed-width format
 
-        # Top line (title)
-        self.top_line = lines.pop(0).rstrip()
+        # Ensure there is only one top line, concatenating if necessary
+        if lines:
+            possible_top_lines = []
+            while (
+                lines and not lines[0].strip().isdigit()
+            ):  # Until the atom count is found
+                possible_top_lines.append(lines.pop(0).strip())
+            self.top_line = (
+                " ".join(possible_top_lines)
+                if possible_top_lines
+                else "default top line"
+            )
+
+        else:
+            self.top_line = "default top line"
 
         # Parse number of atoms
         if not lines:
@@ -126,26 +139,42 @@ class GroHandler(BaseHandler):
     def _export_content(self) -> List[str]:
         """
         Export the parsed content to `.gro` format lines.
-        Ensures adherence to the fixed-width format.
+        Ensures adherence to the fixed-width format for both atom lines and box dimensions.
         """
         lines = []
 
-        # Export atom data with fixed widths
+        # Add the atom count as the second line
+        actual_num_atoms = len(self.atom_data)
+        if self.num_atoms != actual_num_atoms:
+            logger.warning(
+                f"Mismatch between expected ({self.num_atoms}) and actual ({actual_num_atoms}) atom counts."
+            )
+            self.num_atoms = actual_num_atoms  # Update to reflect the actual count
+        lines.append(f"{self.num_atoms}")
+
+        # Export atom data with strict fixed-width formatting
         for row in self.atom_data:
             content = (
-                f"{row[0]:>5}{row[1]:<5}{row[2]:>5}{row[3]:>5}"
-                f"{row[4]:8.3f}{row[5]:8.3f}{row[6]:8.3f}"
+                f"{row[0]:>5}"  # Residue number (right-aligned, width 5)
+                f"{row[1]:<5}"  # Residue name (left-aligned, width 5)
+                f"{row[2]:>5}"  # Atom name (right-aligned, width 5)
+                f"{row[3]:>5}"  # Atom index (right-aligned, width 5)
+                f"{row[4]:8.3f}"  # X coordinate (fixed width, 8 chars, 3 decimals)
+                f"{row[5]:8.3f}"  # Y coordinate (fixed width, 8 chars, 3 decimals)
+                f"{row[6]:8.3f}"  # Z coordinate (fixed width, 8 chars, 3 decimals)
             )
-            if row[7]:
+            if row[7]:  # Include in-line comments if present
                 content += f" ; {row[7]}"
             lines.append(content)
 
-        # Export box dimensions if valid
+        # Export box dimensions, ensuring proper formatting
         if self.validate_box_dimensions(self.box_dimensions):
-            lines.append(" ".join(f"{dim:.6f}" for dim in self.box_dimensions))
+            box_line = f"{self.box_dimensions[0]:10.5f} {self.box_dimensions[1]:10.5f} {self.box_dimensions[2]:10.5f}"
+            lines.append(box_line)
         else:
-            logger.error("Cannot export .gro file without valid box dimensions.")
-            raise ValueError("Invalid or missing box dimensions during export.")
+            raise ValueError(
+                "Missing or invalid box dimensions; cannot export .gro file."
+            )
 
         return lines
 
