@@ -23,11 +23,15 @@ from A_modules.atomistic.gromacs.commands.solvate import Solvate
 import logging
 import os
 from A_modules.atomistic.gromacs.commands.editconf import Editconf
+from A_modules.atomistic.config import GromacsPaths
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
+@file_type_check_wrapper(file_arg_index=0, expected_file_type="top")
+@file_type_check_wrapper(file_arg_index=1, expected_file_type="itp")
+@file_type_check_wrapper(file_arg_index=2, expected_file_type="gro")
 def process_solvent_files(
     input_top_file: str,
     input_itp_file: str,
@@ -39,42 +43,44 @@ def process_solvent_files(
     output_gro_name: Optional[str] = None,
     parser: GromacsParser = GromacsParser(),
     gro_handler: GroHandler = GroHandler(),
-) -> :
+) -> GromacsPaths:
     gro_handler = get_gro_handler(input_gro_file)
     residue_number = get_residue_number(gro_handler)
     input_itp_file = os.path.abspath(input_itp_file)
     output_top_file = prepare_solvent_topol(
-        input_top_file,
-        new_residue_name,
-        residue_number,
-        input_itp_file,
+        input_top_file=input_top_file,
+        new_residue_name=new_residue_name,
+        residue_number=residue_number,
+        new_include_file=input_itp_file,
         output_name=output_topol_name,
         output_dir=output_topol_dir,
         parser=parser,
+        del_posre=True,
+        del_defaults=True,
     )
-
     if new_residue_name:
         gro_handler = rename_residue_name_from_handler(gro_handler, new_residue_name)
 
-    output_gro_file_path = prepare_output_file_path(
+    output_gro_file = prepare_output_file_path(
         input_gro_file, "gro", output_gro_dir, output_gro_name
     )
-    output_gro_file_path = export_gro_handler(gro_handler, output_gro_file_path, parser)
-    return output_file_path
+    output_gro_file = export_gro_handler(gro_handler, output_gro_file, parser)
+    paths = GromacsPaths(input_itp_file, output_gro_file, output_top_file)
+    return paths
 
 
-@file_type_check_wrapper(file_arg_index=0, expected_file_type="top")
 def prepare_solvent_topol(
     input_top_file: str,
-    residue_name: str,
-    residue_number: str,
+    residue_number: int,
+    new_residue_name: Optional[str] = None,
     new_include_file: Optional[str] = None,  # New single include file for solvent
     output_name: Optional[str] = None,
     output_dir: Optional[str] = None,
     parser: GromacsParser = GromacsParser(),
     del_posre: bool = True,
     del_defaults: bool = True,
-):
+) -> str:
+    residue_number = str(residue_number)
     sections = parser.parse(input_top_file)
     # Ensure there is only one `#include` section
     include_sections = [
@@ -109,8 +115,8 @@ def prepare_solvent_topol(
         data_molecules_df = data_molecules_handler.content
         if len(data_molecules_df) != 1:
             raise ValueError("Multiple rows in 'data_molecules' section.")
-        if residue_name:
-            data_molecules_df["Compound"] = residue_name
+        if new_residue_name:
+            data_molecules_df["Compound"] = new_residue_name
         data_molecules_df["nmols"] = residue_number
         data_molecules_handler.content = data_molecules_df
         data_molecules_section = data_molecules_handler.export()
