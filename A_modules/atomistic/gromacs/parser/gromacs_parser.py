@@ -41,7 +41,6 @@ class GromacsParser:
                         sections,
                         current_section.construct_name,
                         current_section.name,
-                        is_data_handler=is_data_handler,
                     )
                     sections[key] = current_section
 
@@ -58,7 +57,6 @@ class GromacsParser:
                 sections,
                 current_section.construct_name,
                 current_section.name,
-                is_data_handler=current_section.construct_name == "data",
             )
             sections[key] = current_section
 
@@ -69,7 +67,6 @@ class GromacsParser:
         sections: OrderedDict[str, Section],
         construct_type: str,
         name: Optional[str],
-        is_data_handler: bool = False,
     ) -> str:
         """
         Generate a unique key for a section or handler. If it's a DataHandler,
@@ -79,11 +76,14 @@ class GromacsParser:
             sections (OrderedDict[str, Section]): Current sections in the parser.
             construct_type (str): Type of the construct (e.g., 'gro_file').
             name (Optional[str]): Name of the section (if applicable).
-            is_data_handler (bool): Flag indicating if this is a DataHandler.
+            handler_type (str): The type of the handler to determine if it's a DataHandler.
 
         Returns:
             str: Unique key for the section or handler.
         """
+        # Identify if it's a DataHandler based on handler type
+        is_data_handler = construct_type == "data"
+
         # Append the name only for DataHandler constructs
         if is_data_handler:
             base_key = f"{construct_type}_{name or 'no_name'}"
