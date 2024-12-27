@@ -28,6 +28,107 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
+def process_solvent_files(
+    input_top_file: str,
+    input_itp_file: str,
+    input_gro_file: str,
+    new_residue_name: Optional[str] = None,
+    output_topol_dir: Optional[str] = None,
+    output_gro_dir: Optional[str] = None,
+    output_topol_name: Optional[str] = None,
+    output_gro_name: Optional[str] = None,
+    parser: GromacsParser = GromacsParser(),
+    gro_handler: GroHandler = GroHandler(),
+) -> :
+    gro_handler = get_gro_handler(input_gro_file)
+    residue_number = get_residue_number(gro_handler)
+    input_itp_file = os.path.abspath(input_itp_file)
+    output_top_file = prepare_solvent_topol(
+        input_top_file,
+        new_residue_name,
+        residue_number,
+        input_itp_file,
+        output_name=output_topol_name,
+        output_dir=output_topol_dir,
+        parser=parser,
+    )
+
+    if new_residue_name:
+        gro_handler = rename_residue_name_from_handler(gro_handler, new_residue_name)
+
+    output_gro_file_path = prepare_output_file_path(
+        input_gro_file, "gro", output_gro_dir, output_gro_name
+    )
+    output_gro_file_path = export_gro_handler(gro_handler, output_gro_file_path, parser)
+    return output_file_path
+
+
+@file_type_check_wrapper(file_arg_index=0, expected_file_type="top")
+def prepare_solvent_topol(
+    input_top_file: str,
+    residue_name: str,
+    residue_number: str,
+    new_include_file: Optional[str] = None,  # New single include file for solvent
+    output_name: Optional[str] = None,
+    output_dir: Optional[str] = None,
+    parser: GromacsParser = GromacsParser(),
+    del_posre: bool = True,
+    del_defaults: bool = True,
+):
+    sections = parser.parse(input_top_file)
+    # Ensure there is only one `#include` section
+    include_sections = [
+        section
+        for key, section in sections.items()
+        if section.construct_name == "include"
+    ]
+    if len(include_sections) != 1:
+        raise ValueError(
+            f"Expected exactly one `#include` section, found {len(include_sections)}."
+        )
+
+    if new_include_file:
+        # Modify the `#include to point to the new file
+        include_section = include_sections[0]
+        include_handler = parser.handler_registry.get_handler(
+            include_section.construct_name
+        )()
+        include_handler.process(include_section)
+        include_handler.content = f'#include "{new_include_file}"'
+        sections["include"] = include_handler.export()
+
+    # Handle `data_molecules` section
+    if "data_molecules" not in sections:
+        raise ValueError("No 'data_molecules' section found in topology file.")
+    else:
+        data_molecules_section = sections["data_molecules"]
+        data_molecules_handler = parser.handler_registry.get_handler(
+            data_molecules_section.construct_name
+        )()
+        data_molecules_handler.process(data_molecules_section)
+        data_molecules_df = data_molecules_handler.content
+        if len(data_molecules_df) != 1:
+            raise ValueError("Multiple rows in 'data_molecules' section.")
+        if residue_name:
+            data_molecules_df["Compound"] = residue_name
+        data_molecules_df["nmols"] = residue_number
+        data_molecules_handler.content = data_molecules_df
+        data_molecules_section = data_molecules_handler.export()
+        sections["data_molecules"] = data_molecules_section
+
+    # Optionally delete `data_posre` section
+    if del_posre and "conditional_if" in sections:
+        del sections["conditional_if"]
+
+    if del_defaults and "data_defaults" in sections:
+        del sections["data_defaults"]
+    output_path = prepare_output_file_path(
+        input_top_file, "top", output_dir, output_name
+    )
+    output_path = parser.export(sections, output_path)
+    return output_path
+
+
 @dataframe_not_empty_check(dataframe_arg_index=0)
 def calculate_minimum_box_size_from_df(
     atom_df: pd.DataFrame,

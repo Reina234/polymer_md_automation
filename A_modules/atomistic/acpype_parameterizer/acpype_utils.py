@@ -1,14 +1,12 @@
 import os
 from A_modules.shared.utils.file_utils import copy_file, rename_file
-from A_modules.atomistic.acpype_parameterizer.acpype_config import (
-    AcpypeOutputConfig,
-    AcpypePaths,
-)
+from A_modules.atomistic.acpype_parameterizer.acpype_config import AcpypeOutputConfig
+from A_modules.atomistic.config import GromacsPaths
 
 
 def generate_acpype_paths(
     acpype_output_config: AcpypeOutputConfig, directory: str, molecule_name: str
-) -> AcpypePaths:
+) -> GromacsPaths:
     """
     Generates paths for ACPYPE output files based on the configuration.
 
@@ -19,9 +17,9 @@ def generate_acpype_paths(
     :param molecule_name: Name of the molecule (ACPYPE molecule name).
     :type molecule_name: str
     :return: Paths to the ACPYPE output files.
-    :rtype: AcpypePaths
+    :rtype: GromacsPaths
     """
-    return AcpypePaths(
+    return GromacsPaths(
         itp_path=(
             os.path.join(
                 directory,
@@ -66,41 +64,41 @@ def generate_acpype_paths(
 
 
 def copy_acpype_files(
-    acpype_paths: AcpypePaths, dest_dir: str, delete_original: bool = False
-) -> AcpypePaths:
+    acpype_paths: GromacsPaths, dest_dir: str, delete_original: bool = False
+) -> GromacsPaths:
     """
-    Copies files in an AcpypePaths instance to a destination directory.
+    Copies files in an GromacsPaths instance to a destination directory.
 
     :param acpype_paths: Paths to the files to copy
-    :type acpype_paths: AcpypePaths
+    :type acpype_paths: GromacsPaths
     :param dest_dir: Destination directory to copy the files to
     :type dest_dir: str
     :param delete_original: Flag to delete files or not, defaults to False
     :type delete_original: bool, optional
     :return: Paths to the copied files
-    :rtype: AcpypePaths
+    :rtype: GromacsPaths
     """
 
     copied_files = [
         copy_file(path, dest_dir, delete_original) if path else None
         for path in acpype_paths.to_list()
     ]
-    return AcpypePaths(*copied_files)
+    return GromacsPaths(*copied_files)
 
 
-def rename_acpype_paths(acpype_paths: AcpypePaths, new_base_name: str) -> AcpypePaths:
+def rename_acpype_paths(acpype_paths: GromacsPaths, new_base_name: str) -> GromacsPaths:
     """
-    Renames files in an AcpypePaths instance with a new base name.
+    Renames files in an GromacsPaths instance with a new base name.
 
     :param acpype_paths: Paths to the files to rename
-    :type acpype_paths: AcpypePaths
+    :type acpype_paths: GromacsPaths
     :param new_base_name: New base name for the files
     :type new_base_name: str
     :return: Paths to the renamed files
-    :rtype: AcpypePaths
+    :rtype: GromacsPaths
     """
     renamed_files = [
         rename_file(path, new_base_name) if path else None
         for path in acpype_paths.to_list()
     ]
-    return AcpypePaths(*renamed_files)
+    return GromacsPaths(*renamed_files)

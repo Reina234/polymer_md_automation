@@ -7,8 +7,8 @@ from A_modules.shared.utils.file_utils import (
 from A_modules.shared.command_line_operation import CommandLineOperation
 from A_modules.atomistic.acpype_parameterizer.acpype_config import (
     AcpypeOutputConfig,
-    AcpypePaths,
 )
+from A_modules.atomistic.config import GromacsPaths
 from A_modules.atomistic.acpype_parameterizer.acpype_utils import (
     generate_acpype_paths,
     copy_acpype_files,
@@ -74,7 +74,7 @@ class ACPYPEParameterizer(CommandLineOperation):
         new_file_name: Optional[str] = None,
         additional_notes: Optional[str] = None,
         verbose: bool = False,
-    ) -> AcpypePaths:
+    ) -> GromacsPaths:
         input_file_path = os.path.abspath(input_file_path)
         command = self.acpype_command(input_file_path=input_file_path)
         overwrite_directory(self.raw_output_dir)
@@ -101,7 +101,7 @@ class ACPYPEParameterizer(CommandLineOperation):
     def metadata(
         self,
         input_file_path,
-        output_acpype_paths: AcpypePaths,
+        output_acpype_paths: GromacsPaths,
         additional_notes: Optional[str],
     ):
         return {
