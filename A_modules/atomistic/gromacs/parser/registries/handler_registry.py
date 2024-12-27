@@ -6,7 +6,7 @@ from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
     BaseHandler,
 )
 from A_modules.atomistic.gromacs.parser.handlers.section_handler import (
-    SectionHandler,
+    DataHandler,
 )
 from A_modules.atomistic.gromacs.parser.handlers.includes_handler import (
     IncludesHandler,
@@ -46,7 +46,7 @@ class HandlerRegistry:
 # Initialize and populate the registry
 handler_registry = HandlerRegistry()
 handler_registry.register_handler(DefaultHandler)
-handler_registry.register_handler(SectionHandler)
+handler_registry.register_handler(DataHandler)
 handler_registry.register_handler(IncludesHandler)
 handler_registry.register_handler(ConditionalIfHandler)
 handler_registry.register_handler(GroHandler)

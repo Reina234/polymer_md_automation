@@ -24,18 +24,10 @@ class GromacsParser:
         self.suppressed_constructs: Optional[List[str]] = None
 
     # NOTE: make this more robust
-    def parse(self, filepath: str) -> OrderedDict[str, Section]:
-        if filepath.endswith(".gro"):
-            construct_name = "gro_file"
-            handler_name = GroHandler.construct_name
-        else:
-            construct_name = None
-            handler_name = DefaultHandler.construct_name
 
+    def parse(self, filepath: str) -> OrderedDict[str, Section]:
         sections: OrderedDict[str, Section] = OrderedDict()
-        current_section = Section(
-            construct_name=construct_name, handler_name=handler_name
-        )
+        current_section = Section(construct_name=None, handler_name=None)
 
         with open(filepath, "r") as file:
             for line in file:
@@ -44,8 +36,12 @@ class GromacsParser:
                 construct_name, handler_name, name = self._match_line(line)
 
                 if construct_name:
+                    is_data_handler = construct_name == "data"
                     key = self._generate_key(
-                        sections, current_section.construct_name, current_section.name
+                        sections,
+                        current_section.construct_name,
+                        current_section.name,
+                        is_data_handler=is_data_handler,
                     )
                     sections[key] = current_section
 
@@ -59,7 +55,10 @@ class GromacsParser:
 
         if current_section.lines:
             key = self._generate_key(
-                sections, current_section.construct_name, current_section.name
+                sections,
+                current_section.construct_name,
+                current_section.name,
+                is_data_handler=current_section.construct_name == "data",
             )
             sections[key] = current_section
 
@@ -70,20 +69,55 @@ class GromacsParser:
         sections: OrderedDict[str, Section],
         construct_type: str,
         name: Optional[str],
+        is_data_handler: bool = False,
     ) -> str:
-        base_key = f"{construct_type}_{name or 'no_name'}"
+        """
+        Generate a unique key for a section or handler. If it's a DataHandler,
+        append the name to the key; otherwise, use only the handler name.
+
+        Args:
+            sections (OrderedDict[str, Section]): Current sections in the parser.
+            construct_type (str): Type of the construct (e.g., 'gro_file').
+            name (Optional[str]): Name of the section (if applicable).
+            is_data_handler (bool): Flag indicating if this is a DataHandler.
+
+        Returns:
+            str: Unique key for the section or handler.
+        """
+        # Append the name only for DataHandler constructs
+        if is_data_handler:
+            base_key = f"{construct_type}_{name or 'no_name'}"
+        else:
+            base_key = construct_type
 
         if base_key in sections:
-            last_key = next(reversed(sections), None)
-            if last_key and last_key.startswith(base_key):
-                return last_key
-            raise ValueError(f"Duplicate section found: {base_key}")
+            # Append an incremented suffix to ensure uniqueness
+            index = 1
+            while f"{base_key}_{index}" in sections:
+                index += 1
+            return f"{base_key}_{index}"
 
         return base_key
 
+    @property
+    def available_handlers(self) -> Dict[str, BaseHandler]:
+        """
+        Return handlers from the registry, excluding those in suppressed constructs.
+        """
+        if not self.suppressed_constructs:
+            return self.handler_registry._handlers
+        return {
+            handler_name: handler_class
+            for handler_name, handler_class in self.handler_registry._handlers.items()
+            if handler_name not in self.suppressed_constructs
+        }
+
     def _match_line(self, line: str) -> Tuple[str, str, str]:
-        """Matches a line to a construct and returns its type, name, and handler name."""
-        for handler_name, handler_class in self.handler_registry._handlers.items():
+        """
+        Matches a line to a construct and returns its type, name, and handler name.
+        Filters out suppressed constructs.
+        """
+        for handler_name, handler_class in self.available_handlers.items():
             if handler_class.re_pattern is None:
                 continue
 

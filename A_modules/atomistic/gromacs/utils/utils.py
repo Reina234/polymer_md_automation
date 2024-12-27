@@ -98,6 +98,12 @@ def rename_residue_name_from_handler(gro_handler: GroHandler, new_residue_name: 
     return gro_handler
 
 
+def get_residue_number(gro_handler: GroHandler):
+    residue_numbers = gro_handler.content["Residue Number"].iloc[-1]
+
+    return residue_numbers
+
+
 def rename_residue_name_from_gro(
     gro_file: str,
     new_residue_name: str,
@@ -108,11 +114,24 @@ def rename_residue_name_from_gro(
 ):
     gro_handler = get_gro_handler(gro_file)
     gro_handler = rename_residue_name_from_handler(gro_handler, new_residue_name)
+
     output_file_path = prepare_output_file_path(
         gro_file, "gro", output_dir, output_name
     )
     output_file_path = export_gro_handler(gro_handler, output_file_path, parser)
     return output_file_path
+
+
+def export_gro_handler(
+    gro_handler: GroHandler,
+    output_path: str,
+    parser: GromacsParser = GromacsParser(),
+):
+    gro_section = gro_handler.export()
+    sections = OrderedDict()
+    sections["gro_file"] = gro_section
+    output_file = parser.export(sections, output_path)
+    return output_file
 
 
 def export_gro_handler(

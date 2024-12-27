@@ -12,9 +12,9 @@ import pandas as pd
 from typing import List, Dict
 
 
-class SectionHandler(BaseHandler):
+class DataHandler(BaseHandler):
     re_pattern = re.compile(r"^\s*\[\s*(.+?)\s*\]\s*$")
-    construct_name = "section"
+    construct_name = "data"
     suppress = None
 
     def __init__(self, section_registry: SectionRegistry = SectionRegistry()):
