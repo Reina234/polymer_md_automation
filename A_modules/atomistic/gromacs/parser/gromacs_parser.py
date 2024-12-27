@@ -96,7 +96,7 @@ class GromacsParser:
         # Fallback to DefaultHandler
         return None, DefaultHandler.construct_name, None
 
-    def export_beta(self, sections: OrderedDict[str, Section], output_filepath: str):
+    def export(self, sections: OrderedDict[str, Section], output_filepath: str) -> str:
         """
         Export all sections back to a `.gro` file.
 
@@ -107,3 +107,5 @@ class GromacsParser:
         with open(output_filepath, "w") as file:
             for section in sections.values():
                 file.write("\n".join(section.lines) + "\n")
+
+        return output_filepath

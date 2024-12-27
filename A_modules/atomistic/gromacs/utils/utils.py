@@ -9,6 +9,7 @@ from A_modules.shared.utils.file_utils import (
     add_suffix_to_filename,
     copy_file,
 )
+from collections import OrderedDict
 from A_modules.atomistic.gromacs.commands.insert_molecules import InsertMolecules
 from A_config.paths import TEMP_DIR
 from A_config.constants import MassUnits2, LengthUnits2
@@ -86,6 +87,44 @@ def get_gro_handler(
     gro_section = next(iter(sections.values()))
     gro_handler.process(gro_section)
     return gro_handler
+
+
+def rename_residue_name_from_handler(gro_handler: GroHandler, new_residue_name: str):
+    content_df = gro_handler.content
+    content_df["Residue Name"] = new_residue_name
+
+    # Update the handler content with the modified DataFrame
+    gro_handler.content = content_df
+    return gro_handler
+
+
+def rename_residue_name_from_gro(
+    gro_file: str,
+    new_residue_name: str,
+    output_dir: Optional[str] = None,
+    output_name: Optional[str] = None,
+    parser: GromacsParser = GromacsParser(),
+    gro_handler: GroHandler = GroHandler(),
+):
+    gro_handler = get_gro_handler(gro_file)
+    gro_handler = rename_residue_name_from_handler(gro_handler, new_residue_name)
+    output_file_path = prepare_output_file_path(
+        gro_file, "gro", output_dir, output_name
+    )
+    output_file_path = export_gro_handler(gro_handler, output_file_path, parser)
+    return output_file_path
+
+
+def export_gro_handler(
+    gro_handler: GroHandler,
+    output_path: str,
+    parser: GromacsParser = GromacsParser(),
+):
+    gro_section = gro_handler.export()
+    sections = OrderedDict()
+    sections["gro_file"] = gro_section
+    output_file = parser.export(sections, output_path)
+    return output_file
 
 
 def calculate_minimum_box_size_from_handler(
