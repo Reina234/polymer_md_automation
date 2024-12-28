@@ -14,7 +14,7 @@ result = run_solvent_workflow(
     box_size_nm=box_size_nm,
     output_dir="TEST_RUN_28",
     workflow=workflow,
-    temperatures=[300],
+    temperatures=[298, 318],
     identifier="run_1",
     verbose=False,
 )

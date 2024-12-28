@@ -1,6 +1,6 @@
 #include "amber99sb-ildn.ff/forcefield.itp"
-#include "/home/reina/polymerpinn/TEST_RUN_28/hexane_run_1.itp"
-; TMZK_GMX.top created by acpype (v: 2023.10.27) on Sat Dec 28 21:08:58 2024
+#include "/home/reina/polymerpinn/TEST_RUN_28/hexane_run_1/solvent.itp"
+; TMZK_GMX.top created by acpype (v: 2023.10.27) on Sat Dec 28 22:17:47 2024
 
 [ system ]
  TMZK

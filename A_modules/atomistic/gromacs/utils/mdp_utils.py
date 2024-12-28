@@ -10,6 +10,16 @@ def format_temperatures(temperatures: List[float]) -> List[Dict[str, str]]:
     return [{"temp": str(temp)} for temp in temperatures]
 
 
+def generate_dynamic_filename(varying_params: Dict[str, str]) -> str:
+    """
+    Generate a dynamic filename based on varying parameters.
+
+    :param varying_params: Dictionary of parameter names and values.
+    :return: A filename string in the format `param1_value1_param2_value2.gro`.
+    """
+    return "_".join(f"{key}_{value}" for key, value in varying_params.items())
+
+
 def generate_file_from_template(
     template_path: str,
     output_path: str,

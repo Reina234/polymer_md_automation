@@ -14,20 +14,20 @@ workflow_step = BaseWorkflowStep(Grompp(), MDrun())
 workflow = FullEquilibrationWorkflow(mdp_cache)
 
 
-workflow.add_step(
+workflow.add_em_step(
     step_name="minim_1",
     workflow_step=workflow_step,
     template_path="A_modules/atomistic/gromacs/equilibriation/templates/em_2.mdp",
     base_params={"nsteps": "50000", "emtol": "1000"},
 )
-workflow.add_step(
+workflow.add_em_step(
     step_name="minim_2",
     workflow_step=workflow_step,
     template_path="A_modules/atomistic/gromacs/equilibriation/templates/em_2.mdp",
     base_params={"nsteps": "50000", "emtol": "100"},
 )
 
-workflow.add_step(
+workflow.add_thermal_step(
     step_name="nvt_short",
     workflow_step=workflow_step,
     template_path="A_modules/atomistic/gromacs/equilibriation/templates/nvt.mdp",
@@ -36,7 +36,7 @@ workflow.add_step(
     },
 )
 
-workflow.add_step(
+workflow.add_thermal_step(
     step_name="npt_short",
     workflow_step=workflow_step,
     template_path="A_modules/atomistic/gromacs/equilibriation/templates/npt_short.mdp",
@@ -46,7 +46,7 @@ workflow.add_step(
         "dt": "0.002",
     },
 )
-workflow.add_step(
+workflow.add_thermal_step(
     step_name="npt_2",
     workflow_step=workflow_step,
     template_path="A_modules/atomistic/gromacs/equilibriation/templates/npt_2.mdp",

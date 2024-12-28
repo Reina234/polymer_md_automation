@@ -16,6 +16,7 @@ from data_models.output_types import GromacsPaths
 from A_config.paths import TEMP_DIR, LOG_DIR
 from A_modules.shared.utils.file_utils import add_identifier_name
 from A_modules.atomistic.gromacs.utils.mdp_utils import format_temperatures
+import os
 
 
 def run_solvent_workflow(
@@ -28,13 +29,16 @@ def run_solvent_workflow(
     temp_dir=TEMP_DIR,
     log_dir=LOG_DIR,
     verbose: bool = False,
+    override_safeguard_off=False,
     save_intermediate_edr=True,
     save_intermediate_gro=True,
     save_intermediate_log=True,
     parameterizer: ACPYPEParameterizer = ACPYPEParameterizer,
 ) -> GromacsPaths:
+    subdir = add_identifier_name(solvent.name, identifier=identifier, suffix=None)
+    output_dir = os.path.join(output_dir, subdir)
     parameterizer = parameterizer(acpype_molecule_name=solvent.pdb_molecule_name)
-    itp_name = add_identifier_name(solvent.name, identifier=identifier, suffix=None)
+    itp_name = "solvent"
     mol2_converter = ConverterFactory().get_converter("pdb", "mol2")
     mol2_file = mol2_converter.run(solvent.pdb_path, temp_dir, verbose=verbose)
     file_config = AcpypeOutputConfig(itp=True, gro=True, top=True, posre=False)
@@ -69,7 +73,7 @@ def run_solvent_workflow(
         temp_dir,
         output_dir,
         log_dir,
-        final_gro_name=gro_name,
+        override_safeguard_off=override_safeguard_off,
         varying_params_list=temperatures,
         save_intermediate_edr=save_intermediate_edr,
         save_intermediate_gro=save_intermediate_gro,
