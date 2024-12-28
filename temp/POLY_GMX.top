@@ -1,10 +1,20 @@
-#include "amber99sb-ildn.ff/forcefield.itp"
-#include "/home/reina/polymerpinn/TEST_RUN_28/hexane_run_1.itp"
-; POLY_GMX.top created by acpype (v: 2023.10.27) on Sat Dec 28 14:34:39 2024
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Sat Dec 28 18:15:30 2024
+
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+1               2               yes             0.5     0.8333333333
+
+; Include POLY_GMX.itp topology
+#include "POLY_GMX.itp"
+
+; Ligand position restraints
+#ifdef POSRES_LIG
+#include "posre_POLY.itp"
+#endif
 
 [ system ]
  POLY
 
 [ molecules ]
 ; Compound        nmols
-TMZK 577
+ POLY             1     

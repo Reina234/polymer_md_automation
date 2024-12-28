@@ -8,7 +8,7 @@ from A_modules.shared.command_line_operation import CommandLineOperation
 from A_modules.atomistic.acpype_parameterizer.acpype_config import (
     AcpypeOutputConfig,
 )
-from A_modules.atomistic.config import GromacsPaths
+from data_models.output_types import GromacsPaths
 from A_modules.atomistic.acpype_parameterizer.acpype_utils import (
     generate_acpype_paths,
     copy_acpype_files,

@@ -2,7 +2,7 @@ import hashlib
 import json
 from typing import Dict
 import os
-from A_modules.atomistic.gromacs.equilibriation.utils import generate_file_from_template
+from A_modules.atomistic.gromacs.utils.mdp_utils import generate_file_from_template
 
 import logging
 

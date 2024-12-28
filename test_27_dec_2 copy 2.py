@@ -1,4 +1,4 @@
-from A_modules.atomistic.config import GromacsPaths
+from data_models.output_types import GromacsPaths
 
 from A_modules.atomistic.gromacs.equilibriation.mdp_cache import MDPCache
 from A_modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow import (

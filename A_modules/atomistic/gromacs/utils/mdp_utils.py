@@ -1,32 +1,56 @@
-from A_modules.atomistic.gromacs.gromacs_config import MDP_NAMING_SCHEME, TemplatedMdps
-from A_modules.shared.utils.file_utils import (
-    directory_exists_check_wrapper,
-    generate_file_from_template,
-)
-from typing import Optional
 import os
+import shutil
 import logging
+from typing import Dict, List
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
 
 
-@directory_exists_check_wrapper(dir_arg_index=1)
-def get_or_create_mdp_file(
-    mdp_template: TemplatedMdps,
-    output_dir: str,
-    simulation_temp_k: float,
-    mdp_output_naming_scheme: str = MDP_NAMING_SCHEME,
-):
-    template_path = mdp_template.template_path
-    output_filename = mdp_template.generate_mdp_name(
-        temp=simulation_temp_k, mdp_output_naming_scheme=mdp_output_naming_scheme
-    )
-    output_path = os.path.join(output_dir, output_filename)
-    generate_file_from_template(
-        template_path,
-        output_path,
-        replacements={"temp": str(simulation_temp_k)},
-        overwrite=False,
-    )
+def format_temperatures(temperatures: List[float]) -> List[Dict[str, str]]:
+    return [{"temp": str(temp)} for temp in temperatures]
+
+
+def generate_file_from_template(
+    template_path: str,
+    output_path: str,
+    replacements: Dict[str, str],
+    overwrite: bool = False,
+) -> str:
+    """
+    Generates a file based on a template with multiple key-value replacements.
+
+    :param template_path: Path to the template file to read.
+    :type template_path: str
+    :param output_path: Path to save the generated file.
+    :type output_path: str
+    :param replacements: Dictionary of placeholder keys and their replacement values.
+    :type replacements: Dict[str, str]
+    :param overwrite: Whether to overwrite the output file if it already exists.
+    :type overwrite: bool
+    :return: The path to the generated file.
+    :rtype: str
+    """
+    if not os.path.exists(template_path):
+        raise FileNotFoundError(f"Template file not found: {template_path}")
+
+    if os.path.exists(output_path) and not overwrite:
+        logger.info(
+            f"Output file already exists and overwrite is disabled: {output_path}"
+        )
+        return output_path
+
+    with open(template_path, "r") as template_file:
+        content = template_file.read()
+
+    for key, value in replacements.items():
+        placeholder = f"{{{key}}}"  # Assuming placeholders are in `{key}` format
+        if placeholder not in content:
+            logger.warning(f"Placeholder '{placeholder}' not found in template.")
+        content = content.replace(placeholder, value)
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as output_file:
+        output_file.write(content)
+
+    logger.info(f"Generated file from template: {output_path}")
     return output_path

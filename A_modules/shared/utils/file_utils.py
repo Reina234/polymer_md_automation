@@ -669,6 +669,22 @@ def prepare_output_file_path(
     return str(output_file_path)
 
 
+def add_identifier_name(
+    name: str,
+    default_identifier: Optional[str] = None,
+    identifier: Optional[str] = None,
+    suffix: Optional[str] = None,
+) -> str:
+    parts = [name.lower()]
+    if default_identifier:
+        parts.append(default_identifier)
+    if identifier:
+        parts.append(identifier)
+    if suffix:
+        parts.append(suffix)
+    return "_".join(parts)
+
+
 def add_suffix_to_filename(
     file_path: str, suffix: str, return_full_path: bool = True
 ) -> str:

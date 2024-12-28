@@ -48,6 +48,8 @@ class FullEquilibrationWorkflow:
                 # Merge base and varying parameters
                 params = {**base_params, **varying_params}
 
+                print("!!!!!!!!!!!!!!!!!!")
+                print(current_gro_path)
                 # Run the step
                 current_gro_path = step.run(
                     step_name=step_name,

@@ -19,11 +19,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 class BaseWorkflowStep:
-    def __init__(
-        self,
-        grompp: Grompp,
-        mdrun: MDrun,
-    ):
+    def __init__(self, grompp, mdrun):
         """
         Initialize the workflow step.
 
@@ -55,23 +51,23 @@ class BaseWorkflowStep:
         """
         saved_files = []
 
-        # Handle `.edr` files
-        if save_intermediate_edr and "edr" in mdrun_outputs:
-            edr_dir = os.path.join(log_dir, "edr_files")
-            os.makedirs(edr_dir, exist_ok=True)
-            saved_files.append(copy_file(mdrun_outputs["edr"], edr_dir))
+        def save_file(file_type: str, sub_dir: str):
+            if file_type in mdrun_outputs:
+                file_path = mdrun_outputs[file_type]
+                if os.path.isfile(file_path):
+                    dest_dir = os.path.join(log_dir, sub_dir)
+                    os.makedirs(dest_dir, exist_ok=True)
+                    saved_files.append(copy_file(file_path, dest_dir))
+                else:
+                    logger.warning(f"Expected {file_type} file not found: {file_path}")
 
-        # Handle `.gro` files
-        if save_intermediate_gro and "gro" in mdrun_outputs:
-            gro_dir = os.path.join(log_dir, "gro_files")
-            os.makedirs(gro_dir, exist_ok=True)
-            saved_files.append(copy_file(mdrun_outputs["gro"], gro_dir))
-
-        # Handle `.log` files
-        if save_intermediate_log and "log" in mdrun_outputs:
-            log_dir_path = os.path.join(log_dir, "log_files")
-            os.makedirs(log_dir_path, exist_ok=True)
-            saved_files.append(copy_file(mdrun_outputs["log"], log_dir_path))
+        # Save files based on flags
+        if save_intermediate_edr:
+            save_file("edr", "edr_files")
+        if save_intermediate_gro:
+            save_file("gro", "gro_files")
+        if save_intermediate_log:
+            save_file("log", "log_files")
 
         return saved_files
 
@@ -84,7 +80,7 @@ class BaseWorkflowStep:
         temp_output_dir: str,
         log_dir: str,
         varying_params: Dict[str, str],
-        mdp_cache: MDPCache,
+        mdp_cache,
         save_intermediate_edr: bool = False,
         save_intermediate_gro: bool = False,
         save_intermediate_log: bool = False,
@@ -98,7 +94,6 @@ class BaseWorkflowStep:
         :param input_gro_path: Path to the input GRO file.
         :param input_topol_path: Path to the topology file.
         :param temp_output_dir: Directory for temporary output files.
-        :param main_output_dir: Directory for final output files.
         :param log_dir: Directory for storing intermediate `.gro`, `.edr`, and `.log` files.
         :param varying_params: Parameters specific to this workflow step.
         :param save_intermediate_edr: Flag to save intermediate `.edr` files in log_dir.
@@ -113,10 +108,16 @@ class BaseWorkflowStep:
         )
 
         # Ensure directories exist
-        check_directory_exists(temp_output_dir)
-        check_directory_exists(log_dir)
+        os.makedirs(temp_output_dir, exist_ok=True)
+        os.makedirs(log_dir, exist_ok=True)
 
+        # Define output paths
         output_prefix = os.path.join(temp_output_dir, step_name)
+        expected_outputs = {
+            "gro": f"{output_prefix}.gro",
+            "edr": f"{output_prefix}.edr",
+            "log": f"{output_prefix}.log",
+        }
 
         # Run GROMPP
         grompp_output = self.grompp.run(
@@ -135,17 +136,22 @@ class BaseWorkflowStep:
             verbose=verbose,
         )
 
+        # Verify generated files
+        for file_type, file_path in expected_outputs.items():
+            if not os.path.isfile(file_path):
+                raise FileNotFoundError(
+                    f"Expected {file_type} file not found: {file_path}"
+                )
+
         # Save intermediate files
         self._save_intermediate_files(
             step_name,
-            mdrun_outputs,
+            expected_outputs,
             log_dir,
             save_intermediate_edr,
             save_intermediate_gro,
             save_intermediate_log,
         )
 
-        # final_gro_path = copy_file(mdrun_outputs["gro"], main_output_dir)
-        final_gro_path = mdrun_outputs["gro"]
         logger.info(f"Workflow step '{step_name}' completed.")
-        return final_gro_path
+        return expected_outputs["gro"]

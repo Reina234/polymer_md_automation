@@ -1,4 +1,4 @@
-; TMZK_GMX_OPLS.top created by acpype (v: 2023.10.27) on Sun Dec 15 14:33:57 2024
+; TMZK_GMX_OPLS.top created by acpype (v: 2023.10.27) on Sat Dec 28 18:39:54 2024
 
 ; Include forcefield parameters
 #include "ffoplsaa.itp"
