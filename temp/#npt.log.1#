@@ -44,7 +44,7 @@ GROMACS:      gmx mdrun, version 2024.4-conda_forge
 Executable:   /home/reina/miniconda3/envs/lammps_packages/bin.AVX2_256/gmx
 Data prefix:  /home/reina/miniconda3/envs/lammps_packages
 Working dir:  /home/reina/polymerpinn
-Process ID:   158915
+Process ID:   38726
 Command line:
   gmx mdrun -s temp/npt.tpr -deffnm temp/npt
 
@@ -159,7 +159,7 @@ Input Parameters:
    comm-mode                      = Linear
    nstcomm                        = 100
    bd-fric                        = 0
-   ld-seed                        = 1794766775
+   ld-seed                        = -1491241515
    emtol                          = 10
    emstep                         = 0.01
    niter                          = 20
@@ -385,7 +385,7 @@ Center of mass motion removal mode is Linear
 We have the following groups for center of mass motion removal:
   0:  rest
 
-Started mdrun on rank 0 Sat Dec 28 00:09:39 2024
+Started mdrun on rank 0 Sat Dec 28 13:30:05 2024
 
            Step           Time
               0        0.00000
@@ -397,50 +397,4 @@ Started mdrun on rank 0 Sat Dec 28 00:09:39 2024
     3.08796e+03   -8.81500e+03    1.38454e+03   -7.43045e+03   -7.42293e+03
     Temperature Pressure (bar)   Constr. rmsd
     1.40798e+01    2.90913e+04    1.91943e-06
-
-
-Step 1 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 51 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 201 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 251 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 351 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 401 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 451 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 501 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 601 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 651 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 801 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-
-Step 851 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
-           Step           Time
-           5000       10.00000
-
-   Energies (kJ/mol)
-          Angle    Proper Dih.          LJ-14     Coulomb-14        LJ (SR)
-    2.01895e+04    4.45325e+03    4.13192e+03   -5.70216e+02   -1.51667e+04
-   Coulomb (SR)      Potential    Kinetic En.   Total Energy  Conserved En.
-    2.56214e+03    1.55999e+04    2.96577e+04    4.52576e+04    3.79032e+04
-    Temperature Pressure (bar)   Constr. rmsd
-    3.01598e+02    3.87823e+02    4.10476e-06
-
-           Step           Time
-          10000       20.00000
-
-   Energies (kJ/mol)
-          Angle    Proper Dih.          LJ-14     Coulomb-14        LJ (SR)
-    2.05604e+04    3.95989e+03    4.04388e+03   -4.59039e+02   -1.73439e+04
-   Coulomb (SR)      Potential    Kinetic En.   Total Energy  Conserved En.
-    2.43560e+03    1.31969e+04    2.95374e+04    4.27342e+04    3.82445e+04
-    Temperature Pressure (bar)   Constr. rmsd
-    3.00375e+02    5.28353e+02    4.13276e-06
 

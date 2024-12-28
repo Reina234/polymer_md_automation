@@ -3,7 +3,11 @@ from A_modules.atomistic.gromacs.equilibriation.base_workflow_step import (
     BaseWorkflowStep,
 )
 from A_modules.atomistic.gromacs.equilibriation.mdp_cache import MDPCache
-from A_modules.shared.utils.file_utils import directory_exists_check_wrapper
+from A_modules.shared.utils.file_utils import (
+    directory_exists_check_wrapper,
+    copy_file,
+    rename_file,
+)
 
 
 class FullEquilibrationWorkflow:
@@ -30,6 +34,7 @@ class FullEquilibrationWorkflow:
         temp_output_dir: str,
         main_output_dir: str,
         log_dir: str,
+        final_gro_name: str,
         varying_params_list: List[Dict[str, str]],
         save_intermediate_edr: bool = False,
         save_intermediate_gro: bool = False,
@@ -50,7 +55,6 @@ class FullEquilibrationWorkflow:
                     input_gro_path=current_gro_path,
                     input_topol_path=input_topol_path,
                     temp_output_dir=temp_output_dir,
-                    main_output_dir=main_output_dir,
                     log_dir=log_dir,
                     varying_params=params,
                     mdp_cache=self.mdp_cache,
@@ -64,3 +68,10 @@ class FullEquilibrationWorkflow:
                     raise RuntimeError(
                         f"Step '{step_name}' did not generate a .gro file required for subsequent steps."
                     )
+
+        final_gro_path = copy_file(
+            current_gro_path, main_output_dir, delete_original=False
+        )
+        final_gro_path = rename_file(final_gro_path, final_gro_name)
+
+        return final_gro_path

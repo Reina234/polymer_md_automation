@@ -11,7 +11,7 @@ from A_modules.atomistic.gromacs.commands.grompp import Grompp
 from A_modules.atomistic.gromacs.commands.mdrun import MDrun
 
 output_files = GromacsPaths(
-    "TEST_RUN_27/POLY_GMX.itp",
+    "Z2/POLY_GMX.itp",
     "TEST_RUN_27_2/hexane_solvent_box.gro",
     "TEST_RUN_27/POLY_GMX.top",
     None,

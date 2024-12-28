@@ -1,4 +1,4 @@
-; POLY_GMX_OPLS.top created by acpype (v: 2023.10.27) on Sat Dec 28 00:05:17 2024
+; POLY_GMX_OPLS.top created by acpype (v: 2023.10.27) on Sat Dec 28 14:34:39 2024
 
 ; Include forcefield parameters
 #include "ffoplsaa.itp"

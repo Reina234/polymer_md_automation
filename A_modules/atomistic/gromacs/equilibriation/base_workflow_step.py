@@ -82,7 +82,6 @@ class BaseWorkflowStep:
         input_gro_path: str,
         input_topol_path: str,
         temp_output_dir: str,
-        main_output_dir: str,
         log_dir: str,
         varying_params: Dict[str, str],
         mdp_cache: MDPCache,
@@ -115,7 +114,6 @@ class BaseWorkflowStep:
 
         # Ensure directories exist
         check_directory_exists(temp_output_dir)
-        check_directory_exists(main_output_dir)
         check_directory_exists(log_dir)
 
         output_prefix = os.path.join(temp_output_dir, step_name)
@@ -147,7 +145,7 @@ class BaseWorkflowStep:
             save_intermediate_log,
         )
 
-        final_gro_path = copy_file(mdrun_outputs["gro"], main_output_dir)
-
+        # final_gro_path = copy_file(mdrun_outputs["gro"], main_output_dir)
+        final_gro_path = mdrun_outputs["gro"]
         logger.info(f"Workflow step '{step_name}' completed.")
         return final_gro_path

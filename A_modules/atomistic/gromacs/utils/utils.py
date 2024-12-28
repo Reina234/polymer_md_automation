@@ -9,6 +9,7 @@ from A_modules.shared.utils.file_utils import (
     add_suffix_to_filename,
     copy_file,
 )
+from A_modules.atomistic.gromacs.parser.handlers.includes_handler import IncludesHandler
 from collections import OrderedDict
 from A_modules.atomistic.gromacs.commands.insert_molecules import InsertMolecules
 from A_config.paths import TEMP_DIR
@@ -20,38 +21,74 @@ from A_modules.atomistic.gromacs.parser.handlers.gro_handler import GroHandler
 from typing import List, Optional, Dict
 from data_models.solvent import Solvent
 from A_modules.atomistic.gromacs.commands.solvate import Solvate
+from A_modules.atomistic.gromacs.parser.handlers.section_handler import DataHandler
 import logging
 import os
 from A_modules.atomistic.gromacs.commands.editconf import Editconf
 from A_modules.atomistic.config import GromacsPaths
+from A_modules.atomistic.gromacs.parser.data_models.section import Section
+
+
+def create_includes_section(
+    include_path: str, include_handler: IncludesHandler = IncludesHandler
+):
+    include_handler = include_handler()
+    # Create a dummy Section to initialize the handler
+    dummy_section = Section(
+        construct_name="include", handler_name="IncludesHandler", name=None
+    )
+    include_handler.section = dummy_section  # Assign the dummy Section
+
+    # Set the content for the include line
+    include_handler.content = f'#include "{include_path}"'
+
+    # Export the section
+    include_section = include_handler.export()
+    return include_section
+
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 
-@file_type_check_wrapper(file_arg_index=0, expected_file_type="top")
-@file_type_check_wrapper(file_arg_index=1, expected_file_type="itp")
-@file_type_check_wrapper(file_arg_index=2, expected_file_type="gro")
+@file_type_check_wrapper(file_arg_index=0, expected_file_type="itp")
+@file_type_check_wrapper(file_arg_index=1, expected_file_type="gro")
+@file_type_check_wrapper(file_arg_index=2, expected_file_type="top")
 def process_solvent_files(
-    input_top_file: str,
     input_itp_file: str,
     input_gro_file: str,
+    input_top_file: str,
+    forcefield: str = "amber99sb-ildn.ff/forcefield.itp",
     new_residue_name: Optional[str] = None,
-    output_topol_dir: Optional[str] = None,
+    output_itp_dir: Optional[str] = None,
     output_gro_dir: Optional[str] = None,
-    output_topol_name: Optional[str] = None,
+    output_topol_dir: Optional[str] = None,
+    output_itp_name: Optional[str] = None,
     output_gro_name: Optional[str] = None,
+    output_topol_name: Optional[str] = None,
     parser: GromacsParser = GromacsParser(),
     gro_handler: GroHandler = GroHandler(),
 ) -> GromacsPaths:
+    if new_residue_name:
+        if len(new_residue_name) > 5:
+            raise ValueError(
+                "Residue name must be 5 characters or less. Gromacs has fixed width for residue names."
+            )
+    output_itp_file = process_solvent_itp(
+        input_itp_file=input_itp_file,
+        new_residue_name=new_residue_name,
+        output_dir=output_itp_dir,
+        output_name=output_itp_name,
+    )
+    output_itp_path = os.path.abspath(output_itp_file)
     gro_handler = get_gro_handler(input_gro_file)
     residue_number = get_residue_number(gro_handler)
-    input_itp_file = os.path.abspath(input_itp_file)
     output_top_file = prepare_solvent_topol(
         input_top_file=input_top_file,
-        new_residue_name=new_residue_name,
         residue_number=residue_number,
-        new_include_file=input_itp_file,
+        forcefield=forcefield,
+        new_include_file=output_itp_path,
+        new_residue_name=new_residue_name,
         output_name=output_topol_name,
         output_dir=output_topol_dir,
         parser=parser,
@@ -65,15 +102,74 @@ def process_solvent_files(
         input_gro_file, "gro", output_gro_dir, output_gro_name
     )
     output_gro_file = export_gro_handler(gro_handler, output_gro_file, parser)
-    paths = GromacsPaths(input_itp_file, output_gro_file, output_top_file)
+    paths = GromacsPaths(output_itp_file, output_gro_file, output_top_file)
     return paths
+
+
+def rename_data_column_content(
+    section: Section,
+    column_name: str,
+    new_content: str,
+    data_handler: DataHandler = DataHandler,
+):
+    data_handler = data_handler()
+    data_handler.section = section
+    data_handler.process(section)
+    data_df = data_handler.content
+    data_df[column_name] = new_content
+    data_handler.content = data_df
+    return data_handler.export()
+
+
+def process_solvent_itp(
+    input_itp_file: str,
+    new_residue_name: Optional[str] = None,
+    output_dir: Optional[str] = None,
+    output_name: Optional[str] = None,
+    parser: GromacsParser = GromacsParser(),
+):
+    sections = parser.parse(input_itp_file)
+    if new_residue_name:
+        moleculetype_section = sections["data_moleculetype"]
+        moleculetype_section = rename_data_column_content(
+            moleculetype_section, "name", new_residue_name
+        )
+        atoms_section = sections["data_atoms"]
+        atoms_section = rename_data_column_content(
+            atoms_section, "res", new_residue_name
+        )
+        sections["data_moleculetype"] = moleculetype_section
+        sections["data_atoms"] = atoms_section
+    output_itp_path = prepare_output_file_path(
+        input_itp_file, "itp", output_dir, output_name
+    )
+    output_itp_path = parser.export(sections, output_itp_path)
+    return output_itp_path
+
+
+def delete_all_include_sections(sections: OrderedDict) -> OrderedDict:
+    """
+    Deletes all sections with construct_name set to 'include'.
+
+    Args:
+        sections (OrderedDict): The parsed sections from the topology file.
+
+    Returns:
+        OrderedDict: The updated sections with all 'include' sections removed.
+    """
+    return OrderedDict(
+        (key, section)
+        for key, section in sections.items()
+        if section.construct_name != "include"
+    )
 
 
 def prepare_solvent_topol(
     input_top_file: str,
     residue_number: int,
-    new_residue_name: Optional[str] = None,
-    new_include_file: Optional[str] = None,  # New single include file for solvent
+    forcefield: str,
+    new_include_file: str,
+    new_residue_name: Optional[str] = None,  # New single include file for solvent
     output_name: Optional[str] = None,
     output_dir: Optional[str] = None,
     parser: GromacsParser = GromacsParser(),
@@ -82,28 +178,15 @@ def prepare_solvent_topol(
 ) -> str:
     residue_number = str(residue_number)
     sections = parser.parse(input_top_file)
-    # Ensure there is only one `#include` section
-    include_sections = [
-        section
-        for key, section in sections.items()
-        if section.construct_name == "include"
-    ]
-    if len(include_sections) != 1:
-        raise ValueError(
-            f"Expected exactly one `#include` section, found {len(include_sections)}."
-        )
 
-    if new_include_file:
-        # Modify the `#include to point to the new file
-        include_section = include_sections[0]
-        include_handler = parser.handler_registry.get_handler(
-            include_section.construct_name
-        )()
-        include_handler.process(include_section)
-        include_handler.content = f'#include "{new_include_file}"'
-        sections["include"] = include_handler.export()
+    sections = delete_all_include_sections(sections)
 
-    # Handle `data_molecules` section
+    sections["include_solvent_itp"] = create_includes_section(new_include_file)
+    sections.move_to_end("include_solvent_itp", last=False)
+
+    sections["include_forcefield"] = create_includes_section(forcefield)
+    sections.move_to_end("include_forcefield", last=False)
+
     if "data_molecules" not in sections:
         raise ValueError("No 'data_molecules' section found in topology file.")
     else:
@@ -128,10 +211,12 @@ def prepare_solvent_topol(
 
     if del_defaults and "data_defaults" in sections:
         del sections["data_defaults"]
+
     output_path = prepare_output_file_path(
         input_top_file, "top", output_dir, output_name
     )
     output_path = parser.export(sections, output_path)
+
     return output_path
 
 

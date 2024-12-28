@@ -1,10 +1,9 @@
-; POLY_GMX.top created by acpype (v: 2023.10.27) on Mon Dec 23 18:53:26 2024
-
-; Ligand position restraints
-#include "/home/reina/polymerpinn/TEST/POLY_GMX.itp"
+#include "/home/reina/polymerpinn/Z2/POLY_GMX.itp"
+#include "amber99sb-ildn.ff/forcefield.itp"
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Fri Dec 27 23:11:34 2024
 [ system ]
  POLY
 
 [ molecules ]
 ; Compound        nmols
-TESTER 1
+TEST 1

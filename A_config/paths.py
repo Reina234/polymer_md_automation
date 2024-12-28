@@ -4,8 +4,9 @@ import dataclasses
 from typing import Optional
 
 TEMP_DIR = "temp"
+LOG_DIR = "logs"
 TOPOL_NAME = "topol.top"
-
+CACHE_DIR = "cache"
 
 # SOLVENT_ITP_DIR = "preprocessed_output/solvents/solvent_itp"
 # SOLVENT_MOL2_DIR = "preprocessed_output/solvents/solvent_mol2"
