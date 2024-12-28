@@ -1,9 +1,0 @@
-tolerance 2.0
-filetype pdb
-
-output ZZZZZ/test_solvent_box.pdb
-
-structure ZZZZZ/POLY_GMX.pdb
-  number 2134
-  inside box 0.0 0.0 0.0 100.0 100.0 100.0
-end structure

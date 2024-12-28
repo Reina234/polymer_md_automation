@@ -26,23 +26,45 @@ workflow.add_step(
     template_path="A_modules/atomistic/gromacs/equilibriation/templates/em_2.mdp",
     base_params={"nsteps": "50000", "emtol": "100"},
 )
+
 workflow.add_step(
-    step_name="npt",
+    step_name="nvt_short",
     workflow_step=workflow_step,
-    template_path="A_modules/atomistic/gromacs/equilibriation/templates/npt.mdp",
+    template_path="A_modules/atomistic/gromacs/equilibriation/templates/nvt.mdp",
     base_params={
-        "nsteps": "5000",
-        "pressure": "1.0",
-        "compressibility": "4.5e-5",
-        "pressure_tau": "2.0",
+        "nsteps": "100000",
+    },
+)
+
+workflow.add_step(
+    step_name="npt_short",
+    workflow_step=workflow_step,
+    template_path="A_modules/atomistic/gromacs/equilibriation/templates/npt_short.mdp",
+    base_params={
+        "nsteps": "50000",
+        "compressibility": "1.4e-4",
+        "dt": "0.002",
+    },
+)
+workflow.add_step(
+    step_name="npt_2",
+    workflow_step=workflow_step,
+    template_path="A_modules/atomistic/gromacs/equilibriation/templates/npt_2.mdp",
+    base_params={
+        "nsteps": "15000",
+        "dt": "0.001",
     },
 )
 
 # workflow.add_step(
-#    step_name="nvt",
+#    step_name="npt_full",
 #    workflow_step=workflow_step,
-#    template_path="A_modules/atomistic/gromacs/equilibriation/templates/nvt.mdp",
+#    template_path="A_modules/atomistic/gromacs/equilibriation/templates/npt.mdp",
 #    base_params={
 #        "nsteps": "5000",
+#        "compressibility": "1.4e-4",
+#        "dt": "0.001",
+#        "pressure": "1.0",
+#        "pressure_tau": "2.0",
 #    },
 # )
