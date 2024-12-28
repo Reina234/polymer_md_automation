@@ -1,9 +1,0 @@
-tolerance 2.0
-filetype pdb
-
-output solvent_box.pdb
-
-structure styrene.pdb
-  number 0
-  inside box 0.0 0.0 0.0 50.0 50.0 50.0
-end structure

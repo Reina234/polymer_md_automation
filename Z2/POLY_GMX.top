@@ -1,9 +1,0 @@
-#include "/home/reina/polymerpinn/Z2/POLY_GMX.itp"
-#include "amber99sb-ildn.ff/forcefield.itp"
-; POLY_GMX.top created by acpype (v: 2023.10.27) on Fri Dec 27 23:11:34 2024
-[ system ]
- POLY
-
-[ molecules ]
-; Compound        nmols
-TEST 1
