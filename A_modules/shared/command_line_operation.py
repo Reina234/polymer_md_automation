@@ -3,7 +3,7 @@ from typing import Optional, Tuple, List
 import subprocess
 from A_modules.shared.metadata_tracker import MetadataTracker
 import logging
-from config.constants import LengthUnits
+from A_config.constants import LengthUnits2
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

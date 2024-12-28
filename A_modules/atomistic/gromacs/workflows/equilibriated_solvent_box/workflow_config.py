@@ -1,4 +1,4 @@
-from A_config.paths import CACHE_DIR
+from A_config.paths import MDP_CACHE_DIR
 from A_modules.atomistic.gromacs.equilibriation.base_workflow_step import (
     BaseWorkflowStep,
 )
@@ -9,7 +9,7 @@ from A_modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow imp
 )
 from A_modules.atomistic.gromacs.equilibriation.mdp_cache import MDPCache
 
-mdp_cache = MDPCache(cache_dir=CACHE_DIR)
+mdp_cache = MDPCache(cache_dir=MDP_CACHE_DIR)
 workflow_step = BaseWorkflowStep(Grompp(), MDrun())
 workflow = FullEquilibrationWorkflow(mdp_cache)
 

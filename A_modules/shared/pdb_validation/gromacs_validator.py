@@ -9,7 +9,7 @@ from data_models.solvent import Solvent
 from A_config.constants import DENSITY_TOLERANCE_PERCENTAGE
 from A_config.constants import LengthUnits2
 from A_modules.shared.metadata_tracker import MetadataTracker
-from config.constants import LengthUnits
+from A_config.constants import LengthUnits2
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
