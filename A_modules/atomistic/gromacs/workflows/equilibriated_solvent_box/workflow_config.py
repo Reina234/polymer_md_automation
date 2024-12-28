@@ -15,10 +15,16 @@ workflow = FullEquilibrationWorkflow(mdp_cache)
 
 
 workflow.add_step(
+    step_name="minim_1",
+    workflow_step=workflow_step,
+    template_path="A_modules/atomistic/gromacs/equilibriation/templates/em_2.mdp",
+    base_params={"nsteps": "50000", "emtol": "1000"},
+)
+workflow.add_step(
     step_name="minim_2",
     workflow_step=workflow_step,
     template_path="A_modules/atomistic/gromacs/equilibriation/templates/em_2.mdp",
-    base_params={"nsteps": "50000"},
+    base_params={"nsteps": "50000", "emtol": "100"},
 )
 workflow.add_step(
     step_name="npt",
@@ -32,11 +38,11 @@ workflow.add_step(
     },
 )
 
-workflow.add_step(
-    step_name="nvt",
-    workflow_step=workflow_step,
-    template_path="A_modules/atomistic/gromacs/equilibriation/templates/nvt.mdp",
-    base_params={
-        "nsteps": "5000",
-    },
-)
+# workflow.add_step(
+#    step_name="nvt",
+#    workflow_step=workflow_step,
+#    template_path="A_modules/atomistic/gromacs/equilibriation/templates/nvt.mdp",
+#    base_params={
+#        "nsteps": "5000",
+#    },
+# )

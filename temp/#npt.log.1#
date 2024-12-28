@@ -44,7 +44,7 @@ GROMACS:      gmx mdrun, version 2024.4-conda_forge
 Executable:   /home/reina/miniconda3/envs/lammps_packages/bin.AVX2_256/gmx
 Data prefix:  /home/reina/miniconda3/envs/lammps_packages
 Working dir:  /home/reina/polymerpinn
-Process ID:   67442
+Process ID:   80927
 Command line:
   gmx mdrun -s temp/npt.tpr -deffnm temp/npt
 
@@ -159,7 +159,7 @@ Input Parameters:
    comm-mode                      = Linear
    nstcomm                        = 100
    bd-fric                        = 0
-   ld-seed                        = -855691267
+   ld-seed                        = -403929121
    emtol                          = 10
    emstep                         = 0.01
    niter                          = 20
@@ -385,16 +385,41 @@ Center of mass motion removal mode is Linear
 We have the following groups for center of mass motion removal:
   0:  rest
 
-Started mdrun on rank 0 Sat Dec 28 18:28:36 2024
+Started mdrun on rank 0 Sat Dec 28 19:00:10 2024
 
            Step           Time
               0        0.00000
 
    Energies (kJ/mol)
           Angle    Proper Dih.          LJ-14     Coulomb-14        LJ (SR)
-    1.39573e+03    2.11121e+02    3.22879e+03   -1.10193e+03   -1.62501e+04
+    8.47391e+02    6.95874e+02    2.60273e+03   -1.04126e+03   -2.10362e+04
    Coulomb (SR)      Potential    Kinetic En.   Total Energy  Conserved En.
-    3.07677e+03   -9.43961e+03    5.47256e+05    5.37817e+05    5.37824e+05
+    3.05931e+03   -1.48722e+04    3.35100e+05    3.20228e+05    3.20235e+05
     Temperature Pressure (bar)   Constr. rmsd
-    5.56522e+03    7.05002e+06    1.86687e-06
+    3.40773e+03   -9.17342e+06    1.80191e-06
 
+
+Step 1 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 101 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+Constraint error in algorithm Lincs at step 103
+Wrote pdb files with previous and current coordinates
+Constraint error in algorithm Lincs at step 104
+Wrote pdb files with previous and current coordinates
+Constraint error in algorithm Lincs at step 105
+Wrote pdb files with previous and current coordinates
+
+-------------------------------------------------------
+Program:     gmx mdrun, version 2024.4-conda_forge
+Source file: src/gromacs/mdlib/constr.cpp (line 240)
+
+Fatal error:
+Too many LINCS warnings (1212)
+If you know what you are doing you can adjust the lincs warning threshold in
+your mdp file
+or set the environment variable GMX_MAXCONSTRWARN to -1,
+but normally it is better to fix the problem
+
+For more information and tips for troubleshooting, please check the GROMACS
+website at https://manual.gromacs.org/current/user-guide/run-time-errors.html
+-------------------------------------------------------
