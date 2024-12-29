@@ -1,4 +1,4 @@
-from A_modules.atomistic.gromacs.workflows.polymer_mol2_generator.full_workflow import (
+from A_modules.atomistic.gromacs.workflows.parameterised_polymer_generator.full_workflow import (
     run_polymerisation_workflow,
 )
 from A_modules.atomistic.gromacs.workflows.equilibriated_solvated_polymer.full_workflow import (

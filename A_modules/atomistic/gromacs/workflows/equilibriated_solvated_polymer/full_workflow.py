@@ -11,11 +11,12 @@ from A_modules.atomistic.gromacs.commands.insert_molecules import InsertMolecule
 from A_modules.atomistic.gromacs.workflows.equilibriated_solvated_polymer.file_preparation_utils import (
     prepare_solute_files,
 )
+from data_models.output_types import GromacsPaths
 
 
 # NOTE: will need helper function to extract temperatures, solvent gro, solvent itp, all from folder
 def run_polymer_solvation_workflow(
-    polymer_mol2: str,
+    parameterised_polymer: GromacsPaths,
     solvent_equilibriated_gro: str,
     solvent_itp: str,
     output_dir: str,
@@ -31,25 +32,21 @@ def run_polymer_solvation_workflow(
     save_intermediate_edr=True,
     save_intermediate_gro=True,
     save_intermediate_log=True,
-    parameterizer: ACPYPEParameterizer = ACPYPEParameterizer,
 ):
-    parameterizer = parameterizer(acpype_molecule_name=polymer_name)
-    file_config = AcpypeOutputConfig(itp=True, gro=True, top=True, posre=False)
-    parametized_polymer = parameterizer.run(polymer_mol2, temp_dir, file_config)
 
     polymer_in_solvent = InsertMolecules().run(
         solvent_equilibriated_gro,
-        parametized_polymer.gro_path,
+        parameterised_polymer.gro_path,
         num_polymers,
         temp_dir,
         "polymer_in_solvent",
     )
 
     prepared_files = prepare_solute_files(
-        solute_itp_file=parametized_polymer.itp_path,
-        solvent_itp=solvent_itp,
+        solute_itp_file=parameterised_polymer.itp_path,
+        solvent_itp_file=solvent_itp,
         solvent_box_gro_file=polymer_in_solvent,
-        input_top_file=parametized_polymer.top_path,
+        input_top_file=parameterised_polymer.top_path,
         output_dir=temp_dir,
         solute_molecule_name=polymer_name,
     )
