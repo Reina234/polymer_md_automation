@@ -1,11 +1,11 @@
 from typing import List, Dict
-from A_modules.atomistic.gromacs.parser.registries.prebuilt_section_registries import (
-    acpype_generated_sections,
+from A_modules.atomistic.gromacs.parser.registries.prebuilt_data_registries import (
+    acpype_generated_data,
 )
 
 
-class SectionRegistry:
-    def __init__(self, prebuilt_registry: Dict[str, List] = acpype_generated_sections):
+class DataRegistry:
+    def __init__(self, prebuilt_registry: Dict[str, List] = acpype_generated_data):
         self.registry = prebuilt_registry
 
     def register_section(self, section_name: str, headers: List[str]):

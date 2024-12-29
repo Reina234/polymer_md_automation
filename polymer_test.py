@@ -33,5 +33,5 @@ solvent_equilibriated_gro = "TEST_RUN_28/hexane_run_1/equilibriated_gros/temp_29
 insert_molecules = InsertMolecules()
 # run insert-molecules
 solute_in_box = insert_molecules.run(
-    parametized_files.gro_path, solvent_equilibriated_gro, 1, temp_dir_run, "solute_box"
+    solvent_equilibriated_gro, parametized_files.gro_path, 1, temp_dir_run, "solute_box"
 )

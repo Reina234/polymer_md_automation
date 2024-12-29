@@ -18,10 +18,10 @@ from A_modules.shared.utils.calculation_utils import calculate_num_particles
 import pandas as pd
 from A_modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
 from A_modules.atomistic.gromacs.parser.handlers.gro_handler import GroHandler
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
 from data_models.solvent import Solvent
 from A_modules.atomistic.gromacs.commands.solvate import Solvate
-from A_modules.atomistic.gromacs.parser.handlers.section_handler import DataHandler
+from A_modules.atomistic.gromacs.parser.handlers.data_handler import DataHandler
 import logging
 import os
 from A_modules.atomistic.gromacs.commands.editconf import Editconf
@@ -47,6 +47,100 @@ def delete_all_include_sections(sections: OrderedDict) -> OrderedDict:
         for key, section in sections.items()
         if section.construct_name != "include"
     )
+
+
+def calculate_molecule_counts(
+    gro_handler: GroHandler,
+    residue_name_col: str = "Residue Name",
+    residue_number_col="Residue Number",
+) -> pd.DataFrame:
+    """
+    Calculates the number of molecules for each unique residue name by counting unique residue numbers.
+
+    :param dataframe: Input dataframe containing residue information.
+    :param residue_number_col: Column name for residue numbers.
+    :param residue_name_col: Column name for residue names.
+    :return: A dataframe with residue names and their corresponding molecule counts.
+    """
+    dataframe = gro_handler.content
+
+    # Group by residue name and count unique residue numbers
+    molecule_counts = (
+        dataframe.groupby(residue_name_col)[residue_number_col]
+        .nunique()
+        .reset_index()
+        .rename(
+            columns={
+                residue_name_col: "Residue Name",
+                residue_number_col: "Number of Molecules",
+            }
+        )
+    )
+    return molecule_counts
+
+
+def replace_value_in_dataframe(
+    dataframe: pd.DataFrame, target_value: str, replacement_value: str
+) -> pd.DataFrame:
+    """
+    Replace all occurrences of a specific value in the DataFrame with a new value.
+
+    :param dataframe: The input DataFrame where values will be replaced.
+    :param target_value: The value to be replaced.
+    :param replacement_value: The value to replace with.
+    :return: The updated DataFrame with the values replaced.
+    """
+    # Replace the value and return the updated DataFrame
+    return dataframe.replace(to_replace=target_value, value=replacement_value)
+
+
+def replace_dataframe_contents(
+    original_df: pd.DataFrame,
+    new_df: pd.DataFrame,
+    pad_missing: bool = False,
+) -> pd.DataFrame:
+    """
+    Replace the contents of the original dataframe with the new dataframe.
+    Optionally pad missing columns in the new dataframe and ensure all values are strings.
+
+    :param original_df: The original dataframe with the expected headers.
+    :param new_df: The new dataframe without headers.
+    :param pad_missing: If True, pad missing columns in the new dataframe.
+    :return: The updated dataframe with the same headers as the original.
+    """
+    # Ensure all values in new_df are converted to strings
+    new_df = new_df.astype(str)
+
+    # Clear the original dataframe
+    original_headers = original_df.columns.tolist()
+
+    if pad_missing:
+        # Check for missing columns and pad them
+        missing_columns = len(original_headers) - len(new_df.columns)
+        if missing_columns > 0:
+            logger.info(
+                f"Padding {missing_columns} missing columns in the new dataframe."
+            )
+            for _ in range(missing_columns):
+                new_df[len(new_df.columns)] = ""
+        elif missing_columns < 0:
+            raise ValueError(
+                f"The new dataframe has more columns ({len(new_df.columns)}) "
+                f"than the original dataframe ({len(original_headers)})."
+            )
+
+    # Validate column count
+    if len(new_df.columns) != len(original_headers):
+        raise ValueError(
+            f"The new dataframe does not match the original dataframe's structure. "
+            f"Expected {len(original_headers)} columns but got {len(new_df.columns)}."
+        )
+
+    # Assign headers from the original dataframe
+    new_df.columns = original_headers
+
+    # Return updated dataframe
+    return new_df
 
 
 def rename_data_column_content(
@@ -158,6 +252,21 @@ def get_residue_number(gro_handler: GroHandler):
     return residue_numbers
 
 
+def validate_and_extract_residue_name(
+    gro_handler: GroHandler, column_name="Residue Name"
+):
+
+    unique_values = gro_handler.content[column_name].unique()
+
+    if len(unique_values) == 1:
+        # Return the single unique value
+        return unique_values[0]
+    else:
+        raise ValueError(
+            f"Column '{column_name}' contains multiple residue names: {unique_values}"
+        )
+
+
 def rename_residue_name_from_gro(
     gro_file: str,
     new_residue_name: str,
@@ -198,6 +307,52 @@ def export_gro_handler(
     sections["gro_file"] = gro_section
     output_file = parser.export(sections, output_path)
     return output_file
+
+
+# NOTE: honestly, could turn the grohandler -> dataframe, dataframe -> grohandler part into a wrapper or something
+def add_full_rows_to_handler(
+    handler: Union[GroHandler, DataHandler],
+    dataframe_to_add: pd.DataFrame,
+    add_to_top: bool = False,
+) -> Union[GroHandler, DataHandler]:
+
+    if add_to_top is True:
+        new_content = pd.concat([dataframe_to_add, handler.content], ignore_index=True)
+    else:
+        new_content = pd.concat([handler.content, dataframe_to_add], ignore_index=True)
+    handler.content = new_content
+    return handler
+
+
+def add_to_specific_handler_columns(
+    handler: Union["GroHandler", "DataHandler"],
+    column_values: Dict[str, Union[str, int, float]],
+    add_to_top: bool = False,
+) -> Union["GroHandler", "DataHandler"]:
+    """
+    Add a row with values for specific columns, leaving others empty.
+
+    :param handler: The handler object containing a `content` DataFrame.
+    :param column_values: Dictionary of column names and their values.
+    :param add_to_top: Whether to add the row to the top or bottom of the DataFrame.
+    :return: The updated handler.
+    """
+    # Create a row with specified column values, leaving others as NaN
+
+    column_values_str = {key: str(value) for key, value in column_values.items()}
+
+    # Create a row with specified column values, leaving others as NaN
+    row_to_add = {
+        col: column_values_str.get(col, None) for col in handler.content.columns
+    }
+    row_df = pd.DataFrame([row_to_add], columns=handler.content.columns)
+
+    if add_to_top:
+        new_content = pd.concat([row_df, handler.content], ignore_index=True)
+    else:
+        new_content = pd.concat([handler.content, row_df], ignore_index=True)
+    handler.content = new_content
+    return handler
 
 
 def calculate_minimum_box_size_from_handler(

@@ -39,7 +39,6 @@ def process_solvent_files(
     output_gro_name: Optional[str] = None,
     output_topol_name: Optional[str] = None,
     parser: GromacsParser = GromacsParser(),
-    gro_handler: GroHandler = GroHandler(),
 ) -> GromacsPaths:
     if new_residue_name:
         if len(new_residue_name) > 5:

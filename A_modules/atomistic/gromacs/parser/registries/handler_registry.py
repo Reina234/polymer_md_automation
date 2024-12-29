@@ -5,7 +5,7 @@ from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
 from A_modules.atomistic.gromacs.parser.handlers.base_handler import (
     BaseHandler,
 )
-from A_modules.atomistic.gromacs.parser.handlers.section_handler import (
+from A_modules.atomistic.gromacs.parser.handlers.data_handler import (
     DataHandler,
 )
 from A_modules.atomistic.gromacs.parser.handlers.includes_handler import (
