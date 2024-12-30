@@ -1,25 +1,13 @@
-from typing import Dict, List
-from modules.atomistic.gromacs.equilibriation.base_workflow_step import (
-    BaseWorkflowStep,
-)
-from modules.atomistic.gromacs.equilibriation.mdp_cache import MDPCache
-from modules.shared.utils.file_utils import (
-    directory_exists_check_wrapper,
-    copy_file,
-    rename_file,
-)
-import os
-from modules.atomistic.utils.mdp_utils import generate_dynamic_filename
-
+import shutil
 import os
 from typing import Dict, List, Optional
 from modules.atomistic.gromacs.equilibriation.base_workflow_step import BaseWorkflowStep
 from modules.atomistic.gromacs.equilibriation.mdp_cache import MDPCache
 from modules.shared.utils.file_utils import (
     directory_exists_check_wrapper,
-    copy_file,
-    rename_file,
+    copy_and_rename,
 )
+from data_models.output_types import GromacsOutputs
 from modules.atomistic.utils.mdp_utils import generate_dynamic_filename
 
 
@@ -65,18 +53,25 @@ class FullEquilibrationWorkflow:
         files_to_keep: Optional[List[str]] = None,
         override_safeguard_off: bool = False,
         subdir: str = "equilibriated_outputs",
+        save_intermediate_edr: bool = True,
+        save_intermediate_gro: bool = True,
+        save_intermediate_log: bool = True,
         verbose: bool = False,
     ):
         """
         Run the full equilibration workflow.
 
-        :param files_to_keep: List of file extensions to keep (e.g., ["gro", "xtc"]). Defaults to ["gro"].
+        :param files_to_keep: List of file extensions to keep (e.g., ["gro", "edr"]). Defaults to ["gro"].
         """
-        files_to_keep = files_to_keep or ["gro"]
+        outputs = GromacsOutputs()
+        if not files_to_keep:
+            files_to_keep = ["gro"]
+
         main_output_dir = os.path.join(main_output_dir, subdir)
         os.makedirs(main_output_dir, exist_ok=True)
 
         current_gro_path = input_gro_path
+        final_step_name = None
 
         # Run all EM steps first
         for step_name, step, template_path, base_params in self.em_steps:
@@ -89,11 +84,12 @@ class FullEquilibrationWorkflow:
                 log_dir=log_dir,
                 varying_params=base_params,  # No variation for EM steps
                 mdp_cache=self.mdp_cache,
-                save_intermediate_edr="edr" in files_to_keep,
-                save_intermediate_gro="gro" in files_to_keep,
-                save_intermediate_log="log" in files_to_keep,
+                save_intermediate_edr=save_intermediate_edr,
+                save_intermediate_gro=save_intermediate_gro,
+                save_intermediate_log=save_intermediate_log,
                 verbose=verbose,
             )
+            final_step_name = step_name  # Track the last step name
 
             if not current_gro_path:
                 raise RuntimeError(
@@ -116,17 +112,31 @@ class FullEquilibrationWorkflow:
                     log_dir=log_dir,
                     varying_params=params,
                     mdp_cache=self.mdp_cache,
-                    save_intermediate_edr="edr" in files_to_keep,
-                    save_intermediate_gro="gro" in files_to_keep,
-                    save_intermediate_log="log" in files_to_keep,
+                    save_intermediate_edr=save_intermediate_edr,
+                    save_intermediate_gro=save_intermediate_gro,
+                    save_intermediate_log=save_intermediate_log,
                     verbose=verbose,
                 )
+                final_step_name = step_name  # Track the last step name
 
-            # Generate dynamic filename based on parameters
-            final_filename = generate_dynamic_filename(varying_params, extension="gro")
-            final_path = os.path.join(main_output_dir, final_filename)
-            copy_file(
-                current_gro_path, final_path, delete_original=override_safeguard_off
-            )
+        if final_step_name and files_to_keep:
+            for ext in files_to_keep:
+                file_name = f"{final_step_name}.{ext}"
+                file_path = os.path.join(temp_output_dir, file_name)
+                new_filename = generate_dynamic_filename(varying_params, extension=None)
+                if os.path.exists(file_path):
+                    new_file_path = copy_and_rename(
+                        file_path,
+                        main_output_dir,
+                        new_name=new_filename,
+                        delete_original=False,
+                        replace_if_exists=True,
+                    )
+                    if hasattr(outputs, ext):  # Ensure the extension is valid
+                        setattr(outputs, ext, new_file_path)
+                    else:
+                        raise ValueError(
+                            f"Extension '{ext}' is not a valid output type for GromacsOutputs."
+                        )
 
-        return main_output_dir
+        return main_output_dir, outputs

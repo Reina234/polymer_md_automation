@@ -207,6 +207,66 @@ def batch_copy_file(
     return copied_files
 
 
+def copy_and_rename(
+    file_path: Optional[str],
+    dest_dir: str,
+    new_name: Optional[str] = None,
+    delete_original: bool = False,
+    replace_if_exists: bool = True,
+) -> Optional[str]:
+    """
+    Copies a file to a destination directory and optionally renames it. Optionally deletes the original.
+    Optionally skips copying if the file already exists.
+
+    :param file_path: Relative or absolute path to the file to copy, can be None (will return None).
+    :type file_path: Optional[str]
+    :param dest_dir: The directory to copy the file to.
+    :type dest_dir: str
+    :param new_name: New name for the copied file (without extension). If None, keeps the original name.
+    :type new_name: Optional[str]
+    :param delete_original: If True, deletes the original file after copying, defaults to False.
+    :type delete_original: bool, optional
+    :param skip_if_exists: If True, skips copying if the file already exists in the destination directory.
+    :type skip_if_exists: bool, optional
+    :return: The path to the copied (and optionally renamed) file, if successful, else None.
+    :rtype: Optional[str]
+    """
+
+    if file_path is None:
+        logger.info("File is None, skipping.")
+        return None
+
+    check_file_exists(file_path)
+    check_directory_exists(dest_dir)
+
+    # Determine the new file name
+    original_extension = os.path.splitext(file_path)[1]
+    new_file_name = (
+        f"{new_name}{original_extension}" if new_name else os.path.basename(file_path)
+    )
+    dest_file_path = os.path.join(dest_dir, new_file_name)
+
+    if os.path.exists(dest_file_path):
+        if not replace_if_exists:
+            logger.info(f"File already exists at {dest_file_path}. Skipping copy.")
+            return dest_file_path
+        else:
+            logger.info(
+                f"File already exists at {dest_file_path}. Deleting existing file."
+            )
+            os.remove(dest_file_path)
+
+    # Perform the copy operation
+    dest_file = shutil.copy2(file_path, dest_file_path)
+    logger.info(f"Copied {file_path} to {dest_file}.")
+
+    if delete_original:
+        os.remove(file_path)
+        logger.info(f"Deleted original file: {file_path}")
+
+    return dest_file
+
+
 def copy_file(
     file_path: Optional[str],
     dest_dir: str,

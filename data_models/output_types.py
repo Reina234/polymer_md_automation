@@ -21,3 +21,14 @@ class GromacsPaths:
         :rtype: List[Optional[str]]
         """
         return [self.itp_path, self.gro_path, self.top_path, self.posre_path]
+
+
+@dataclass
+class GromacsOutputs:
+    itp: Optional[str] = None
+    gro: Optional[str] = None
+    top: Optional[str] = None
+    edr: Optional[str] = None
+    trr: Optional[str] = None
+    log: Optional[str] = None
+    xtc: Optional[str] = None

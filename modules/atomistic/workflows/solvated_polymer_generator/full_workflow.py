@@ -57,14 +57,14 @@ def run_polymer_solvation_workflow(
         solute_molecule_name=polymer_name,
     )
 
-    final_dir, _ = workflow.run(
+    final_dir, outputs = workflow.run(
         prepared_files.gro_path,
         prepared_files.top_path,
         temp_dir,
         final_output_dir,
         log_dir,
         varying_params_list=[{"temp": str(temperature)}],
-        files_to_keep=["edr", "gro", "trr"],
+        files_to_keep=["edr", "trr", "gro"],
         override_safeguard_off=override_safeguard_off,
         save_intermediate_edr=save_intermediate_edr,
         save_intermediate_gro=save_intermediate_gro,
@@ -73,12 +73,14 @@ def run_polymer_solvation_workflow(
         verbose=verbose,
     )
     # keep topol file
-    copy_file(prepared_files.top_path, final_output_dir, skip_if_exists=True)
+    topol_file = copy_file(
+        prepared_files.top_path, final_output_dir, skip_if_exists=True
+    )
     if cleanup:
         delete_directory(temp_dir, verbose=verbose, confirm=False)
         delete_directory(log_dir, verbose=verbose, confirm=confirm_log_deletion)
-
-    return final_output_dir
+    outputs.top = topol_file
+    return outputs
 
 
 # NOTE: might need more than just gro as final output!
