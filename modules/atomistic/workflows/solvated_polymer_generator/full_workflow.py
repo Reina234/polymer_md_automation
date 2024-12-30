@@ -64,7 +64,7 @@ def run_polymer_solvation_workflow(
         final_output_dir,
         log_dir,
         varying_params_list=[{"temp": str(temperature)}],
-        files_to_keep=["edr", "trr", "gro"],
+        files_to_keep=["edr", "trr", "gro", "xtc"],
         override_safeguard_off=override_safeguard_off,
         save_intermediate_edr=save_intermediate_edr,
         save_intermediate_gro=save_intermediate_gro,

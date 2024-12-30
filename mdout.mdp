@@ -2,7 +2,7 @@
 ;	File 'mdout.mdp' was generated
 ;	By user: unknown (1000)
 ;	On host: LENOVO-PC
-;	At date: Mon Dec 30 22:01:43 2024
+;	At date: Mon Dec 30 22:28:09 2024
 ;
 ;	Created by:
 ;	               :-) GROMACS - gmx grompp, 2024.4-conda_forge (-:
@@ -11,7 +11,7 @@
 ;	Data prefix:  /home/reina/miniconda3/envs/lammps_packages
 ;	Working dir:  /home/reina/polymerpinn
 ;	Command line:
-;	  gmx grompp -f cache/mdp_cache/d7adf8d08f2e8d35ef9b2b0de0693397.mdp -c temp/minim_2.gro -p temp/topol.top -o temp/nvt_short.tpr
+;	  gmx grompp -f cache/mdp_cache/001a0f4dec0281e4e694fe55aec534be.mdp -c temp/npt_short.gro -p temp/topol.top -o temp/npt_2.tpr
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
@@ -24,8 +24,8 @@ define                   =
 integrator               = md
 ; Start time and timestep in ps
 tinit                    = 0
-dt                       = 0.002
-nsteps                   = 100000
+dt                       = 0.001
+nsteps                   = 15000
 ; For exact run continuation or redoing part of a run
 init-step                = 0
 ; Part index is updated automatically on checkpointing (keeps files separate)
@@ -63,15 +63,15 @@ rtpi                     = 0.05
 
 ; OUTPUT CONTROL OPTIONS
 ; Output frequency for coords (x), velocities (v) and forces (f)
-nstxout                  = 1000
-nstvout                  = 1000
+nstxout                  = 0
+nstvout                  = 0
 nstfout                  = 0
 ; Output frequency for energies to log file and energy file
 nstlog                   = 1000
 nstcalcenergy            = 100
 nstenergy                = 1000
 ; Output frequency and precision for .xtc file
-nstxout-compressed       = 0
+nstxout-compressed       = 500
 compressed-x-precision   = 1000
 ; This selects the subset of atoms for the compressed
 ; trajectory file. You can select multiple groups. By
@@ -94,7 +94,7 @@ verlet-buffer-tolerance  = 0.005
 ; Allowed error in the average pressure due to the Verlet buffer for LJ interactions
 verlet-buffer-pressure-tolerance = 0.5
 ; nblist cut-off        
-rlist                    = 1.0
+rlist                    = 1.2
 ; long-range cut-off for switched potentials
 
 ; OPTIONS FOR ELECTROSTATICS AND VDW
@@ -102,18 +102,18 @@ rlist                    = 1.0
 coulombtype              = PME
 coulomb-modifier         = Potential-shift-Verlet
 rcoulomb-switch          = 0
-rcoulomb                 = 1.0
+rcoulomb                 = 1.2
 ; Relative dielectric constant for the medium and the reaction field
 epsilon-r                = 1
 epsilon-rf               = 0
 ; Method for doing Van der Waals
-vdwtype                  = cutoff
+vdwtype                  = cut-off
 vdw-modifier             = Potential-shift-Verlet
 ; cut-off lengths       
 rvdw-switch              = 0
-rvdw                     = 1.0
+rvdw                     = 1.2
 ; Apply long range dispersion corrections for Energy and Pressure
-DispCorr                 = No
+DispCorr                 = EnerPres
 ; Extension of the potential lookup tables beyond the cut-off
 table-extension          = 1
 ; Separate tables between energy group pairs
@@ -137,7 +137,7 @@ implicit-solvent         = no
 ensemble-temperature-setting = auto
 ensemble-temperature     = -1
 ; Temperature coupling  
-tcoupl                   = V-rescale
+tcoupl                   = v-rescale
 nsttcouple               = -1
 nh-chain-length          = 10
 print-nose-hoover-chain-variables = no
@@ -147,13 +147,13 @@ tc-grps                  = System
 tau_t                    = 0.1
 ref_t                    = 300
 ; pressure coupling     
-pcoupl                   = no
-pcoupltype               = Isotropic
+pcoupl                   = Parrinello-Rahman
+pcoupltype               = isotropic
 nstpcouple               = -1
 ; Time constant (ps), compressibility (1/bar) and reference P (bar)
-tau-p                    = 5
-compressibility          = 
-ref-p                    = 
+tau_p                    = 2.0
+compressibility          = 1.4e-4
+ref_p                    = 1.0
 ; Scaling of reference coordinates, No, All or COM
 refcoord-scaling         = No
 
@@ -175,14 +175,14 @@ annealing-temp           =
 ; GENERATE VELOCITIES FOR STARTUP RUN
 gen-vel                  = no
 gen-temp                 = 300
-gen-seed                 = -85213545
+gen-seed                 = 1872691198
 
 ; OPTIONS FOR BONDS    
 constraints              = h-bonds
 ; Type of constraint algorithm
 constraint_algorithm     = LINCS
 ; Do not constrain the start configuration
-continuation             = no
+continuation             = yes
 ; Use successive overrelaxation to reduce the number of shake iterations
 Shake-SOR                = no
 ; Relative tolerance of shake

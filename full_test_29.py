@@ -28,3 +28,7 @@ run_polymer_solvation_workflow(
     workflow=workflow,
     temperature=298,
 )
+
+#################################################################################
+# need to pass in compressibility somehow, set a default, put into Solvent class
+#################################################################################
