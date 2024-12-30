@@ -51,7 +51,6 @@ class FullEquilibrationWorkflow:
         log_dir: str,
         varying_params_list: List[Dict[str, str]],
         files_to_keep: Optional[List[str]] = None,
-        override_safeguard_off: bool = False,
         subdir: str = "equilibriated_outputs",
         save_intermediate_edr: bool = True,
         save_intermediate_gro: bool = True,
