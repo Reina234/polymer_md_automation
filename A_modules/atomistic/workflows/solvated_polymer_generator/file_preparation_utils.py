@@ -24,7 +24,7 @@ from A_modules.atomistic.gromacs.utils.utils import (
     create_includes_section,
     delete_all_include_sections,
     validate_and_extract_residue_name,
-    add_full_rows_to_handler,
+    add_full_rows_to_handler_deduplicate,
     add_to_specific_handler_columns,
 )
 
@@ -129,8 +129,8 @@ def process_solute_itp(
     atoms_sections = solute_sections["data_atomtypes"]
 
     data_handler.process(atoms_sections)
-    data_handler = add_full_rows_to_handler(
-        data_handler, solvent_atomtype_data, add_to_top=False
+    data_handler = add_full_rows_to_handler_deduplicate(
+        data_handler, solvent_atomtype_data, add_to_top=False, deduplicate_column="name"
     )
     atoms_sections = data_handler.export()
     solute_sections["data_atomtypes"] = atoms_sections

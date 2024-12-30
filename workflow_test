@@ -1,0 +1,22 @@
+from A_modules.atomistic.workflows.equilibriated_solvent_box_generator.workflow_config import (
+    workflow,
+)
+from A_modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow import (
+    FullEquilibrationWorkflow,
+)
+
+solvent_gro = "polymer_in_solvent.gro"
+top = "topol_2.top"
+final_gro = workflow.run(
+    solvent_gro,
+    top,
+    "TEMP_30",
+    "test_29",
+    "logs",
+    varying_params_list=[{"temp": str(298)}],
+    override_safeguard_off=True,
+    save_intermediate_edr=True,
+    save_intermediate_gro=True,
+    save_intermediate_log=True,
+    verbose=True,
+)

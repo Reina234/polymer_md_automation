@@ -12,8 +12,10 @@ from A_modules.atomistic.workflows.solvated_polymer_generator.file_preparation_u
     prepare_solute_files,
 )
 from data_models.output_types import GromacsPaths
+from A_modules.atomistic.gromacs.utils.moltemplate_utils import add_polymer_to_solvent
 
 
+# NOTE: will need naming scheme
 # NOTE: will need helper function to extract temperatures, solvent gro, solvent itp, all from folder
 def run_polymer_solvation_workflow(
     parameterised_polymer: GromacsPaths,
@@ -23,8 +25,7 @@ def run_polymer_solvation_workflow(
     workflow: FullEquilibrationWorkflow,
     temperature: float,
     polymer_name: str = "POLY",
-    num_polymers: int = 1,
-    identifier: Optional[str] = None,
+    cutoff: float = 0.2,
     temp_dir=TEMP_DIR,
     log_dir=LOG_DIR,
     verbose: bool = False,
@@ -34,12 +35,12 @@ def run_polymer_solvation_workflow(
     save_intermediate_log=True,
 ):
 
-    polymer_in_solvent = InsertMolecules().run(
-        solvent_equilibriated_gro,
+    polymer_in_solvent = add_polymer_to_solvent(
         parameterised_polymer.gro_path,
-        num_polymers,
+        solvent_equilibriated_gro,
         temp_dir,
         "polymer_in_solvent",
+        cutoff=cutoff,
     )
 
     prepared_files = prepare_solute_files(

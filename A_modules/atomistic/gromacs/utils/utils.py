@@ -52,21 +52,28 @@ def delete_all_include_sections(sections: OrderedDict) -> OrderedDict:
 def calculate_molecule_counts(
     gro_handler: GroHandler,
     residue_name_col: str = "Residue Name",
-    residue_number_col="Residue Number",
+    residue_number_col: str = "Residue Number",
 ) -> pd.DataFrame:
     """
-    Calculates the number of molecules for each unique residue name by counting unique residue numbers.
+    Calculates the number of molecules for each unique residue name by counting unique residue numbers,
+    preserving the order of first occurrence.
 
-    :param dataframe: Input dataframe containing residue information.
-    :param residue_number_col: Column name for residue numbers.
+    :param gro_handler: Input GroHandler containing residue information.
     :param residue_name_col: Column name for residue names.
-    :return: A dataframe with residue names and their corresponding molecule counts.
+    :param residue_number_col: Column name for residue numbers.
+    :return: A dataframe with residue names and their corresponding molecule counts, in the order of first occurrence.
     """
     dataframe = gro_handler.content
 
+    # Ensure residue names appear in their first occurrence order
+    residue_name_order = dataframe[residue_name_col].drop_duplicates()
+    dataframe[residue_name_col] = pd.Categorical(
+        dataframe[residue_name_col], categories=residue_name_order, ordered=True
+    )
+
     # Group by residue name and count unique residue numbers
     molecule_counts = (
-        dataframe.groupby(residue_name_col)[residue_number_col]
+        dataframe.groupby(residue_name_col, observed=True)[residue_number_col]
         .nunique()
         .reset_index()
         .rename(
@@ -76,6 +83,7 @@ def calculate_molecule_counts(
             }
         )
     )
+
     return molecule_counts
 
 
@@ -309,6 +317,53 @@ def add_full_rows_to_handler(
     else:
         new_content = pd.concat([handler.content, dataframe_to_add], ignore_index=True)
     handler.content = new_content
+    return handler
+
+
+import pandas as pd
+from typing import Union, Optional
+
+
+def add_full_rows_to_handler_deduplicate(
+    handler: Union[GroHandler, DataHandler],
+    dataframe_to_add: pd.DataFrame,
+    add_to_top: bool = False,
+    deduplicate_column: Optional[str] = None,
+    keep: str = "first",
+) -> Union[GroHandler, DataHandler]:
+    """
+    Add full rows to a handler's content, with optional deduplication based on a specified column.
+
+    :param handler: The handler containing the original content.
+    :param dataframe_to_add: The new dataframe to add to the handler's content.
+    :param add_to_top: If True, adds the new rows to the top; otherwise, to the bottom.
+    :param deduplicate_column: The column to use for deduplication. If None, no deduplication is performed.
+    :param keep: Which duplicate to keep when deduplicating. "first" or "last".
+    :return: The updated handler with the modified content.
+    """
+    # Combine the existing content with the new rows
+    if add_to_top:
+        combined_content = pd.concat(
+            [dataframe_to_add, handler.content], ignore_index=True
+        )
+    else:
+        combined_content = pd.concat(
+            [handler.content, dataframe_to_add], ignore_index=True
+        )
+
+    # Deduplicate if a column is specified
+    if deduplicate_column is not None:
+        if deduplicate_column not in combined_content.columns:
+            raise ValueError(
+                f"Column '{deduplicate_column}' not found in the dataframe."
+            )
+
+        combined_content = combined_content.drop_duplicates(
+            subset=deduplicate_column, keep=keep
+        )
+
+    # Update the handler content
+    handler.content = combined_content
     return handler
 
 
