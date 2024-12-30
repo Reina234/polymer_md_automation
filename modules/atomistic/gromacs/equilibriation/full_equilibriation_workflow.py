@@ -11,6 +11,17 @@ from modules.shared.utils.file_utils import (
 import os
 from modules.atomistic.utils.mdp_utils import generate_dynamic_filename
 
+import os
+from typing import Dict, List, Optional
+from modules.atomistic.gromacs.equilibriation.base_workflow_step import BaseWorkflowStep
+from modules.atomistic.gromacs.equilibriation.mdp_cache import MDPCache
+from modules.shared.utils.file_utils import (
+    directory_exists_check_wrapper,
+    copy_file,
+    rename_file,
+)
+from modules.atomistic.utils.mdp_utils import generate_dynamic_filename
+
 
 class FullEquilibrationWorkflow:
     def __init__(self, mdp_cache: MDPCache):
@@ -51,14 +62,20 @@ class FullEquilibrationWorkflow:
         main_output_dir: str,
         log_dir: str,
         varying_params_list: List[Dict[str, str]],
+        files_to_keep: Optional[List[str]] = None,
         override_safeguard_off: bool = False,
-        save_intermediate_edr: bool = False,
-        save_intermediate_gro: bool = False,
-        save_intermediate_log: bool = False,
+        subdir: str = "equilibriated_outputs",
         verbose: bool = False,
     ):
-        subdir = "equilibriated_gros"
+        """
+        Run the full equilibration workflow.
+
+        :param files_to_keep: List of file extensions to keep (e.g., ["gro", "xtc"]). Defaults to ["gro"].
+        """
+        files_to_keep = files_to_keep or ["gro"]
         main_output_dir = os.path.join(main_output_dir, subdir)
+        os.makedirs(main_output_dir, exist_ok=True)
+
         current_gro_path = input_gro_path
 
         # Run all EM steps first
@@ -72,9 +89,9 @@ class FullEquilibrationWorkflow:
                 log_dir=log_dir,
                 varying_params=base_params,  # No variation for EM steps
                 mdp_cache=self.mdp_cache,
-                save_intermediate_edr=save_intermediate_edr,
-                save_intermediate_gro=save_intermediate_gro,
-                save_intermediate_log=save_intermediate_log,
+                save_intermediate_edr="edr" in files_to_keep,
+                save_intermediate_gro="gro" in files_to_keep,
+                save_intermediate_log="log" in files_to_keep,
                 verbose=verbose,
             )
 
@@ -99,18 +116,17 @@ class FullEquilibrationWorkflow:
                     log_dir=log_dir,
                     varying_params=params,
                     mdp_cache=self.mdp_cache,
-                    save_intermediate_edr=save_intermediate_edr,
-                    save_intermediate_gro=save_intermediate_gro,
-                    save_intermediate_log=save_intermediate_log,
+                    save_intermediate_edr="edr" in files_to_keep,
+                    save_intermediate_gro="gro" in files_to_keep,
+                    save_intermediate_log="log" in files_to_keep,
                     verbose=verbose,
                 )
 
-            final_gro_name = generate_dynamic_filename(varying_params)
-            final_gro_path = copy_file(
-                current_gro_path,
-                main_output_dir,
-                delete_original=override_safeguard_off,
+            # Generate dynamic filename based on parameters
+            final_filename = generate_dynamic_filename(varying_params, extension="gro")
+            final_path = os.path.join(main_output_dir, final_filename)
+            copy_file(
+                current_gro_path, final_path, delete_original=override_safeguard_off
             )
-            rename_file(final_gro_path, final_gro_name)
 
-        return main_output_dir, final_gro_path
+        return main_output_dir

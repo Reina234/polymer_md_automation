@@ -78,6 +78,7 @@ def run_solvent_workflow(
         output_dir,
         log_dir,
         override_safeguard_off=override_safeguard_off,
+        files_to_keep=["gro"],
         varying_params_list=temperatures,
         save_intermediate_edr=save_intermediate_edr,
         save_intermediate_gro=save_intermediate_gro,

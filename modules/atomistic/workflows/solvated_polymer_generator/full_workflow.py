@@ -11,9 +11,10 @@ from modules.atomistic.gromacs.commands.insert_molecules import InsertMolecules
 from modules.atomistic.workflows.solvated_polymer_generator.file_preparation_utils import (
     prepare_solute_files,
 )
-from modules.shared.utils.file_utils import delete_directory
+from modules.shared.utils.file_utils import delete_directory, copy_file
 from data_models.output_types import GromacsPaths
 from modules.atomistic.utils.moltemplate_utils import add_polymer_to_solvent
+import os
 
 
 # NOTE: will need naming scheme
@@ -23,6 +24,7 @@ def run_polymer_solvation_workflow(
     solvent_equilibriated_gro: str,
     solvent_itp: str,
     output_dir: str,
+    subdir: str,
     workflow: FullEquilibrationWorkflow,
     temperature: float,
     polymer_name: str = "POLY",
@@ -37,7 +39,7 @@ def run_polymer_solvation_workflow(
     cleanup: bool = True,
     confirm_log_deletion: bool = True,
 ) -> str:
-
+    final_output_dir = os.path.join(output_dir, subdir)
     polymer_in_solvent = add_polymer_to_solvent(
         parameterised_polymer.gro_path,
         solvent_equilibriated_gro,
@@ -55,24 +57,28 @@ def run_polymer_solvation_workflow(
         solute_molecule_name=polymer_name,
     )
 
-    _, final_gro = workflow.run(
+    final_dir, _ = workflow.run(
         prepared_files.gro_path,
         prepared_files.top_path,
         temp_dir,
-        output_dir,
+        final_output_dir,
         log_dir,
         varying_params_list=[{"temp": str(temperature)}],
+        files_to_keep=["edr", "gro", "trr"],
         override_safeguard_off=override_safeguard_off,
         save_intermediate_edr=save_intermediate_edr,
         save_intermediate_gro=save_intermediate_gro,
         save_intermediate_log=save_intermediate_log,
+        subdir="gromacs_output",
         verbose=verbose,
     )
+    # keep topol file
+    copy_file(prepared_files.top_path, final_output_dir, skip_if_exists=True)
     if cleanup:
         delete_directory(temp_dir, verbose=verbose, confirm=False)
         delete_directory(log_dir, verbose=verbose, confirm=confirm_log_deletion)
 
-    return final_gro
+    return final_output_dir
 
 
 # NOTE: might need more than just gro as final output!

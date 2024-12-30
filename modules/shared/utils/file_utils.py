@@ -208,19 +208,24 @@ def batch_copy_file(
 
 
 def copy_file(
-    file_path: Optional[str], dest_dir: str, delete_original: bool = False
+    file_path: Optional[str],
+    dest_dir: str,
+    delete_original: bool = False,
+    skip_if_exists: bool = True,
 ) -> Optional[str]:
     """
-    Copies a file to a destination directory. Optionally deletes the original.
+    Copies a file to a destination directory. Optionally deletes the original. Optionally skips copying if the file already exists.
 
-    :param file_path: Relative or absolute path to the file to copy, can be None (will return None)
+    :param file_path: Relative or absolute path to the file to copy, can be None (will return None).
     :type file_path: Optional[str]
-    :param dest_dir: The directory to copy the file to
+    :param dest_dir: The directory to copy the file to.
     :type dest_dir: str
-    :param delete_original: If True, deletes the original file after copying, defaults to False, defaults to False
+    :param delete_original: If True, deletes the original file after copying, defaults to False.
     :type delete_original: bool, optional
-    :return: The path to the copied file, if successful, else None
-    :rtype: List[Optional[str,]]
+    :param skip_if_exists: If True, skips copying if the file already exists in the destination directory.
+    :type skip_if_exists: bool, optional
+    :return: The path to the copied file, if successful, else None.
+    :rtype: Optional[str]
     """
 
     if file_path is None:
@@ -230,6 +235,13 @@ def copy_file(
     check_file_exists(file_path)
     check_directory_exists(dest_dir)
 
+    dest_file_path = os.path.join(dest_dir, os.path.basename(file_path))
+
+    if skip_if_exists and os.path.exists(dest_file_path):
+        logger.info(f"File already exists at {dest_file_path}. Skipping copy.")
+        return dest_file_path
+
+    # Perform the copy operation
     dest_file = shutil.copy2(file_path, dest_dir)
     logger.info(f"Copied {file_path} to {dest_file}.")
 
