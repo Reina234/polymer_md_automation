@@ -29,6 +29,7 @@ run_polymer_solvation_workflow(
     temperature=298,
 )
 
-#################################################################################
+############################################################################################
 # need to pass in compressibility somehow, set a default, put into Solvent class
-#################################################################################
+# MAYBE, use the file name itself to get the compressibility value and the temp value? !!!
+############################################################################################
