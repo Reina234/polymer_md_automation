@@ -297,18 +297,6 @@ def export_gro_handler(
     return output_file
 
 
-def export_gro_handler(
-    gro_handler: GroHandler,
-    output_path: str,
-    parser: GromacsParser = GromacsParser(),
-):
-    gro_section = gro_handler.export()
-    sections = OrderedDict()
-    sections["gro_file"] = gro_section
-    output_file = parser.export(sections, output_path)
-    return output_file
-
-
 # NOTE: honestly, could turn the grohandler -> dataframe, dataframe -> grohandler part into a wrapper or something
 def add_full_rows_to_handler(
     handler: Union[GroHandler, DataHandler],

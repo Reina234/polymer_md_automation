@@ -1,4 +1,4 @@
-from A_modules.atomistic.gromacs.workflows.equilibriated_solvent_box.workflow_config import (
+from A_modules.atomistic.workflows.equilibriated_solvent_box_generator.workflow_config import (
     workflow,
 )
 

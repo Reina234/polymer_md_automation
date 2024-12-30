@@ -87,7 +87,8 @@ def prepare_solute_files(
     output_gro_path = prepare_output_file_path(
         solvent_box_gro_file, output_extension="gro", output_dir=output_dir
     )
-    shutil.copy(solvent_box_gro_file, output_gro_path)
+    if output_gro_path != solvent_box_gro_file:
+        shutil.copy(solvent_box_gro_file, output_gro_path)
     paths = GromacsPaths(
         itp_path=solute_itp_file, gro_path=output_gro_path, top_path=output_top_path
     )

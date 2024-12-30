@@ -5,7 +5,7 @@ from A_modules.atomistic.acpype_parameterizer.acpype_parametizer import (
     ACPYPEParameterizer,
 )
 from A_modules.shared.file_conversion.converter_factory import ConverterFactory
-from A_modules.atomistic.gromacs.workflows.equilibriated_solvent_box.file_preparation_utils import (
+from A_modules.atomistic.workflows.equilibriated_solvent_box_generator.file_preparation_utils import (
     process_solvent_files,
 )
 from A_modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow import (

@@ -8,7 +8,7 @@ from A_modules.atomistic.acpype_parameterizer.acpype_parametizer import (
 )
 from A_config.paths import TEMP_DIR, LOG_DIR
 from A_modules.atomistic.gromacs.commands.insert_molecules import InsertMolecules
-from A_modules.atomistic.gromacs.workflows.equilibriated_solvated_polymer.file_preparation_utils import (
+from A_modules.atomistic.workflows.solvated_polymer_generator.file_preparation_utils import (
     prepare_solute_files,
 )
 from data_models.output_types import GromacsPaths
@@ -54,10 +54,10 @@ def run_polymer_solvation_workflow(
     final_gro = workflow.run(
         prepared_files.gro_path,
         prepared_files.top_path,
-        temp_output_dir=temp_dir,
-        main_output_dir=output_dir,
-        log_dir=log_dir,
-        varying_params_list=[{"temp": temp} for temp in temperature],
+        temp_dir,
+        output_dir,
+        log_dir,
+        varying_params_list=[{"temp": str(temperature)}],
         override_safeguard_off=override_safeguard_off,
         save_intermediate_edr=save_intermediate_edr,
         save_intermediate_gro=save_intermediate_gro,

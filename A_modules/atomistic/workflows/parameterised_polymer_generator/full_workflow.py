@@ -10,6 +10,7 @@ from A_modules.atomistic.acpype_parameterizer.acpype_parametizer import (
     ACPYPEParameterizer,
 )
 from data_models.output_types import GromacsPaths
+import os
 
 # NOTE: I think I can use just a copolymer generator, and create a homopolymer by passing in two of the same monomer units
 
@@ -27,6 +28,8 @@ def run_polymerisation_workflow(
     parameterizer: ACPYPEParameterizer = ACPYPEParameterizer,
     converter_factory: ConverterFactory = ConverterFactory(),
 ) -> GromacsPaths:
+    subdir = f"{monomer_smiles.lower()}_{num_units}"
+    main_output_dir = os.path.join(output_dir, subdir)
     generator = HomopolymerGenerator()
     polymer_pdb = generator.generate_polymer(
         monomer_smiles,
@@ -36,15 +39,15 @@ def run_polymerisation_workflow(
         overwrite=overwrite,
     )
     if keep_pdb:
-        polymer_pdb = copy_file(generator.pdb_path, output_dir)
+        polymer_pdb = copy_file(generator.pdb_path, main_output_dir)
 
     if keep_mol2:
-        mol2_output_dir = output_dir
+        mol2_output_dir = main_output_dir
     else:
         mol2_output_dir = temp_dir
     mol2_converter = converter_factory.get_converter("pdb", "mol2")
     mol2_file = mol2_converter.run(polymer_pdb, mol2_output_dir)
     parameterizer = parameterizer(acpype_molecule_name=polymer_name)
     file_config = AcpypeOutputConfig(itp=True, gro=True, top=True, posre=False)
-    parametized_polymer = parameterizer.run(mol2_file, output_dir, file_config)
+    parametized_polymer = parameterizer.run(mol2_file, main_output_dir, file_config)
     return parametized_polymer
