@@ -16,7 +16,8 @@ def add_polymer_to_solvent(
 
     :param polymer_file: Path to the polymer GRO file.
     :param solvent_file: Path to the solvent GRO file.
-    :param output_file: Path to save the combined system.
+    :param output_dir: Directory to save the combined system.
+    :param output_name: Name of the output file.
     :param cutoff: Distance cutoff (in nm) for removing overlapping solvent molecules.
     """
     output_path = prepare_output_file_path(polymer_file, "gro", output_dir, output_name)
@@ -32,11 +33,13 @@ def add_polymer_to_solvent(
     distances = distance_array(
         u_polymer.atoms.positions, u_solvent.atoms.positions, box=u_solvent.dimensions
     )
-    overlapping_solvent_indices = distances.min(axis=0) < cutoff
+    overlapping_atoms = distances.min(axis=0) < cutoff
+    overlapping_residues = u_solvent.atoms[overlapping_atoms].residues.resids
 
-    # Create a selection of non-overlapping solvent molecules
-    solvent_atoms = u_solvent.atoms
-    non_overlapping_solvent = solvent_atoms[~overlapping_solvent_indices]
+    # Select non-overlapping solvent molecules
+    non_overlapping_solvent = u_solvent.select_atoms(
+        f"not resid {' '.join(map(str, overlapping_residues))}"
+    )
 
     # Combine polymer and non-overlapping solvent
     combined = mda.Merge(u_polymer.atoms, non_overlapping_solvent)
