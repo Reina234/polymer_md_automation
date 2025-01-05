@@ -17,8 +17,10 @@ polymerised_files = GromacsPaths(
     top_path="rdkit_test/POLY_GMX.top",
 )
 
-solvent_itp_file = "TEST_RUN_28/hexane_run_1/solvent.itp"
-solvent_box_gro = "TEST_RUN_28/hexane_run_1/equilibriated_gros/temp_298.gro"
+solvent_itp_file = "1_5_test/hexane/solvent.itp"
+solvent_box_gro = (
+    "1_5_test/hexane/equilibriated_outputs/temp_298_compressibility_0.000124.gro"
+)
 run_polymer_solvation_workflow(
     polymerised_files,
     subdir="styrene",
@@ -27,6 +29,7 @@ run_polymer_solvation_workflow(
     output_dir="test_29_full",
     workflow=workflow,
     temperature=298,
+    compressibility=1.24e-4,
 )
 
 ############################################################################################

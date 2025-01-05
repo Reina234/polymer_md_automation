@@ -118,24 +118,26 @@ class FullEquilibrationWorkflow:
                 )
                 final_step_name = step_name  # Track the last step name
 
-        if final_step_name and files_to_keep:
-            for ext in files_to_keep:
-                file_name = f"{final_step_name}.{ext}"
-                file_path = os.path.join(temp_output_dir, file_name)
-                new_filename = generate_dynamic_filename(varying_params, extension=None)
-                if os.path.exists(file_path):
-                    new_file_path = copy_and_rename(
-                        file_path,
-                        main_output_dir,
-                        new_name=new_filename,
-                        delete_original=False,
-                        replace_if_exists=True,
+            if final_step_name and files_to_keep:
+                for ext in files_to_keep:
+                    file_name = f"{final_step_name}.{ext}"
+                    file_path = os.path.join(temp_output_dir, file_name)
+                    new_filename = generate_dynamic_filename(
+                        varying_params, extension=None
                     )
-                    if hasattr(outputs, ext):  # Ensure the extension is valid
-                        setattr(outputs, ext, new_file_path)
-                    else:
-                        raise ValueError(
-                            f"Extension '{ext}' is not a valid output type for GromacsOutputs."
+                    if os.path.exists(file_path):
+                        new_file_path = copy_and_rename(
+                            file_path,
+                            main_output_dir,
+                            new_name=new_filename,
+                            delete_original=False,
+                            replace_if_exists=True,
                         )
+                        if hasattr(outputs, ext):  # Ensure the extension is valid
+                            setattr(outputs, ext, new_file_path)
+                        else:
+                            raise ValueError(
+                                f"Extension '{ext}' is not a valid output type for GromacsOutputs."
+                            )
 
         return main_output_dir, outputs

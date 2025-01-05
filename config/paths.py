@@ -22,3 +22,4 @@ MDP_CACHE_DIR = os.path.join(CACHE_DIR, "mdp_cache")
 # ACPYPE_SOLVENT_OUTPUT_SUBDIR = "acpype_solvent_output"
 
 ACPYPE_POLYMER_NAME = "POLY"
+PACKMOL_TEMPLATE_DIR = "modules/shared/packmol/templates"

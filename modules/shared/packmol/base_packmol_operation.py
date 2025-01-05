@@ -11,6 +11,7 @@ from modules.shared.utils.file_utils import (
     check_file_exists,
     directory_exists_check_wrapper,
 )
+from config.paths import PACKMOL_TEMPLATE_DIR
 import subprocess
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ class BasePackmolOperation(CommandLineOperation, ABC):
     """
 
     template_name: str
-    TEMPLATE_DIR = "A_modules/shared/packmol/templates"
+    TEMPLATE_DIR = PACKMOL_TEMPLATE_DIR
 
     def __init_subclass__(cls):
         super().__init_subclass__()

@@ -9,6 +9,15 @@ from modules.shared.utils.file_utils import (
     add_suffix_to_filename,
     copy_file,
 )
+
+from modules.shared.file_conversion.converters.base_converter import BaseConverter
+from modules.shared.file_conversion.converters.editconf_gro_to_pdb import (
+    EditconfGROtoPDBConverter,
+)
+from modules.shared.file_conversion.converters.editconf_pdb_to_gro import (
+    EditconfPDBtoGROConverter,
+)
+from modules.shared.packmol.solvent_box import PackmolSolventBox
 from modules.atomistic.gromacs.parser.handlers.includes_handler import IncludesHandler
 from collections import OrderedDict
 from modules.atomistic.gromacs.commands.insert_molecules import InsertMolecules
@@ -451,48 +460,6 @@ def validate_box_dimensions(
     return box_dimensions
 
 
-def validate_solute_gro_with_editconf(
-    gro_file: str,
-    output_dir: Optional[str] = None,
-    validated_file_name: Optional[str] = None,
-    suppress_error: bool = True,
-    editconf: Editconf = Editconf(),
-) -> str:
-    if not output_dir:
-        output_dir = os.path.dirname(gro_file)
-        print("not new")
-        print(type(output_dir))
-    else:
-        check_directory_exists(output_dir, make_dirs=True)
-        print("new output dir")
-        print(output_dir)
-
-    gro_handler = get_gro_handler(gro_file)
-    box_size = gro_handler.box_dimensions
-    if not box_size:
-
-        box_size = validate_box_dimensions(
-            gro_handler.box_dimensions, suppress_error=suppress_error
-        )
-    if not validated_file_name:
-        validated_file_name = add_suffix_to_filename(gro_file, "_validated")
-
-    if box_size:
-        return gro_file
-    else:
-        box_size = calculate_minimum_box_size_from_handler(gro_handler)
-        print("TEST AGAIN !!!")
-        print(gro_file)
-        print(output_dir)
-        validated_solute_path = editconf.run(
-            gro_file,
-            output_dir,
-            box_size_nm=box_size,
-            output_name=validated_file_name,
-        )
-        return validated_solute_path
-
-
 @file_type_check_wrapper(file_arg_index=0, expected_file_type="gro")
 @file_type_check_wrapper(file_arg_index=1, expected_file_type="top")
 def prepare_solvated_solute_box(
@@ -512,16 +479,12 @@ def prepare_solvated_solute_box(
         temp_dir,
         box_size_nm=initial_box_size_nm,
     )
-
-    print(output_dir)
-    print("finished editconf")
     solvated_box = solvate.run(
         editconf_box_gro,
         solvent_gro_file,
         topol_file,
         output_dir,
     )
-    print("finished solvate")
     return solvated_box
 
 
@@ -755,55 +718,8 @@ def refine_solvated_box(
     return box_gro_path
 
 
-def create_solvated_box(
-    solvent_gro_file: str,
-    topol_file: str,
-    final_box_size: List[float],
-    solvent: Solvent,
-    output_dir: str,
-    initial_box_factor: float = 0.9,
-    tolerance: float = 0.01,
-    safety_margin: float = 0.95,
-    max_attempts: int = 5,
-) -> str:
-    validated_solvent_gro_file = validate_solute_gro_with_editconf(
-        gro_file=solvent_gro_file, output_dir=output_dir
-    )
-    target_num_particles = calculate_num_particles(
-        box_dimensions=final_box_size,
-        molecular_weight=solvent.molecular_weight,
-        density_SI=solvent.density,
-        box_units=LengthUnits.NANOMETER,
-        mass_units=MassUnits.GRAM,
-    )
-    solvated_box = refine_solvated_box(
-        solvent_gro_file=validated_solvent_gro_file,
-        topol_file=topol_file,
-        final_box_size=final_box_size,
-        target_num_particles=target_num_particles,
-        output_dir=output_dir,
-        initial_box_factor=initial_box_factor,
-        tolerance=tolerance,
-        safety_margin=safety_margin,
-        max_attempts=max_attempts,
-    )
-
-    print("NUM_MOLECULES")
-    return solvated_box
-
-
 def prepare_solvent_box_name(solvent: Solvent, extension: str):
     return f"{solvent.name.lower()}_solvent_box.{extension}"
-
-
-from modules.shared.file_conversion.converters.base_converter import BaseConverter
-from modules.shared.file_conversion.converters.editconf_gro_to_pdb import (
-    EditconfGROtoPDBConverter,
-)
-from modules.shared.file_conversion.converters.editconf_pdb_to_gro import (
-    EditconfPDBtoGROConverter,
-)
-from modules.shared.packmol.solvent_box import PackmolSolventBox
 
 
 def create_solvent_box_gro(
@@ -827,7 +743,6 @@ def create_solvent_box_gro(
         solvent=solvent,
         box_size_nm=box_size_nm,
     )
-    print(packmol_output)
     output_gro = pdb_to_gro_converter.run(
         packmol_output, output_dir, box_size_nm=box_size_nm, output_name=output_name
     )

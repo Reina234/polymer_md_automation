@@ -1,3 +1,16 @@
 30/12/2024
-- need to pass in compressibility somehow, set a default, put into Solvent class
-- MAYBE, use the file name itself to get the compressibility value and the temp value? !!!
+1. need to test full run, check that it works with compressibliity mods
+
+2. deal with automatic getting of compressiblity and temperature from the file name 
+
+3. add in prod run 
+
+4. check course running 
+
+5. need to trial compressibility and test mods work 
+
+6. need to change Solvent data model !
+
+7. make function to extract the compressibility and temp from file names, same w the polymer name
+   should be automated so that I just need to pass in the polymer and 
+   solvent name

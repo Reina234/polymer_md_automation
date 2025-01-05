@@ -27,6 +27,7 @@ def run_polymer_solvation_workflow(
     subdir: str,
     workflow: FullEquilibrationWorkflow,
     temperature: float,
+    compressibility: float,
     polymer_name: str = "POLY",
     cutoff: float = 0.2,
     temp_dir=TEMP_DIR,
@@ -62,7 +63,9 @@ def run_polymer_solvation_workflow(
         temp_dir,
         final_output_dir,
         log_dir,
-        varying_params_list=[{"temp": str(temperature)}],
+        varying_params_list=[
+            {"temp": str(temperature), "compressibility": compressibility}
+        ],
         files_to_keep=["edr", "trr", "gro", "xtc"],
         save_intermediate_edr=save_intermediate_edr,
         save_intermediate_gro=save_intermediate_gro,

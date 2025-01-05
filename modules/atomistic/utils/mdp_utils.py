@@ -6,8 +6,13 @@ from typing import Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 
-def format_temperatures(temperatures: List[float]) -> List[Dict[str, str]]:
-    return [{"temp": str(temp)} for temp in temperatures]
+def format_temperatures(
+    temperatures: List[float], compressibility: str
+) -> List[Dict[str, str]]:
+    return [
+        {"temp": str(temp), "compressibility": str(compressibility)}
+        for temp in temperatures
+    ]
 
 
 def generate_file_from_template(

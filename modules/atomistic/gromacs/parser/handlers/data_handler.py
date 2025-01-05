@@ -47,7 +47,6 @@ class DataHandler(BaseHandler):
             raise ValueError("Section name is missing.")
 
         # Retrieve headers from the registry
-        print(section_name + "!!!")
         self.expected_headers = self.section_registry.get_headers(section_name)
 
         # Validate headers

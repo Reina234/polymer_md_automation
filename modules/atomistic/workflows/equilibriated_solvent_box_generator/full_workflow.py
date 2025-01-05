@@ -1,5 +1,5 @@
 from data_models.solvent import Solvent
-from modules.atomistic.utils.file_utils import create_solvent_box_gro
+from modules.atomistic.utils.calculation_utils import create_solvent_box_gro
 from modules.atomistic.acpype_parameterizer.acpype_config import AcpypeOutputConfig
 from modules.atomistic.acpype_parameterizer.acpype_parametizer import (
     ACPYPEParameterizer,
@@ -38,6 +38,7 @@ def run_solvent_workflow(
     cleanup: bool = True,
     confirm_log_deletion: bool = True,
 ) -> str:
+
     subdir = add_identifier_name(solvent.name, identifier=identifier, suffix=None)
     output_dir = os.path.join(output_dir, subdir)
     parameterizer = parameterizer(acpype_molecule_name=solvent.pdb_molecule_name)
@@ -62,7 +63,9 @@ def run_solvent_workflow(
         output_itp_name=itp_name,
     )
 
-    temperatures = format_temperatures(temperatures)
+    varying_params_list = format_temperatures(
+        temperatures=temperatures, compressibility=solvent.compressibility
+    )
 
     gro_name = add_identifier_name(
         solvent.name,
@@ -77,7 +80,7 @@ def run_solvent_workflow(
         output_dir,
         log_dir,
         files_to_keep=["gro"],
-        varying_params_list=temperatures,
+        varying_params_list=varying_params_list,
         save_intermediate_edr=save_intermediate_edr,
         save_intermediate_gro=save_intermediate_gro,
         save_intermediate_log=save_intermediate_log,
