@@ -1,5 +1,4 @@
 from data_models.solvent import Solvent
-from modules.atomistic.utils.file_utils import create_solvent_box_gro
 from modules.atomistic.acpype_parameterizer.acpype_config import AcpypeOutputConfig
 from modules.atomistic.acpype_parameterizer.acpype_parametizer import (
     ACPYPEParameterizer,
@@ -11,10 +10,14 @@ from modules.atomistic.workflows.equilibriated_solvent_box_generator.file_prepar
 from modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow import (
     FullEquilibrationWorkflow,
 )
+from modules.atomistic.workflows.equilibriated_solvent_box_generator.workflow_config import (
+    workflow,
+)
 from modules.atomistic.utils.file_utils import (
     get_gro_handler,
     get_residue_number,
     rename_residue_name_from_handler,
+    create_solvent_box_gro,
     rename_data_column_content,
     export_gro_handler,
     create_includes_section,
@@ -34,8 +37,8 @@ import os
 def run_solvent_workflow(
     solvent: Solvent,
     box_size_nm: List[float],
-    workflow: FullEquilibrationWorkflow,
     temperatures: List[float],
+    workflow: FullEquilibrationWorkflow = workflow,
     output_dir: str = EQUILIBRIATED_SOLVENT_BOX_DIR,
     identifier: Optional[str] = None,
     temp_dir=TEMP_DIR,

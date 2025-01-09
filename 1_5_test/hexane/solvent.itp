@@ -1,4 +1,4 @@
-; TMZK_GMX.itp created by acpype (v: 2023.10.27) on Sun Jan  5 11:59:48 2025
+; TMZK_GMX.itp created by acpype (v: 2023.10.27) on Sun Jan  5 19:10:32 2025
 
 [ atomtypes ]
 ;name   bond_type     mass     charge   ptype   sigma         epsilon       Amb

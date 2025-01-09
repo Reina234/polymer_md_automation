@@ -9,6 +9,7 @@ from modules.shared.utils.file_utils import (
 )
 from data_models.output_types import GromacsOutputs
 from modules.atomistic.utils.mdp_utils import generate_dynamic_filename
+from config.paths import EQUILIBRIATED_OUTPUTS_SUBDIR
 
 
 class FullEquilibrationWorkflow:
@@ -51,7 +52,7 @@ class FullEquilibrationWorkflow:
         log_dir: str,
         varying_params_list: List[Dict[str, str]],
         files_to_keep: Optional[List[str]] = None,
-        subdir: str = "equilibriated_outputs",
+        subdir: str = EQUILIBRIATED_OUTPUTS_SUBDIR,
         save_intermediate_edr: bool = True,
         save_intermediate_gro: bool = True,
         save_intermediate_log: bool = True,
