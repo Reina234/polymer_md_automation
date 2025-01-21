@@ -4,8 +4,8 @@ from modules.atomistic.rdkit.base_polymer_generator import BasePolymerGenerator
 
 
 class HomopolymerGenerator(BasePolymerGenerator):
-    def __init__(self, cap_smiles: str = "[H]"):
-        super().__init__(cap_smiles)
+    def __init__(self):
+        super().__init__()
 
     def _generate_polymer_rdkit(self, monomer_smiles: str, num_units: int) -> Chem.Mol:
         monomer_residue, open_sites = self._create_monomer_residue(monomer_smiles)
@@ -50,17 +50,23 @@ class HomopolymerGenerator(BasePolymerGenerator):
         output_name: Optional[str] = None,
         uff_optimise: bool = True,
         overwrite: bool = True,
+        save: bool = True,
     ) -> str:
         polymer = self._generate_polymer_rdkit(monomer_smiles, num_units)
         polymer = self._finalise_molecule(polymer, uff_optimise=uff_optimise)
-        if output_name is None:
-            output_name = self._generate_filename(monomer_smiles, num_units)
+        self._populate_polymer_class(polymer)
+
+        if save:
+            if output_name is None:
+                output_name = self._generate_filename(monomer_smiles, num_units)
+            else:
+                output_name = f"{output_name}.pdb"
+            output_path = self._save_as_pdb(
+                polymer,
+                output_dir,
+                output_name=output_name,
+                overwrite=overwrite,
+            )
+            return output_path
         else:
-            output_name = f"{output_name}.pdb"
-        output_path = self._save_as_pdb(
-            polymer,
-            output_dir,
-            output_name=output_name,
-            overwrite=overwrite,
-        )
-        return output_path
+            return polymer
