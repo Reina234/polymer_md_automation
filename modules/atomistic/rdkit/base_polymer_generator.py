@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from typing import Tuple, List, Set
+from typing import Tuple, List, Set, Optional
 from modules.shared.utils.file_utils import (
     check_file_does_not_exist,
     directory_exists_check_wrapper,
@@ -17,6 +17,7 @@ class BasePolymerGenerator(ABC):
             set()
         )  # Store end residue (hydrogen-added) molecules
         self.end_residue_smiles: Set[str] = None
+        self.polymer_mol: Optional[Chem.Mol] = None
 
     def _create_monomer_residue(
         self, monomer_smiles: str
@@ -169,11 +170,12 @@ class BasePolymerGenerator(ABC):
 
     def _process_polymer(self, polymer: Chem.Mol):
         self.polymer_smiles = self.residue_to_smiles(polymer, [])
+        self.polymer_mol = polymer
         matched_end_residues = self._match_end_residues(polymer)
         self.end_residue_smiles = matched_end_residues
 
-    def retrieve_smiles(self):
-        return self.monomer_residue_smiles, self.end_residue_smiles, self.polymer_smiles
+    def retrieve_unit_smiles_list(self) -> List[str]:
+        return list(self.end_residue_smiles) + list(self.monomer_residue_smiles)
 
     @abstractmethod
     def _generate_filename(self, **kwargs):
