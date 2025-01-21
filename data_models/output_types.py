@@ -31,4 +31,5 @@ class GromacsOutputs:
     edr: Optional[str] = None
     trr: Optional[str] = None
     log: Optional[str] = None
+    tpr: Optional[str] = None
     xtc: Optional[str] = None

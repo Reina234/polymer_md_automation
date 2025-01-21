@@ -5,7 +5,7 @@ from modules.shared.utils.file_utils import (
     directory_exists_check_wrapper,
 )
 from modules.shared.command_line_operation import CommandLineOperation
-from modules.atomistic.acpype_parameterizer.acpype_config import (
+from config.acpype_config import (
     AcpypeOutputConfig,
 )
 from data_models.output_types import GromacsPaths

@@ -2,7 +2,7 @@ from typing import List, Optional
 from modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow import (
     FullEquilibrationWorkflow,
 )
-from modules.atomistic.acpype_parameterizer.acpype_config import AcpypeOutputConfig
+from config.acpype_config import AcpypeOutputConfig
 from modules.atomistic.acpype_parameterizer.acpype_parametizer import (
     ACPYPEParameterizer,
 )

@@ -1,6 +1,6 @@
 import os
 from modules.shared.utils.file_utils import copy_file, rename_file
-from modules.atomistic.acpype_parameterizer.acpype_config import AcpypeOutputConfig
+from config.acpype_config import AcpypeOutputConfig
 from data_models.output_types import GromacsPaths
 
 

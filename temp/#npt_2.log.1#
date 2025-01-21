@@ -1,0 +1,897 @@
+                :-) GROMACS - gmx mdrun, 2024.4-conda_forge (-:
+
+Copyright 1991-2024 The GROMACS Authors.
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+                         Current GROMACS contributors:
+       Mark Abraham           Andrey Alekseenko           Vladimir Basov      
+      Cathrine Bergh            Eliane Briand               Ania Brown        
+      Mahesh Doijade            Giacomo Fiorin          Stefan Fleischmann    
+      Sergey Gorelov         Gilles Gouaillardet            Alan Gray         
+     M. Eric Irrgang         Farzaneh Jalalypour            Joe Jordan        
+     Carsten Kutzner           Justin A. Lemkul          Magnus Lundborg      
+       Pascal Merz              Vedran Miletic            Dmitry Morozov      
+       Julien Nabet              Szilard Pall        Andrea Pasquadibisceglie 
+    Michele Pellegrino          Hubert Santuz             Roland Schulz       
+     Tatiana Shugaeva          Alexey Shvetsov            Philip Turner       
+     Alessandra Villa      Sebastian Wingbermuehle  
+
+                         Previous GROMACS contributors:
+        Emile Apol             Rossen Apostolov           James Barnett       
+        Paul Bauer          Herman J.C. Berendsen          Par Bjelkmar       
+      Christian Blau          Viacheslav Bolnykh            Kevin Boyd        
+    Aldert van Buuren          Carlo Camilloni           Rudi van Drunen      
+      Anton Feenstra           Oliver Fleetwood            Vytas Gapsys       
+       Gaurav Garg             Gerrit Groenhof            Bert de Groot       
+      Anca Hamuraru           Vincent Hindriksen          Victor Holanda      
+     Aleksei Iupinov          Christoph Junghans        Prashanth Kanduri     
+   Dimitrios Karkoulis           Peter Kasson             Sebastian Kehl      
+     Sebastian Keller             Jiri Kraus               Per Larsson        
+      Viveca Lindahl            Erik Marklund           Pieter Meulenhoff     
+      Teemu Murtola              Sander Pronk             Michael Shirts      
+      Alfons Sijbers            Balint Soproni         David van der Spoel    
+      Peter Tieleman            Carsten Uphoff             Jon Vincent        
+     Teemu Virolainen         Christian Wennberg           Maarten Wolf       
+      Artem Zhmurov       
+
+                  Coordinated by the GROMACS project leaders:
+                           Berk Hess and Erik Lindahl
+
+GROMACS:      gmx mdrun, version 2024.4-conda_forge
+Executable:   /home/reina/miniconda3/envs/lammps_packages/bin.AVX2_256/gmx
+Data prefix:  /home/reina/miniconda3/envs/lammps_packages
+Working dir:  /home/reina/polymerpinn
+Process ID:   410002
+Command line:
+  gmx mdrun -s temp/npt_2.tpr -deffnm temp/npt_2
+
+GROMACS version:     2024.4-conda_forge
+Precision:           mixed
+Memory model:        64 bit
+MPI library:         thread_mpi
+OpenMP support:      enabled (GMX_OPENMP_MAX_THREADS = 128)
+GPU support:         OpenCL
+NBNxM GPU setup:     super-cluster 2x2x2 / cluster 8
+SIMD instructions:   AVX2_256
+CPU FFT library:     fftw-3.3.10-sse2-avx
+GPU FFT library:     clFFT
+Multi-GPU FFT:       none
+RDTSCP usage:        disabled
+TNG support:         enabled
+Hwloc support:       disabled
+Tracing support:     disabled
+C compiler:          /home/conda/feedstock_root/build_artifacts/gromacs_1730738529385/_build_env/bin/x86_64-conda-linux-gnu-cc GNU 13.3.0
+C compiler flags:    -fexcess-precision=fast -funroll-all-loops -mavx2 -mfma -Wno-missing-field-initializers -O3 -DNDEBUG
+C++ compiler:        /home/conda/feedstock_root/build_artifacts/gromacs_1730738529385/_build_env/bin/x86_64-conda-linux-gnu-c++ GNU 13.3.0
+C++ compiler flags:  -fexcess-precision=fast -funroll-all-loops -mavx2 -mfma -Wno-missing-field-initializers -Wno-cast-function-type-strict SHELL:-fopenmp -O3 -DNDEBUG
+BLAS library:        Internal
+LAPACK library:      Internal
+OpenCL include dir:  /home/reina/miniconda3/envs/lammps_packages/include
+OpenCL library:      /home/reina/miniconda3/envs/lammps_packages/lib/libOpenCL.so
+OpenCL version:      3.0
+
+
+Running on 1 node with total 8 cores, 16 processing units (GPU detection failed)
+Hardware detected on host LENOVO-PC:
+  CPU info:
+    Vendor: AMD
+    Brand:  AMD Ryzen 7 5800H with Radeon Graphics         
+    Family: 25   Model: 80   Stepping: 0
+    Features: aes amd apic avx avx2 clfsh cmov cx8 cx16 f16c fma htt lahf misalignsse mmx msr nonstop_tsc pclmuldq pdpe1gb popcnt pse rdrnd rdtscp sha sse2 sse3 sse4a sse4.1 sse4.2 ssse3
+  Hardware topology: Basic
+    Packages, cores, and logical processors:
+    [indices refer to OS logical processors]
+      Package  0: [   0   1] [   2   3] [   4   5] [   6   7] [   8   9] [  10  11] [  12  13] [  14  15]
+    CPU limit set by OS: -1   Recommended max number of threads: 16
+
+The current CPU can measure timings more accurately than the code in
+gmx mdrun was configured to use. This might affect your simulation
+speed as accurate timings are needed for load-balancing.
+Please consider rebuilding gmx mdrun with the GMX_USE_RDTSCP=ON CMake option.
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+M. J. Abraham, T. Murtola, R. Schulz, S. Páll, J. C. Smith, B. Hess, E.
+Lindahl
+GROMACS: High performance molecular simulations through multi-level
+parallelism from laptops to supercomputers
+SoftwareX 1 (2015) pp. 19-25
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+S. Páll, M. J. Abraham, C. Kutzner, B. Hess, E. Lindahl
+Tackling Exascale Software Challenges in Molecular Dynamics Simulations with
+GROMACS
+In S. Markidis & E. Laure (Eds.), Solving Software Challenges for Exascale 8759 (2015) pp. 3-27
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+S. Pronk, S. Páll, R. Schulz, P. Larsson, P. Bjelkmar, R. Apostolov, M. R.
+Shirts, J. C. Smith, P. M. Kasson, D. van der Spoel, B. Hess, and E. Lindahl
+GROMACS 4.5: a high-throughput and highly parallel open source molecular
+simulation toolkit
+Bioinformatics 29 (2013) pp. 845-54
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+B. Hess and C. Kutzner and D. van der Spoel and E. Lindahl
+GROMACS 4: Algorithms for highly efficient, load-balanced, and scalable
+molecular simulation
+J. Chem. Theory Comput. 4 (2008) pp. 435-447
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+D. van der Spoel, E. Lindahl, B. Hess, G. Groenhof, A. E. Mark and H. J. C.
+Berendsen
+GROMACS: Fast, Flexible and Free
+J. Comp. Chem. 26 (2005) pp. 1701-1719
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+E. Lindahl and B. Hess and D. van der Spoel
+GROMACS 3.0: A package for molecular simulation and trajectory analysis
+J. Mol. Mod. 7 (2001) pp. 306-317
+-------- -------- --- Thank You --- -------- --------
+
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+H. J. C. Berendsen, D. van der Spoel and R. van Drunen
+GROMACS: A message-passing parallel molecular dynamics implementation
+Comp. Phys. Comm. 91 (1995) pp. 43-56
+-------- -------- --- Thank You --- -------- --------
+
+Input Parameters:
+   integrator                     = md
+   tinit                          = 0
+   dt                             = 0.001
+   nsteps                         = 15000
+   init-step                      = 0
+   simulation-part                = 1
+   mts                            = false
+   mass-repartition-factor        = 1
+   comm-mode                      = Linear
+   nstcomm                        = 100
+   bd-fric                        = 0
+   ld-seed                        = -34087457
+   emtol                          = 10
+   emstep                         = 0.01
+   niter                          = 20
+   fcstep                         = 0
+   nstcgsteep                     = 1000
+   nbfgscorr                      = 10
+   rtpi                           = 0.05
+   nstxout                        = 0
+   nstvout                        = 0
+   nstfout                        = 0
+   nstlog                         = 1000
+   nstcalcenergy                  = 100
+   nstenergy                      = 1000
+   nstxout-compressed             = 500
+   compressed-x-precision         = 1000
+   cutoff-scheme                  = Verlet
+   nstlist                        = 10
+   pbc                            = xyz
+   periodic-molecules             = false
+   verlet-buffer-tolerance        = 0.005
+   verlet-buffer-pressure-tolerance = 0.5
+   rlist                          = 1.2
+   coulombtype                    = PME
+   coulomb-modifier               = Potential-shift
+   rcoulomb-switch                = 0
+   rcoulomb                       = 1.2
+   epsilon-r                      = 1
+   epsilon-rf                     = inf
+   vdw-type                       = Cut-off
+   vdw-modifier                   = Potential-shift
+   rvdw-switch                    = 0
+   rvdw                           = 1.2
+   DispCorr                       = EnerPres
+   table-extension                = 1
+   fourierspacing                 = 0.12
+   fourier-nx                     = 42
+   fourier-ny                     = 42
+   fourier-nz                     = 42
+   pme-order                      = 4
+   ewald-rtol                     = 1e-05
+   ewald-rtol-lj                  = 0.001
+   lj-pme-comb-rule               = Geometric
+   ewald-geometry                 = 3d
+   epsilon-surface                = 0
+   ensemble-temperature-setting   = constant
+   ensemble-temperature           = 300
+   tcoupl                         = V-rescale
+   nsttcouple                     = 20
+   nh-chain-length                = 0
+   print-nose-hoover-chain-variables = false
+   pcoupl                         = Parrinello-Rahman
+   pcoupltype                     = Isotropic
+   nstpcouple                     = 100
+   tau-p                          = 2
+   compressibility (3x3):
+      compressibility[    0]={ 1.40000e-04,  0.00000e+00,  0.00000e+00}
+      compressibility[    1]={ 0.00000e+00,  1.40000e-04,  0.00000e+00}
+      compressibility[    2]={ 0.00000e+00,  0.00000e+00,  1.40000e-04}
+   ref-p (3x3):
+      ref-p[    0]={ 1.00000e+00,  0.00000e+00,  0.00000e+00}
+      ref-p[    1]={ 0.00000e+00,  1.00000e+00,  0.00000e+00}
+      ref-p[    2]={ 0.00000e+00,  0.00000e+00,  1.00000e+00}
+   refcoord-scaling               = No
+   posres-com (3):
+      posres-com[0]= 0.00000e+00
+      posres-com[1]= 0.00000e+00
+      posres-com[2]= 0.00000e+00
+   posres-comB (3):
+      posres-comB[0]= 0.00000e+00
+      posres-comB[1]= 0.00000e+00
+      posres-comB[2]= 0.00000e+00
+   QMMM                           = false
+qm-opts:
+   ngQM                           = 0
+   constraint-algorithm           = Lincs
+   continuation                   = true
+   Shake-SOR                      = false
+   shake-tol                      = 0.0001
+   lincs-order                    = 4
+   lincs-iter                     = 1
+   lincs-warnangle                = 30
+   nwall                          = 0
+   wall-type                      = 9-3
+   wall-r-linpot                  = -1
+   wall-atomtype[0]               = -1
+   wall-atomtype[1]               = -1
+   wall-density[0]                = 0
+   wall-density[1]                = 0
+   wall-ewald-zfac                = 3
+   pull                           = false
+   awh                            = false
+   rotation                       = false
+   interactiveMD                  = false
+   disre                          = No
+   disre-weighting                = Conservative
+   disre-mixed                    = false
+   dr-fc                          = 1000
+   dr-tau                         = 0
+   nstdisreout                    = 100
+   orire-fc                       = 0
+   orire-tau                      = 0
+   nstorireout                    = 100
+   free-energy                    = no
+   cos-acceleration               = 0
+   deform (3x3):
+      deform[    0]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      deform[    1]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+      deform[    2]={ 0.00000e+00,  0.00000e+00,  0.00000e+00}
+   simulated-tempering            = false
+   swapcoords                     = no
+   userint1                       = 0
+   userint2                       = 0
+   userint3                       = 0
+   userint4                       = 0
+   userreal1                      = 0
+   userreal2                      = 0
+   userreal3                      = 0
+   userreal4                      = 0
+   applied-forces:
+     electric-field:
+       x:
+         E0                       = 0
+         omega                    = 0
+         t0                       = 0
+         sigma                    = 0
+       y:
+         E0                       = 0
+         omega                    = 0
+         t0                       = 0
+         sigma                    = 0
+       z:
+         E0                       = 0
+         omega                    = 0
+         t0                       = 0
+         sigma                    = 0
+     density-guided-simulation:
+       active                     = false
+       group                      = protein
+       similarity-measure         = inner-product
+       atom-spreading-weight      = unity
+       force-constant             = 1e+09
+       gaussian-transform-spreading-width = 0.2
+       gaussian-transform-spreading-range-in-multiples-of-width = 4
+       reference-density-filename = reference.mrc
+       nst                        = 1
+       normalize-densities        = true
+       adaptive-force-scaling     = false
+       adaptive-force-scaling-time-constant = 4
+       shift-vector               = 
+       transformation-matrix      = 
+     qmmm-cp2k:
+       active                     = false
+       qmgroup                    = System
+       qmmethod                   = PBE
+       qmfilenames                = 
+       qmcharge                   = 0
+       qmmultiplicity             = 1
+     colvars:
+       active                     = false
+       configfile                 = 
+       seed                       = -1
+grpopts:
+   nrdf:       26697
+   ref-t:         300
+   tau-t:         0.1
+annealing:          No
+annealing-npoints:           0
+   acc:	           0           0           0
+   nfreeze:           N           N           N
+   energygrp-flags[  0]: 0
+
+Changing nstlist from 10 to 100, rlist from 1.2 to 1.334
+
+
+Update groups can not be used for this system because atoms that are (in)directly constrained together are interdispersed with other atoms
+
+Initializing Domain Decomposition on 1 ranks
+Dynamic load balancing: auto
+Minimum cell size due to atom displacement: 0.482 nm
+Initial maximum distances in bonded interactions:
+    two-body bonded interactions: 0.566 nm, LJ-14, atoms 8564 8573
+  multi-body bonded interactions: 0.566 nm, Proper Dih., atoms 8564 8573
+Minimum cell size due to bonded interactions: 0.622 nm
+Maximum distance for 5 constraints, at 120 deg. angles, all-trans: 0.219 nm
+Estimated maximum distance required for P-LINCS: 0.219 nm
+Using 0 separate PME ranks because: there are too few total ranks for efficient splitting
+Optimizing the DD grid for 1 cells with a minimum initial size of 0.622 nm
+The maximum allowed number of cells is: X 8 Y 8 Z 8
+Domain decomposition grid 1 x 1 x 1, separate PME ranks 0
+PME domain decomposition: 1 x 1 x 1
+
+The initial number of communication pulses is:
+The initial domain decomposition cell size is:
+
+The maximum allowed distance for atoms involved in interactions is:
+                 non-bonded interactions           1.334 nm
+(the following are initial values, they could change due to box deformation)
+            two-body bonded interactions  (-rdd)   1.334 nm
+          multi-body bonded interactions  (-rdd)   1.334 nm
+  atoms separated by up to 5 constraints  (-rcon)  4.989 nm
+
+When dynamic load balancing gets turned on, these settings will change to:
+The maximum number of communication pulses is:
+The minimum size for domain decomposition cells is 1.334 nm
+The requested allowed shrink of DD cells (option -dds) is: 0.80
+The allowed shrink of domain decomposition cells is:
+The maximum allowed distance for atoms involved in interactions is:
+                 non-bonded interactions           1.334 nm
+            two-body bonded interactions  (-rdd)   1.334 nm
+          multi-body bonded interactions  (-rdd)   1.334 nm
+  atoms separated by up to 5 constraints  (-rcon)  1.334 nm
+
+Using 1 MPI thread
+Using 16 OpenMP threads 
+
+System total charge: -0.000
+Will do PME sum in reciprocal space for electrostatic interactions.
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+U. Essmann, L. Perera, M. L. Berkowitz, T. Darden, H. Lee and L. G. Pedersen 
+A smooth particle mesh Ewald method
+J. Chem. Phys. 103 (1995) pp. 8577-8592
+-------- -------- --- Thank You --- -------- --------
+
+Using a Gaussian width (1/beta) of 0.384195 nm for Ewald
+Potential shift: LJ r^-12: -1.122e-01 r^-6: -3.349e-01, Ewald -8.333e-06
+Initialized non-bonded Coulomb Ewald tables, spacing: 1.02e-03 size: 1176
+
+Generated table with 1167 data points for 1-4 COUL.
+Tabscale = 500 points/nm
+Generated table with 1167 data points for 1-4 LJ6.
+Tabscale = 500 points/nm
+Generated table with 1167 data points for 1-4 LJ12.
+Tabscale = 500 points/nm
+Long Range LJ corr.: <C6> 5.4632e-04
+
+
+Using SIMD4xM 4x8 nonbonded short-range kernels
+
+Using a dual 4x8 pair-list setup updated with dynamic pruning:
+  outer list: updated every 100 steps, buffer 0.134 nm, rlist 1.334 nm
+  inner list: updated every  10 steps, buffer 0.000 nm, rlist 1.200 nm
+At tolerance 0.005 kJ/mol/ps per atom, equivalent classical 1x1 list would be:
+  outer list: updated every 100 steps, buffer 0.218 nm, rlist 1.418 nm
+  inner list: updated every  10 steps, buffer 0.041 nm, rlist 1.241 nm
+
+The average pressure is off by at most 0.47 bar due to missing LJ interactions
+
+Using Lorentz-Berthelot Lennard-Jones combination rule
+
+Linking all bonded interactions to atoms
+
+
+Pinning threads with an auto-selected logical cpu stride of 1
+
+Initializing Parallel LINear Constraint Solver
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+B. Hess
+P-LINCS: A Parallel Linear Constraint Solver for molecular simulation
+J. Chem. Theory Comput. 4 (2008) pp. 116-122
+-------- -------- --- Thank You --- -------- --------
+
+The number of constraints is 8106
+There are constraints between atoms in different decomposition domains,
+will communicate selected coordinates each lincs iteration
+
+++++ PLEASE READ AND CITE THE FOLLOWING REFERENCE ++++
+G. Bussi, D. Donadio and M. Parrinello
+Canonical sampling through velocity rescaling
+J. Chem. Phys. 126 (2007) pp. 014101
+-------- -------- --- Thank You --- -------- --------
+
+There are: 11602 Atoms
+Atom distribution over 1 domains: av 11602 stddev 0 min 11602 max 11602
+Center of mass motion removal mode is Linear
+We have the following groups for center of mass motion removal:
+  0:  rest
+
+Started mdrun on rank 0 Sat Jan 11 16:19:26 2025
+
+           Step           Time
+              0        0.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.33481e+03    2.12759e+04    4.00860e+03    3.57472e+00    3.57748e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -2.15896e+02   -1.84414e+04   -1.43490e+03    2.19849e+03    4.43381e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    1.83510e+04    3.32773e+04    5.16283e+04    5.16358e+04    2.99835e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.92078e+02   -1.43636e+03    1.34860e-06
+
+           Step           Time
+           1000        1.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.43913e+03    2.24067e+04    3.99693e+03    2.71745e+00    3.10494e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -1.59851e+02   -1.77980e+04   -1.39388e+03    2.17584e+03    4.57622e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    1.98203e+04    3.31551e+04    5.29754e+04    5.34574e+04    2.98734e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.81262e+02   -1.67990e+03    1.39261e-06
+
+
+Step 1801 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+           2000        2.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.52555e+03    2.08850e+04    4.19381e+03    3.64898e+00    4.03856e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -2.59279e+02   -1.86302e+04   -1.44393e+03    2.23632e+03    4.31957e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    1.85926e+04    3.35732e+04    5.21659e+04    5.62099e+04    3.02501e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.94501e+02    2.11108e+03    1.34981e-06
+
+
+Step 2101 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 2401 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 2601 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 2701 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+           3000        3.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.37465e+03    2.08095e+04    4.20311e+03    3.85790e+00    3.74527e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -2.38036e+02   -1.66658e+04   -1.36574e+03    2.20115e+03    4.80351e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.01160e+04    3.43245e+04    5.44405e+04    6.31158e+04    3.09270e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.74023e+02   -9.72399e+02    1.40389e-06
+
+
+Step 3001 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 3201 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 3301 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 3601 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 3901 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+           4000        4.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    8.37817e+03    2.23174e+04    4.30346e+03    7.89434e+00    2.89985e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -1.13310e+02   -1.64447e+04   -1.31009e+03    2.15741e+03    5.03487e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.22464e+04    3.39319e+04    5.61782e+04    7.45684e+04    3.05732e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.60139e+02   -2.28177e+03    1.40763e-06
+
+
+Step 4201 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 4301 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 4501 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 4601 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 4801 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 4901 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+           5000        5.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.55593e+03    2.00780e+04    5.00220e+03    9.94557e+00    4.80040e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -3.39163e+02   -1.70617e+04   -1.39343e+03    2.26961e+03    4.58413e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.09677e+04    3.45411e+04    5.55088e+04    8.36565e+04    3.11221e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.81145e+02    3.71528e+03    1.40657e-06
+
+
+Step 5101 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 5201 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 5401 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 5501 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 5701 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 5801 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+           6000        6.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.75956e+03    2.14271e+04    4.47002e+03    7.90905e+00    3.19308e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -1.65219e+02   -1.46074e+04   -1.24509e+03    2.14959e+03    5.50078e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.30447e+04    3.37946e+04    5.68393e+04    9.56086e+04    3.04496e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.44655e+02   -2.83847e+03    1.44623e-06
+
+
+Step 6001 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 6101 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 6301 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 6401 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 6601 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 6701 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 6901 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+           7000        7.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.82736e+03    2.07911e+04    4.95648e+03    1.46223e+01    3.57139e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -1.51625e+02   -1.61606e+04   -1.30421e+03    2.16609e+03    5.25930e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.17632e+04    3.45926e+04    5.63558e+04    1.07003e+05    3.11686e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.58707e+02    9.61786e+02    1.49545e-06
+
+
+Step 7001 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 7201 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 7301 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 7501 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 7601 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 7901 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+           8000        8.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.63684e+03    2.01775e+04    5.08519e+03    1.83821e+01    4.28126e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -2.43306e+02   -1.48824e+04   -1.26556e+03    2.19478e+03    5.42499e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.30569e+04    3.41505e+04    5.72074e+04    1.17043e+05    3.07702e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.49447e+02    1.65053e+02    1.44369e-06
+
+
+Step 8001 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 8201 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 8301 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 8501 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 8601 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 8801 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 8901 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+           9000        9.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.83595e+03    2.20149e+04    4.70160e+03    1.18510e+01    2.96615e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -8.84532e+01   -1.44967e+04   -1.22627e+03    2.12059e+03    5.85560e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.38982e+04    3.29655e+04    5.68637e+04    1.25691e+05    2.97025e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.40319e+02   -2.31202e+03    1.46186e-06
+
+
+Step 9101 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 9201 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 9501 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 9801 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+          10000       10.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.71644e+03    2.02206e+04    5.34267e+03    1.85233e+01    4.66158e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -2.59295e+02   -1.58153e+04   -1.30689e+03    2.20621e+03    5.17920e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.28364e+04    3.40681e+04    5.69045e+04    1.33055e+05    3.06960e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.59360e+02    2.64914e+03    1.42705e-06
+
+
+Step 10101 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 10401 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 10501 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 10701 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 10801 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+          11000       11.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.35281e+03    2.07238e+04    4.92044e+03    1.29879e+01    3.10418e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -1.15459e+02   -1.35285e+04   -1.20849e+03    2.12237e+03    5.92164e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.34434e+04    3.29144e+04    5.63578e+04    1.38879e+05    2.96564e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.36283e+02   -1.77008e+03    1.50375e-06
+
+
+Step 11101 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 11401 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+          12000       12.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.48725e+03    1.99329e+04    4.85895e+03    7.69555e+00    4.18076e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -2.15155e+02   -1.53762e+04   -1.27195e+03    2.17184e+03    5.42462e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.18304e+04    3.47622e+04    5.65926e+04    1.44148e+05    3.13214e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.50959e+02    2.46959e+03    1.44199e-06
+
+
+Step 12101 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 12401 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 12701 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+          13000       13.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.39185e+03    1.99830e+04    4.81620e+03    1.06193e+01    3.26215e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -1.38494e+02   -1.36559e+04   -1.19404e+03    2.12699e+03    6.12246e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.26637e+04    3.35839e+04    5.62476e+04    1.49359e+05    3.02597e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.33047e+02   -1.96532e+03    1.44380e-06
+
+
+Step 13001 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 13101 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 13301 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 13701 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+          14000       14.00000
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.26263e+03    1.97758e+04    5.04074e+03    1.77144e+01    3.66958e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -1.69675e+02   -1.51724e+04   -1.25602e+03    2.16000e+03    5.56907e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.13840e+04    3.34308e+04    5.48148e+04    1.54727e+05    3.01217e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.47205e+02    1.03477e+03    1.45544e-06
+
+
+Step 14001 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 14301 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+Writing checkpoint, step 14400 at Sat Jan 11 16:37:27 2025
+
+
+
+Step 14601 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+
+Step 14901 Pressure scaling more than 1%. This may mean your system is not yet equilibrated. Use of Parrinello-Rahman pressure coupling during equilibration can lead to simulation instability, and is discouraged.
+           Step           Time
+          15000       15.00000
+
+Writing checkpoint, step 15000 at Sat Jan 11 16:37:32 2025
+
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.80941e+03    1.94522e+04    4.87119e+03    9.42289e+00    4.00441e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -2.34843e+02   -1.51594e+04   -1.26074e+03    2.17834e+03    5.61321e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.17261e+04    3.45850e+04    5.63111e+04    1.60629e+05    3.11617e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.48313e+02   -6.35587e+02    1.46118e-06
+
+
+Energy conservation over simulation part #1 of length 15 ps, time 0 to 15 ps
+  Conserved energy drift: 6.26e-01 kJ/mol/ps per atom
+
+
+	<======  ###############  ==>
+	<====  A V E R A G E S  ====>
+	<==  ###############  ======>
+
+	Statistics over 15001 steps using 151 frames
+
+   Energies (kJ/mol)
+           Bond          Angle    Proper Dih. Per. Imp. Dih.          LJ-14
+    7.57106e+03    2.07939e+04    4.74852e+03    1.07695e+01    3.71283e+03
+     Coulomb-14        LJ (SR)  Disper. corr.   Coulomb (SR)   Coul. recip.
+   -1.92662e+02   -1.58176e+04   -1.30473e+03    2.17613e+03    5.21619e+01
+      Potential    Kinetic En.   Total Energy  Conserved En.    Temperature
+    2.17504e+04    3.38125e+04    5.55629e+04    1.06778e+05    3.04657e+02
+ Pres. DC (bar) Pressure (bar)   Constr. rmsd
+   -1.59429e+02    2.64040e+00    0.00000e+00
+
+          Box-X          Box-Y          Box-Z
+    5.15328e+00    5.15328e+00    5.15328e+00
+
+   Total Virial (kJ/mol)
+    1.15728e+04    1.41286e+02    8.06782e+01
+    1.41282e+02    1.14497e+04   -9.88743e+01
+    8.06740e+01   -9.88756e+01    1.15932e+04
+
+   Pressure (bar)
+   -8.77662e+00   -2.23462e+01   -2.92369e+01
+   -2.23451e+01    2.37932e+01    2.49878e+01
+   -2.92359e+01    2.49881e+01   -7.09540e+00
+
+
+	M E G A - F L O P S   A C C O U N T I N G
+
+ NB=Group-cutoff nonbonded kernels    NxN=N-by-N cluster Verlet kernels
+ RF=Reaction-Field  VdW=Van der Waals  QSTab=quadratic-spline table
+ W3=SPC/TIP3p  W4=TIP4p (single or pairs)
+ V&F=Potential and force  V=Potential only  F=Force only
+
+ Computing:                               M-Number         M-Flops  % Flops
+-----------------------------------------------------------------------------
+ Pair Search distance check             891.632138        8024.689     0.1
+ NxN Ewald Elec. + LJ [F]            138120.401232     9115946.481    91.1
+ NxN Ewald Elec. + LJ [V&F]            1404.190448      150248.378     1.5
+ NxN Ewald Elec. [F]                   1782.210672      108714.851     1.1
+ NxN Ewald Elec. [V&F]                   18.130864        1522.993     0.0
+ 1,4 nonbonded interactions             392.066136       35285.952     0.4
+ Calc Weights                           522.124806       18796.493     0.2
+ Spread Q Bspline                     11138.662528       22277.325     0.2
+ Gather F Bspline                     11138.662528       66831.975     0.7
+ 3D-FFT                               35957.937036      287663.496     2.9
+ Solve PME                              582.158808       37258.164     0.4
+ Reset In Box                             1.740300           5.221     0.0
+ CG-CoM                                   1.751902           5.256     0.0
+ Bonds                                   43.862924        2587.913     0.0
+ Angles                                 313.310886       52636.229     0.5
+ Propers                                392.111139       89793.451     0.9
+ Impropers                                0.450030          93.606     0.0
+ Virial                                   1.758697          31.657     0.0
+ Stop-CM                                  1.751902          17.519     0.0
+ Calc-Ekin                               17.426204         470.508     0.0
+ Lincs                                  121.598106        7295.886     0.1
+ Lincs-Mat                             1038.309216        4153.237     0.0
+ Constraint-V                           243.196212        2188.766     0.0
+ Constraint-Vir                           1.224006          29.376     0.0
+-----------------------------------------------------------------------------
+ Total                                                10011879.421   100.0
+-----------------------------------------------------------------------------
+
+
+    D O M A I N   D E C O M P O S I T I O N   S T A T I S T I C S
+
+ av. #atoms communicated per step for force:  2 x 0.0
+ av. #atoms communicated per step for LINCS:  2 x 0.0
+
+
+      R E A L   C Y C L E   A N D   T I M E   A C C O U N T I N G
+
+On 1 MPI rank, each using 16 OpenMP threads
+
+ Activity:              Num   Num      Call    Wall time         Giga-Cycles
+                        Ranks Threads  Count      (s)         total sum    %
+--------------------------------------------------------------------------------
+ Domain decomp.            1   16        150      12.232         80.885   1.1
+ Neighbor search           1   16        151      11.535         76.277   1.1
+ Force                     1   16      15001     531.000       3511.260  48.9
+ PME mesh                  1   16      15001     256.459       1695.849  23.6
+ NB X/F buffer ops.        1   16      29851     203.566       1346.089  18.7
+ Write traj.               1   16         32       1.423          9.408   0.1
+ Update                    1   16      15001      36.283        239.923   3.3
+ Constraints               1   16      15001      30.727        203.185   2.8
+ Rest                                              3.256         21.533   0.3
+--------------------------------------------------------------------------------
+ Total                                          1086.482       7184.410 100.0
+--------------------------------------------------------------------------------
+ Breakdown of PME mesh activities
+--------------------------------------------------------------------------------
+ PME spread                1   16      15001      96.489        638.038   8.9
+ PME gather                1   16      15001      74.582        493.175   6.9
+ PME 3D-FFT                1   16      30002      75.975        502.387   7.0
+ PME solve Elec            1   16      15001       1.426          9.428   0.1
+--------------------------------------------------------------------------------
+
+               Core t (s)   Wall t (s)        (%)
+       Time:    17383.703     1086.482     1600.0
+                 (ns/day)    (hour/ns)
+Performance:        1.193       20.119
+Finished mdrun on rank 0 Sat Jan 11 16:37:32 2025
+

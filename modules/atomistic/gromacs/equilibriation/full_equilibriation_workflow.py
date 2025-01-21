@@ -57,6 +57,7 @@ class FullEquilibrationWorkflow:
         save_intermediate_gro: bool = True,
         save_intermediate_log: bool = True,
         verbose: bool = False,
+        file_name_override: Optional[str] = None,
     ):
         """
         Run the full equilibration workflow.
@@ -123,9 +124,14 @@ class FullEquilibrationWorkflow:
                 for ext in files_to_keep:
                     file_name = f"{final_step_name}.{ext}"
                     file_path = os.path.join(temp_output_dir, file_name)
-                    new_filename = generate_dynamic_filename(
-                        varying_params, extension=None
-                    )
+                    if file_name_override:
+                        new_filename = file_name_override
+                        print("!!!!!!!!!!!!!!!!!!!")
+                        print(file_name_override)
+                    else:
+                        new_filename = generate_dynamic_filename(
+                            varying_params, extension=None
+                        )
                     if os.path.exists(file_path):
                         new_file_path = copy_and_rename(
                             file_path,

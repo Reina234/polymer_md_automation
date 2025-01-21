@@ -14,3 +14,11 @@
 7. make function to extract the compressibility and temp from file names, same w the polymer name
    should be automated so that I just need to pass in the polymer and 
    solvent name
+
+
+   rip, need to add in genion part, minim first, grommp, then genion
+   then temperature coupling needs fixing too
+
+   pycgtool for CG mapping in post, and then full prod run
+
+   will need to add in ions.itp into topol
