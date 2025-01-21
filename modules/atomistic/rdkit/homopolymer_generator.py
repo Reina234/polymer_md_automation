@@ -54,7 +54,7 @@ class HomopolymerGenerator(BasePolymerGenerator):
     ) -> str:
         polymer = self._generate_polymer_rdkit(monomer_smiles, num_units)
         polymer = self._finalise_molecule(polymer, uff_optimise=uff_optimise)
-        self._populate_polymer_class(polymer)
+        self._process_polymer(polymer)
 
         if save:
             if output_name is None:

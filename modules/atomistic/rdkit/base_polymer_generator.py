@@ -116,11 +116,12 @@ from typing import Tuple, List, Set
 
 class BasePolymerGenerator(ABC):
     def __init__(self):
-        self.cap_smiles = "[H]"  # Hydrogen cap (this will always be [H])
+        self.capping_atom = "[H]"  # Hydrogen cap (this will always be [H])
         self.monomer_residue_smiles: Set[str] = set()  # Store monomer SMILES
-        self.end_caps: Set[Chem.Mol] = (
+        self._possible_end_residues: Set[Chem.Mol] = (
             set()
         )  # Store end residue (hydrogen-added) molecules
+        self.end_residue_smiles: Set[str] = None
 
     def _create_monomer_residue(
         self, monomer_smiles: str
@@ -162,11 +163,11 @@ class BasePolymerGenerator(ABC):
         Chem.SanitizeMol(rw_monomer)
 
         # Generate SMILES for the monomer
-        monomer_smiles = self.residue_to_smiles(rw_monomer, [atom1, atom2])
+        monomer_smiles = Chem.MolToSmiles(rw_monomer, isomericSmiles=True)
         self.monomer_residue_smiles.add(monomer_smiles)
 
         # Generate end residues by adding hydrogen to each open site
-        self._generate_end_residues(rw_monomer, open_sites)
+        self._create_possible_end_residues(rw_monomer, open_sites)
 
         return rw_monomer, open_sites
 
@@ -183,7 +184,7 @@ class BasePolymerGenerator(ABC):
         AllChem.AddHs(mol)
         return mol
 
-    def _generate_end_residues(
+    def _create_possible_end_residues(
         self, monomer: Chem.Mol, open_sites: List[Tuple[int, int]]
     ):
         """
@@ -203,10 +204,10 @@ class BasePolymerGenerator(ABC):
 
                 # Sanitize the molecule and add to end_caps
                 Chem.SanitizeMol(modified_mol)
-                self.end_caps.add(modified_mol)
+                self._possible_end_residues.add(modified_mol)
 
     def _cap_termini(self, polymer: Chem.Mol, end1_idx: int, end2_idx: int) -> Chem.Mol:
-        cap = Chem.MolFromSmiles(self.cap_smiles)
+        cap = Chem.MolFromSmiles(self.capping_atom)
         rw_polymer = Chem.RWMol(polymer)
 
         cap_atom_idx = rw_polymer.AddAtom(cap.GetAtomWithIdx(0))
@@ -240,18 +241,18 @@ class BasePolymerGenerator(ABC):
         Chem.SanitizeMol(rw_mol)
         return Chem.MolToSmiles(rw_mol, isomericSmiles=True)
 
-    def _find_end_termini(self, polymer: Chem.Mol) -> Set[str]:
+    def _match_end_residues(self, polymer: Chem.Mol) -> Set[str]:
         """
         Identifies the two end termini of a polymer by performing substructure matches with possible end residues.
         This function ensures we get exactly 2 matches, even if both matches correspond to the same end residue.
         :param polymer: The Chem.Mol object representing the polymer.
         :return: A set of matched end residue SMILES.
         """
-        matched_termini = set()  # To store the unique matches
+        matched_end_residues = set()  # To store the unique matches
         match_count = 0  # To keep track of how many matches we've found
 
         # Iterate through all end residues and match with the polymer
-        for end_residue in self.end_caps:
+        for end_residue in self._possible_end_residues:
             # Convert the end residue to SMILES for matching
             end_residue_smiles = Chem.MolToSmiles(end_residue, isomericSmiles=True)
 
@@ -260,7 +261,7 @@ class BasePolymerGenerator(ABC):
 
             if len(matches) > 0:
                 # If we find matches, add them to the matched_termini set
-                matched_termini.add(end_residue_smiles)
+                matched_end_residues.add(end_residue_smiles)
                 match_count += len(matches)
 
         # Ensure exactly two termini are found (even if it's the same residue twice)
@@ -269,12 +270,15 @@ class BasePolymerGenerator(ABC):
                 f"Expected exactly two end termini matches, but found {match_count}."
             )
 
-        return matched_termini
+        return matched_end_residues
 
-    def _populate_polymer_class(self, polymer: Chem.Mol):
+    def _process_polymer(self, polymer: Chem.Mol):
         self.polymer_smiles = self.residue_to_smiles(polymer, [])
+        matched_end_residues = self._match_end_residues(polymer)
+        self.end_residue_smiles = matched_end_residues
 
-        matched_termini = self._find_end_termini(polymer)
+    def retrieve_smiles(self):
+        return self.monomer_residue_smiles, self.end_residue_smiles, self.polymer_smiles
 
     @abstractmethod
     def _generate_filename(self, **kwargs):
