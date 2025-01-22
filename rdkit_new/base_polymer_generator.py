@@ -16,24 +16,6 @@ class BasePolymerGenerator(ABC):
         self.map = []  # Mapping information as a list of dictionaries
         self.monomer_bead_map: Dict[str, str] = {}  # Map SMILES → Bead Type
 
-    def _add_to_mapping(self, atom_indices: List[int], bead_type: str):
-        """
-        Adds atom indices to the mapping with the appropriate bead type.
-        :param atom_indices: List of atom indices to map.
-        :param bead_type: The bead type identifier.
-        """
-        current_count = sum(1 for entry in self.map if entry["bead_type"] == bead_type)
-        for idx in atom_indices:
-            unique_bead_name = f"{bead_type}{current_count + 1}"
-            self.map.append(
-                {
-                    "atom_index": idx,
-                    "bead_type": bead_type,
-                    "unique_name": unique_bead_name,
-                }
-            )
-            current_count += 1
-
     def _generate_bead_type(self, monomer_smiles: Optional[str] = None) -> str:
         """
         Generates a unique bead type for a given monomer SMILES.
@@ -43,6 +25,36 @@ class BasePolymerGenerator(ABC):
             bead_count = len(self.monomer_bead_map) + 1
             self.monomer_bead_map[monomer_smiles] = f"B{bead_count}"
         return self.monomer_bead_map[monomer_smiles]
+
+    def _generate_unique_bead_name(self, bead_type: str) -> str:
+        """
+        Generates a unique bead name for a given bead type.
+        Ensures that each monomer residue gets a unique identifier.
+
+        :param bead_type: The base bead type identifier.
+        :return: A unique bead name.
+        """
+        current_count = sum(1 for entry in self.map if entry["bead_type"] == bead_type)
+        return f"{bead_type}{current_count + 1}"
+
+    def _add_to_mapping(
+        self, atom_indices: List[int], bead_type: str, unique_name: str
+    ):
+        """
+        Adds atom indices to the mapping with the provided unique bead name.
+
+        :param atom_indices: List of atom indices belonging to a monomer.
+        :param bead_type: The bead type identifier.
+        :param unique_name: The unique bead name for this monomer residue.
+        """
+        for idx in atom_indices:
+            self.map.append(
+                {
+                    "atom_index": idx,
+                    "bead_type": bead_type,
+                    "unique_name": unique_name,
+                }
+            )
 
     def _create_monomer_residue(
         self, monomer_smiles: str
@@ -97,7 +109,7 @@ class BasePolymerGenerator(ABC):
     ) -> Tuple[Chem.RWMol, int]:
         """
         Adds a monomer to the polymer at the specified open site.
-        Ensures the polymer maintains exactly **one open site** after each addition.
+        Ensures that the polymer maintains exactly **one open site** after each addition.
 
         :param polymer: Growing polymer.
         :param monomer: Monomer residue (should have exactly **two open sites**).
@@ -109,6 +121,9 @@ class BasePolymerGenerator(ABC):
 
         # Create a new copy of the monomer to add to the polymer
         new_monomer = Chem.RWMol(monomer)
+
+        # Generate a unique name for this monomer residue
+        unique_name = self._generate_unique_bead_name(bead_type)
 
         # Map atoms from new monomer into the growing polymer
         atom_map = {}
@@ -131,9 +146,9 @@ class BasePolymerGenerator(ABC):
         # Attach the monomer to the polymer
         polymer.AddBond(prev_end_idx, monomer_site_1, Chem.rdchem.BondType.SINGLE)
 
-        # Assign all atoms in this monomer to one bead
+        # Assign all atoms in this monomer to the same unique bead
         new_indices = list(atom_map.values())
-        self._add_to_mapping(new_indices, bead_type)
+        self._add_to_mapping(new_indices, bead_type, unique_name)
 
         # Return the updated polymer and **new open site index**
         return polymer, monomer_site_2
@@ -156,42 +171,38 @@ class BasePolymerGenerator(ABC):
         """
         if use_open_site not in [0, 1]:
             raise ValueError("Invalid open site index. Must be 0 or 1.")
-        cap = Chem.MolFromSmiles(self.capping_atom)
+
+        # Convert monomer to RWMol for modification
         rw_monomer = Chem.RWMol(monomer)
+
+        # Generate a bead type and unique name for this capped residue
         bead_type = self._generate_bead_type()
+        unique_name = self._generate_unique_bead_name(bead_type)
 
-        # Choose which open site to cap
-        cap_target_idx = open_sites[use_open_site]  # Ensure this is an integer
-        unused_open_site = open_sites[1 - use_open_site]  # Get the other site
+        # Determine which open site to cap and which remains open
+        cap_target_idx = open_sites[use_open_site]  # The site to be capped
+        unused_open_site = open_sites[1 - use_open_site]  # The site that remains open
 
-        cap_atom_idx = rw_monomer.AddAtom(cap.GetAtomWithIdx(0))
+        # Create and add the capping atom (default: hydrogen)
+        cap_atom = Chem.Atom(1)  # Hydrogen
+        cap_atom_idx = rw_monomer.AddAtom(cap_atom)
+
+        # Bond the capping atom to the selected open site
         rw_monomer.AddBond(cap_target_idx, cap_atom_idx, Chem.rdchem.BondType.SINGLE)
-        # Add the capping atom (default: hydrogen)
 
-        Chem.SanitizeMol(rw_monomer)
-        # Optionally add to the mapping
+        # **Ensure all atoms in this monomer are mapped to a unique bead**
+        all_atom_indices = [atom.GetIdx() for atom in rw_monomer.GetAtoms()]
         if add_to_map:
-            self._add_to_mapping([cap_target_idx, cap_atom_idx], f"{bead_type}_cap")
+            self._add_to_mapping(all_atom_indices, bead_type, unique_name)
+
+        # Perform controlled sanitization, avoiding unintended changes
+        Chem.SanitizeMol(
+            rw_monomer,
+            sanitizeOps=Chem.SanitizeFlags.SANITIZE_ALL
+            ^ Chem.SanitizeFlags.SANITIZE_ADJUSTHS,
+        )
 
         return rw_monomer, bead_type, unused_open_site  # The remaining open site
-
-    def _add_to_mapping(self, atom_indices: List[int], bead_type: str):
-        """
-        Adds atom indices to the mapping with the appropriate bead type.
-        :param atom_indices: List of atom indices to map.
-        :param bead_type: The bead type identifier.
-        """
-        current_count = sum(1 for entry in self.map if entry["bead_type"] == bead_type)
-        for idx in atom_indices:
-            unique_bead_name = f"{bead_type}{current_count + 1}"
-            self.map.append(
-                {
-                    "atom_index": idx,
-                    "bead_type": bead_type,
-                    "unique_name": unique_bead_name,
-                }
-            )
-            current_count += 1
 
     def _finalise_molecule(self, mol: Chem.Mol, uff_optimise: bool = True) -> Chem.Mol:
         """

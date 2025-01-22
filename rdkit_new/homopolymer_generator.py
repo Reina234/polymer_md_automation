@@ -24,7 +24,7 @@ class HomopolymerGenerator(BasePolymerGenerator):
             residue_mol, open_sites=open_sites, use_open_site=0, add_to_map=True
         )
         # print(self.debug_print_mol(polymer))
-        for _ in range(num_units - 1):
+        for _ in range(num_units - 2):
 
             polymer, idx = self._add_monomer_to_polymer(
                 polymer,
