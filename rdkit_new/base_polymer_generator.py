@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from rdkit import Chem
+from rdkit.Chem.rdchem import PeriodicTable
 from rdkit.Chem import AllChem
 from typing import Tuple, List, Set, Optional, Dict
 import pandas as pd
@@ -13,48 +14,127 @@ import os
 class BasePolymerGenerator(ABC):
     def __init__(self):
         self.capping_atom = "[H]"  # Hydrogen cap (this will always be [H])
-        self.map = []  # Mapping information as a list of dictionaries
-        self.monomer_bead_map: Dict[str, str] = {}  # Map SMILES → Bead Type
+        self.pycg_map = []  # Mapping information as a list of dictionaries
+        self.votca_map = []  # Mapping information for VOTCA
+        self.votca_bonds = []  # List of VOTCA bond tuples (prev_bead, new_bead)
+        self.votca_angles = []  # List of angle triplets for VOTCA
+        self.monomer_bead_map: Dict[str, str] = {}  # Mapping SMILES to bead types
+        self.bead_type_counts: Dict[str, int] = {}  # Tracking counts per bead type
+        self.mol: Optional[Chem.mol] = None
 
     def _generate_bead_type(self, monomer_smiles: Optional[str] = None) -> str:
         """
-        Generates a unique bead type for a given monomer SMILES.
+        Generates a bead type for a given monomer SMILES.
         Ensures consistency when adding the same monomer multiple times.
         """
-        if monomer_smiles is None or monomer_smiles not in self.monomer_bead_map:
+        if monomer_smiles not in self.monomer_bead_map:
             bead_count = len(self.monomer_bead_map) + 1
             self.monomer_bead_map[monomer_smiles] = f"B{bead_count}"
+
         return self.monomer_bead_map[monomer_smiles]
 
     def _generate_unique_bead_name(self, bead_type: str) -> str:
         """
         Generates a unique bead name for a given bead type.
-        Ensures that each monomer residue gets a unique identifier.
+        Beads are named as 'B1N1', 'B1N2', 'B2N1', etc.
 
         :param bead_type: The base bead type identifier.
         :return: A unique bead name.
         """
-        current_count = sum(1 for entry in self.map if entry["bead_type"] == bead_type)
-        return f"{bead_type}{current_count + 1}"
+        if bead_type not in self.bead_type_counts:
+            self.bead_type_counts[bead_type] = 1
+        else:
+            self.bead_type_counts[bead_type] += 1
+
+        return f"{bead_type}N{self.bead_type_counts[bead_type]}"
 
     def _add_to_mapping(
         self, atom_indices: List[int], bead_type: str, unique_name: str
     ):
         """
-        Adds atom indices to the mapping with the provided unique bead name.
+        Adds atom indices to both self.cg_map (for PyCGTOOL) and self.votca_map (for VOTCA).
+        Ensures that PyCGTOOL mapping is stored per atom, while VOTCA mapping is stored per bead.
 
         :param atom_indices: List of atom indices belonging to a monomer.
         :param bead_type: The bead type identifier.
         :param unique_name: The unique bead name for this monomer residue.
         """
+        self._add_to_pycg_map(atom_indices, bead_type, unique_name)
+        self._add_to_votca_map(atom_indices, bead_type, unique_name)
+
+    def _add_bond_to_votca(self, new_bead: str):
+        """
+        Adds a bond to the VOTCA bond list.
+        Ensures that the new bead bonds with the last added bead.
+        """
+        if len(self.votca_map) > 1:
+            prev_bead = self.votca_map[-2]["unique_name"]  # Last added bead
+            self.votca_bonds.append((prev_bead, new_bead))
+
+    def _add_angle_to_votca(self, new_bead: str):
+        """
+        Adds an angle to the VOTCA angle list.
+        Uses the last three beads added to define an angle.
+        """
+        if len(self.votca_bonds) > 1:
+            bead1, bead2 = self.votca_bonds[-1]  # First bond
+            bead3 = new_bead
+            self.votca_angles.append((bead1, bead2, bead3))
+
+    def _add_to_pycg_map(
+        self, atom_indices: List[int], bead_type: str, unique_name: str
+    ):
+        """
+        Stores mapping data for PyCGTOOL in self.cg_map.
+        Each atom is recorded individually.
+
+        :param atom_indices: List of atom indices in a monomer.
+        :param bead_type: The bead type identifier.
+        :param unique_name: Unique name assigned to this bead.
+        """
         for idx in atom_indices:
-            self.map.append(
+            self.pycg_map.append(
                 {
-                    "atom_index": idx,
+                    "atom_index": idx,  # Each atom has a separate row
                     "bead_type": bead_type,
                     "unique_name": unique_name,
                 }
             )
+
+    def _add_to_votca_map(
+        self, atom_indices: List[int], bead_type: str, unique_name: str
+    ):
+        """
+        Stores mapping data for VOTCA with mass-weighted weights.
+
+        :param atom_indices: List of atom indices in a monomer.
+        :param bead_type: The bead type identifier.
+        :param unique_name: Unique name assigned to this bead.
+        """
+        if not atom_indices:
+            return
+        periodic_table = Chem.GetPeriodicTable()
+
+        # Get atomic masses
+        atomic_masses = []
+        for idx in atom_indices:
+            atom_symbol = self.mol.GetAtomWithIdx(idx).GetSymbol()
+            atomic_masses.append(periodic_table.GetAtomicWeight(atom_symbol))
+
+        # Compute mass fractions (normalized)
+        total_mass = sum(atomic_masses)
+        mass_weights = [round(100 * mass / total_mass) for mass in atomic_masses]
+
+        # Store mapping
+        self.votca_map.append(
+            {
+                "unique_name": unique_name,
+                "bead_type": bead_type,
+                "atom_indices": atom_indices,  # Full list of atoms per bead
+                "x-weight": mass_weights,  # Mass-weighted position
+                "f-weight": mass_weights,  # Mass-weighted force distribution
+            }
+        )
 
     def _create_monomer_residue(
         self, monomer_smiles: str
@@ -148,6 +228,12 @@ class BasePolymerGenerator(ABC):
 
         # Assign all atoms in this monomer to the same unique bead
         new_indices = list(atom_map.values())
+
+        self.mol = polymer
+        new_bead = unique_name
+        self._add_bond_to_votca(new_bead)  # Add bond to previous bead
+        self._add_angle_to_votca(new_bead)  # Add angle to previous beads
+
         self._add_to_mapping(new_indices, bead_type, unique_name)
 
         # Return the updated polymer and **new open site index**
@@ -192,6 +278,7 @@ class BasePolymerGenerator(ABC):
 
         # **Ensure all atoms in this monomer are mapped to a unique bead**
         all_atom_indices = [atom.GetIdx() for atom in rw_monomer.GetAtoms()]
+        self.mol = rw_monomer
         if add_to_map:
             self._add_to_mapping(all_atom_indices, bead_type, unique_name)
 

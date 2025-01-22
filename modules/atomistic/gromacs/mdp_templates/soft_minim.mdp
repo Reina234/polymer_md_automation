@@ -1,0 +1,30 @@
+; Energy minimization with soft potentials
+integrator               = steep       ; Steepest descent algorithm
+emtol                    = {emtol}      ; Convergence when max force < 1000 kJ/mol/nm
+emstep                   = 0.0005      ; Small step size to prevent large forces
+nsteps                   = {nsteps}       ; Increase if necessary
+
+; Neighbor Searching and Cutoffs
+nstlist                  = 10
+cutoff-scheme            = Verlet
+ns_type                  = grid
+rlist                    = 1.2         ; Short-range neighbor list
+vdw-type                 = cut-off
+rvdw                     = 1.2
+coulombtype              = cut-off
+rcoulomb                 = 1.2
+
+; Soft-core Potential to Avoid Overlaps
+free-energy              = yes
+sc-alpha                 = 0.5
+sc-power                 = 6
+sc-sigma                 = 0.3
+
+; Constraints and Temperature Control
+constraints              = none
+constraint-algorithm     = lincs
+lincs-iter               = 4
+lincs-order              = 8
+
+; Output Control
+energygrps               = System

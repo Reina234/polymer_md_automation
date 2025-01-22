@@ -8,7 +8,7 @@ from typing import Dict, List, Tuple
 
 generator = HomopolymerGenerator()
 generator.generate_polymer("C=Cc1ccccc1", 5, "rdkit_test2", overwrite=False, save=False)
-print(generator.map)
+# print(generator.map)
 
 
 def itp_to_dataframe(itp_file: str):
@@ -63,4 +63,5 @@ def verify_and_generate_mapping(
 
 
 itp_df = itp_to_dataframe("rdkit_test/POLY_GMX.itp")
-verify_and_generate_mapping(generator.map, itp_df, "mapping2.txt")
+verify_and_generate_mapping(generator.pycg_map, itp_df, "mapping2.txt")
+print(generator.votca_map)

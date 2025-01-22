@@ -35,11 +35,14 @@ def add_polymer_to_solvent(
     )
     overlapping_atoms = distances.min(axis=0) < cutoff
     overlapping_residues = u_solvent.atoms[overlapping_atoms].residues.resids
-
-    # Select non-overlapping solvent molecules
-    non_overlapping_solvent = u_solvent.select_atoms(
-        f"not resid {' '.join(map(str, overlapping_residues))}"
-    )
+    if overlapping_residues is None or len(overlapping_residues) == 0:
+        print("⚠️ No overlapping residues detected, keeping all solvent molecules.")
+        non_overlapping_solvent = u_solvent.atoms  # Keep all solvent molecules
+    else:
+        # Select non-overlapping solvent molecules
+        non_overlapping_solvent = u_solvent.select_atoms(
+            f"not resid {' '.join(map(str, overlapping_residues))}"
+        )
 
     # Combine polymer and non-overlapping solvent
     combined = mda.Merge(u_polymer.atoms, non_overlapping_solvent)

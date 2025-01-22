@@ -57,7 +57,10 @@ def prepare_solute_files(
         residue_number_col="Residue Number",
     )
     molecule_content = replace_value_in_dataframe(
-        molecule_content, target_value="UNL", replacement_value=solute_molecule_name
+        molecule_content,
+        target_value="UNL",
+        replacement_value=solute_molecule_name,
+        move_to_top=True,
     )
 
     solute_itp_file, solvent_itp_file = process_solute_and_solvent_itps(

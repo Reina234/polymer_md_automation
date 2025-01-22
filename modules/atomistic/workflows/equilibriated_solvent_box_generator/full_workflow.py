@@ -23,10 +23,10 @@ from modules.atomistic.utils.file_utils import (
     create_includes_section,
     delete_all_include_sections,
 )
-
+from data_models.output_types import GromacsPaths
 from config.paths import EQUILIBRIATED_SOLVENT_BOX_DIR
 from typing import List, Optional
-from data_models.output_types import GromacsPaths
+from data_models.output_types import GromacsOutputs
 from config.paths import TEMP_DIR, LOG_DIR
 from modules.shared.utils.file_utils import add_identifier_name, delete_directory
 from modules.atomistic.utils.mdp_utils import format_temperatures
@@ -53,7 +53,7 @@ def run_solvent_workflow(
     parameterizer: ACPYPEParameterizer = ACPYPEParameterizer,
     cleanup: bool = True,
     confirm_log_deletion: bool = True,
-) -> str:
+) -> GromacsOutputs:
 
     subdir = add_identifier_name(solvent.name, identifier=identifier, suffix=None)
     output_dir = os.path.join(output_dir, subdir)
@@ -89,7 +89,7 @@ def run_solvent_workflow(
         identifier=identifier,
         suffix=None,
     )
-    gro_output_dir, _ = workflow.run(
+    gro_output_dir, output_paths = workflow.run(
         reformatted_files.gro_path,
         reformatted_files.top_path,
         temp_dir,
@@ -107,4 +107,5 @@ def run_solvent_workflow(
         delete_directory(temp_dir, verbose=verbose, confirm=False)
         delete_directory(log_dir, verbose=verbose, confirm=confirm_log_deletion)
 
-    return gro_output_dir
+    output_paths.itp = reformatted_files.itp_path
+    return output_paths

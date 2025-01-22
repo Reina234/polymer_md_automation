@@ -1,4 +1,4 @@
-from modules.atomistic.rdkit.homopolymer_generator import HomopolymerGenerator
+from rdkit_new.homopolymer_generator import HomopolymerGenerator
 from config.paths import TEMP_DIR
 from config.acpype_config import AcpypeOutputConfig
 from modules.atomistic.acpype_parameterizer.acpype_parametizer import (

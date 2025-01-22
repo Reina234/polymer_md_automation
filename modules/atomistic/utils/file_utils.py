@@ -87,19 +87,36 @@ def calculate_molecule_counts(
     return molecule_counts
 
 
+import pandas as pd
+
+
 def replace_value_in_dataframe(
-    dataframe: pd.DataFrame, target_value: str, replacement_value: str
+    dataframe: pd.DataFrame,
+    target_value: str,
+    replacement_value: str,
+    move_to_top: bool = False,
 ) -> pd.DataFrame:
     """
     Replace all occurrences of a specific value in the DataFrame with a new value.
+    Optionally move the affected rows to the top.
 
     :param dataframe: The input DataFrame where values will be replaced.
     :param target_value: The value to be replaced.
     :param replacement_value: The value to replace with.
-    :return: The updated DataFrame with the values replaced.
+    :param move_to_top: If True, moves affected rows to the top of the DataFrame.
+    :return: The updated DataFrame with the values replaced and optionally reordered.
     """
-    # Replace the value and return the updated DataFrame
-    return dataframe.replace(to_replace=target_value, value=replacement_value)
+    # Replace the value
+    dataframe = dataframe.replace(to_replace=target_value, value=replacement_value)
+
+    if move_to_top:
+        # Find rows that contain the replacement value
+        mask = dataframe.apply(lambda row: replacement_value in row.values, axis=1)
+
+        # Reorder the DataFrame with affected rows at the top
+        dataframe = pd.concat([dataframe[mask], dataframe[~mask]], ignore_index=True)
+
+    return dataframe
 
 
 def replace_dataframe_contents(

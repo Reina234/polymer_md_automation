@@ -15,6 +15,12 @@ workflow = FullEquilibrationWorkflow(mdp_cache)
 
 
 workflow.add_em_step(
+    step_name="soft_em",
+    workflow_step=workflow_step,
+    template_path="modules/atomistic/gromacs/equilibriation/templates/em_2.mdp",
+    base_params={"nsteps": "10000", "emtol": "1000"},
+)
+workflow.add_em_step(
     step_name="minim_1",
     workflow_step=workflow_step,
     template_path="modules/atomistic/gromacs/equilibriation/templates/em_2.mdp",
