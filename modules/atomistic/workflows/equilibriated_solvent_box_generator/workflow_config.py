@@ -38,7 +38,7 @@ workflow.add_thermal_step(
     workflow_step=workflow_step,
     template_path="modules/atomistic/gromacs/equilibriation/templates/nvt.mdp",
     base_params={
-        "nsteps": "100000",
+        "nsteps": "50000",
     },
 )
 
@@ -47,7 +47,7 @@ workflow.add_thermal_step(
     workflow_step=workflow_step,
     template_path="modules/atomistic/gromacs/equilibriation/templates/npt_short.mdp",
     base_params={
-        "nsteps": "50000",
+        "nsteps": "20000",
         "dt": "0.002",
     },
 )

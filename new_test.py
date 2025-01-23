@@ -10,7 +10,7 @@ from modules.atomistic.workflows.solvated_neutralised_polymer.full_workflow impo
 )
 from data_models.solvent import Solvent
 
-polymer_paths = run_polymerisation_workflow("C=Cc1ccccc1", 2, "1_22_test")
+polymer_paths = run_polymerisation_workflow("C=Cc1ccccc1", 3, "1_22_test")
 solvent = Solvent("hexane", 86.17, 661, "input_data/solvent_pdbs/hexane.pdb", 1.24e-4)
 
 outputs = run_solvent_workflow(

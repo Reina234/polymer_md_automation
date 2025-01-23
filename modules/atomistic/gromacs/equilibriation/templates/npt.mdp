@@ -4,6 +4,7 @@ nsteps          = {nsteps}
 dt              = {dt}
 nstxout         = 5000
 nstvout         = 5000
+nstfout       = 5000
 nstenergy       = 5000
 nstlog          = 5000
 continuation    = yes

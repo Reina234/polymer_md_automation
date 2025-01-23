@@ -9,7 +9,7 @@ import pandas as pd
 from typing import Dict, List, Tuple
 
 generator = HomopolymerGenerator()
-generator.generate_polymer("C=Cc1ccccc1", 2, "rdkit_test2", overwrite=False, save=False)
+generator.generate_polymer("C=Cc1ccccc1", 3, "rdkit_test2", overwrite=False, save=False)
 print(generator.votca_bonds)
 print(generator.votca_map)
 print(generator.votca_angles)
@@ -21,6 +21,6 @@ mapper = VOTCAMappingGenerator(
     generator.votca_map,
     generator.votca_bonds,
     generator.votca_angles,
-    itp_file_path="1_22_test/c=cc1ccccc1_2/POLY_GMX.itp",
+    itp_file_path="1_22_test/c=cc1ccccc1_3/POLY_GMX.itp",
 )
-mapper.save_to_xml("rdkit_test2.xml")
+mapper.save_to_xml("rdkit_test3.xml")

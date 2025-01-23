@@ -2,7 +2,7 @@
 ;	File 'mdout.mdp' was generated
 ;	By user: unknown (1000)
 ;	On host: LENOVO-PC
-;	At date: Thu Jan 23 11:36:42 2025
+;	At date: Thu Jan 23 18:08:00 2025
 ;
 ;	Created by:
 ;	                :-) GROMACS - gmx grompp, 2021.3-bioconda (-:
@@ -11,7 +11,7 @@
 ;	Data prefix:  /home/reina/miniconda3/envs/lammps_packages
 ;	Working dir:  /home/reina/polymerpinn
 ;	Command line:
-;	  gmx grompp -f cache/mdp_cache/4f7703302251abe609616968256196c0.mdp -c temp/minim_2.gro -p temp/TMZK_GMX.top -o temp/nvt_short.tpr
+;	  gmx grompp -f cache/mdp_cache/b50997728c9e80ac4ce6c4a79bd5e85e.mdp -c temp/minim_2.gro -p temp/topol.top -o temp/nvt_short.tpr
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
@@ -63,7 +63,7 @@ rtpi                     = 0.05
 ; Output frequency for coords (x), velocities (v) and forces (f)
 nstxout                  = 1000
 nstvout                  = 1000
-nstfout                  = 0
+nstfout                  = 1000
 ; Output frequency for energies to log file and energy file
 nstlog                   = 1000
 nstcalcenergy            = 100

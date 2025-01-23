@@ -4,7 +4,7 @@ from modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow impor
 )
 from config.paths import TEMP_DIR, LOG_DIR
 from modules.atomistic.gromacs.commands.genion import GenIon
-from modules.atomistic.workflows.solvated_polymer_generator.file_preparation_utils import (
+from modules.atomistic.workflows.solvated_neutralised_polymer.file_preparation_utils import (
     prepare_solute_files,
 )
 from modules.shared.utils.file_utils import delete_directory, copy_file

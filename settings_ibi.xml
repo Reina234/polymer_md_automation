@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<cg>
+  <fmatch>
+    <!-- Number of frames for block averaging -->
+    <frames_per_block>10</frames_per_block>
+    <!-- Constrained least squares? -->
+    <constrainedLS>false</constrainedLS>
+  </fmatch>
+
+
+
+  <non-bonded>
+    <name>CG-CG</name> <!-- Interaction between solvent CG beads -->
+    <type1>CG</type1>
+    <type2>CG</type2>
+    <fmatch>
+      <min>0.35</min>
+      <max>2.5</max>
+      <step>0.01</step>
+      <out_step>0.002</out_step>
+    </fmatch>
+  </non-bonded>
+
+  <non-bonded>
+    <name>B2-CG</name> <!-- Polymer-solvent interaction -->
+    <type1>B2</type1>
+    <type2>CG</type2>
+    <fmatch>
+      <min>0.38</min>
+      <max>2.5</max>
+      <step>0.01</step>
+      <out_step>0.002</out_step>
+    </fmatch>
+  </non-bonded>
+</cg>
+  <inverse>
+    <kBT>1.6629</kBT> <!-- 300*0.00831451 gromacs units -->
+    <program>gromacs</program> <!-- use gromacs to sample -->
+    <gromacs> <!-- gromacs specific options -->
+      <equi_time>10</equi_time> <!-- ignore so many frames -->
+      <table_bins>0.002</table_bins> <!-- grid for table*.xvg -->
+      <pot_max>1000000</pot_max> <!-- cut the potential at value -->
+      <table_end>2.0</table_end> <!-- extend the tables to value -->
+      <topol>temp/npt_short_1.tpr</topol> <!-- topology + trajectory files -->
+      <traj>traj.xtc</traj>
+    </gromacs>
+    <!-- these files are copied for each new run -->
+    <filelist>grompp.mdp temp/npt_short_1.top table.xvg
+      table_a1.xvg table_b1.xvg index.ndx
+  </filelist>
+  <iterations_max>300</iterations_max> <!-- number of iterations -->
+  <method>ibi</method> <!-- inverse Boltzmann or inverse MC -->
+  <log_file>inverse.log</log_file> <!-- log file -->
+  <restart_file>restart_points.log</restart_file> <!-- restart -->
+</inverse>
+</cg>

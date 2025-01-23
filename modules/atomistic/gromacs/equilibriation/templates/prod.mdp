@@ -1,6 +1,6 @@
 ; Run control
 integrator              = md        ; Molecular dynamics integrator
-nsteps                  = {ndsteps}   ; Number of steps (2 fs * 5000000 = 10 ns)
+nsteps                  = {nsteps}   ; Number of steps (2 fs * 5000000 = 10 ns)
 dt                      = {dt}     ; Time step in ps
 
 ; Output control
@@ -9,7 +9,7 @@ nstvout                = 1000       ; Save velocities every 1000 steps
 nstenergy             = 1000       ; Save energies every 1000 steps
 nstlog                = 1000       ; Update the log file every 1000 steps
 nstxout-compressed    = 1000       ; Compressed trajectory output every 1000 steps
-
+nstfout       = 1000
 ; Neighbor searching
 cutoff-scheme          = Verlet     ; Neighbor list scheme
 nstlist                = 10         ; Update neighbor list every 10 steps

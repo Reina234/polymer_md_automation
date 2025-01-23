@@ -8,7 +8,7 @@ nstxout             = 1000          ; Write coordinates to output every 1000 ste
 nstvout             = 1000          ; Write velocities to output every 1000 steps
 nstenergy           = 1000          ; Write energies to energy file every 1000 steps
 nstlog              = 1000          ; Write log file every 1000 steps
-
+nstfout       = 1000
 ; Neighbor searching
 cutoff-scheme       = Verlet        ; Use Verlet lists for neighbor searching
 ns_type             = grid          ; Grid-based neighbor searching

@@ -8,7 +8,7 @@ nstxout                 = 1000           ; Save coordinates every 2 ps
 nstvout                 = 1000           ; Save velocities every 2 ps
 nstenergy               = 100            ; Save energies every 0.2 ps
 nstlog                  = 1000           ; Save log every 2 ps
-
+nstfout       = 100
 ; Neighbor Searching
 cutoff-scheme           = Verlet         ; Verlet neighbor searching
 nstlist                 = 10             ; Update neighbor list every 20 fs
