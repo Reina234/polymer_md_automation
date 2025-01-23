@@ -1,0 +1,11 @@
+[ moleculetype ]
+POLY 3
+
+[atoms]
+; nr type resnr residue atom cgnr charge mass
+1 B2 1 RES B2N1 1 0.000000 105.152002
+2 B2 1 RES B2N3 2 0.000000 105.152002
+
+
+[ bonds ]
+1 2   1  ; 1:bond:1

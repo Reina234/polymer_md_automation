@@ -1,0 +1,7 @@
+[ moleculetype ]
+TMZK 3
+
+[atoms]
+; nr type resnr residue atom cgnr charge mass
+1 CG 1 RES CG 1 0.000000 75.170001
+

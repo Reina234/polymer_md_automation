@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<cg_molecule>
+  <name>TMZK</name>
+  <ident>TMZK</ident>
+  <topology>
+    <cg_beads>
+      <cg_bead>
+        <name>CG</name>
+        <type>CG</type>
+        <mapping>S</mapping>
+        <beads>
+          1:TMZK:H 1:TMZK:C 1:TMZK:H1 1:TMZK:H2 1:TMZK:C1 1:TMZK:H3 1:TMZK:H4 1:TMZK:H2 1:TMZK:H5 1:TMZK:H6 1:TMZK:C3 1:TMZK:H7 1:TMZK:H8 1:TMZK:C4 1:TMZK:H9 1:TMZK:H10 1:TMZK:C5 1:TMZK:H11 1:TMZK:H12 1:TMZK:H13
+        </beads>
+      </cg_bead>
+    </cg_beads>
+  </topology>
+  <maps>
+    <map>
+      <name>S</name>
+      <weights>1 12 1 1 12 1 1 12 1 1 12 1 1 12 1 1 12 1 1 1</weights>
+    </map>
+  </maps>
+</cg_molecule>

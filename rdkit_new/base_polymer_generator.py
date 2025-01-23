@@ -67,8 +67,11 @@ class BasePolymerGenerator(ABC):
         Adds a bond to the VOTCA bond list.
         Ensures that the new bead bonds with the last added bead.
         """
-        if len(self.votca_map) > 1:
-            prev_bead = self.votca_map[-2]["unique_name"]  # Last added bead
+        if len(self.votca_map) < 1:
+            return  # No previous bead to bond with
+
+        prev_bead = self.votca_map[-1]["unique_name"]  # Last added bead before this one
+        if (prev_bead, new_bead) not in self.votca_bonds:
             self.votca_bonds.append((prev_bead, new_bead))
 
     def _add_angle_to_votca(self, new_bead: str):
@@ -105,32 +108,36 @@ class BasePolymerGenerator(ABC):
         self, atom_indices: List[int], bead_type: str, unique_name: str
     ):
         """
-        Stores mapping data for VOTCA with mass-weighted weights.
+        Stores mapping data for VOTCA, including atom indices and predicted atom names.
 
         :param atom_indices: List of atom indices in a monomer.
         :param bead_type: The bead type identifier.
-        :param unique_name: Unique name assigned to this bead.
+        :param unique_name: Unique bead name assigned to this monomer residue.
         """
-        if not atom_indices:
+        if not atom_indices or not self.mol:
             return
+
         periodic_table = Chem.GetPeriodicTable()
 
-        # Get atomic masses
+        # Compute atom names & masses
+        atom_names = []
         atomic_masses = []
         for idx in atom_indices:
-            atom_symbol = self.mol.GetAtomWithIdx(idx).GetSymbol()
-            atomic_masses.append(periodic_table.GetAtomicWeight(atom_symbol))
+            atom = self.mol.GetAtomWithIdx(idx)
+            atom_names.append(atom.GetSymbol() + str(idx))  # Predict atom name
+            atomic_masses.append(periodic_table.GetAtomicWeight(atom.GetSymbol()))
 
         # Compute mass fractions (normalized)
-        total_mass = sum(atomic_masses)
-        mass_weights = [round(100 * mass / total_mass) for mass in atomic_masses]
+
+        mass_weights = [round(mass) for mass in atomic_masses]
 
         # Store mapping
         self.votca_map.append(
             {
                 "unique_name": unique_name,
                 "bead_type": bead_type,
-                "atom_indices": atom_indices,  # Full list of atoms per bead
+                "atom_indices": atom_indices,  # Atom indices
+                "atom_names": atom_names,  # Predicted atom names
                 "x-weight": mass_weights,  # Mass-weighted position
                 "f-weight": mass_weights,  # Mass-weighted force distribution
             }
@@ -231,7 +238,7 @@ class BasePolymerGenerator(ABC):
 
         self.mol = polymer
         new_bead = unique_name
-        self._add_bond_to_votca(new_bead)  # Add bond to previous bead
+        self._add_bond_to_votca(new_bead)
         self._add_angle_to_votca(new_bead)  # Add angle to previous beads
 
         self._add_to_mapping(new_indices, bead_type, unique_name)

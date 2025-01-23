@@ -95,7 +95,7 @@ def run_solvent_workflow(
         temp_dir,
         output_dir,
         log_dir,
-        files_to_keep=["gro"],
+        files_to_keep=["gro", "tpr"],
         varying_params_list=varying_params_list,
         save_intermediate_edr=save_intermediate_edr,
         save_intermediate_gro=save_intermediate_gro,

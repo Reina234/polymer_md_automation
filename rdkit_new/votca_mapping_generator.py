@@ -3,6 +3,9 @@ from typing import List, Dict
 import xml.etree.ElementTree as ET
 from typing import List, Tuple, Dict, Optional
 import xml.dom.minidom
+import pandas as pd
+from modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
+from modules.atomistic.gromacs.parser.handlers.data_handler import DataHandler
 
 
 class VOTCAMappingGenerator:
@@ -14,72 +17,71 @@ class VOTCAMappingGenerator:
         self,
         molecule_name: str,
         bead_mappings: List[Dict[str, any]],
-        bonds: Optional[List[Tuple[str, str]]] = None,
-        angles: Optional[List[Tuple[str, str, str]]] = None,
+        bonds: Optional[List[Tuple[str, str]]],
+        angles: Optional[List[Tuple[str, str, str]]],
+        itp_file_path: Optional[str],
         verify_itp: bool = False,
-        itp_data: Optional[List[str]] = None,
     ):
         """
-        Initializes the VOTCA XML generator with mapping and bonded interaction data.
+        Initializes the VOTCA XML generator.
 
-        :param molecule_name: Name of the molecule in CG representation.
-        :param bead_mappings: List of dicts, each containing:
+        :param molecule_name: Name of the CG molecule.
+        :param bead_mappings: List of dicts containing:
                               - "unique_name": Bead identifier.
                               - "bead_type": Bead type.
-                              - "atom_indices": List of atom indices in this bead.
-        :param bonds: Optional list of bead-pair tuples defining bonded interactions.
-        :param angles: Optional list of bead-triples defining angle interactions.
-        :param verify_itp: If True, validate bond consistency against an .itp file.
-        :param itp_data: Optional .itp file data as a list of strings.
+                              - "atom_indices": List of atom indices.
+                              - "atom_names": Predicted atom names.
+        :param bonds: Optional list of bead-pair tuples defining bonds.
+        :param angles: Optional list of bead-triples defining angles.
+        :param verify_itp: If True, validates against an .itp file.
+        :param itp_file_path: Path to the .itp file.
         """
         self.molecule_name = molecule_name
         self.bead_mappings = bead_mappings
         self.bonds = bonds if bonds else []
         self.angles = angles if angles else []
+        self.itp_data = None
+        self.itp_data = self._parse_itp_data(itp_file_path)
 
-        if verify_itp and itp_data:
-            self._verify_bonds_against_itp(itp_data)
+        if verify_itp and itp_file_path:
+            self._verify_bonds_against_itp()
 
-    def _verify_bonds_against_itp(self, itp_data: List[str]):
+    def _parse_itp_data(self, itp_file_path: str) -> pd.DataFrame:
         """
-        Validates computed CG bead bonds against those found in an .itp file.
+        Parses the .itp file into a DataFrame.
+        Assumes `convert_to_itp(itp_file_path)` exists and provides a DataFrame
+        with expected headers: `["nr", "type", "resnr", "residue", "atom", ...]`
+
+        :param itp_file_path: Path to the .itp file.
+        :return: DataFrame containing residue and atom information.
         """
-        bonds_section = False
-        itp_bonds = []
+        parser = GromacsParser()
+        sections = parser.parse(itp_file_path)
+        atom_section = sections["data_atoms"]
+        data_handler = DataHandler()
+        data_handler.process(atom_section)
+        return data_handler.content
 
-        for line in itp_data:
-            if "[ bonds ]" in line:
-                bonds_section = True
-                continue
-            if bonds_section and line.strip() == "":
-                break  # End of section
-            if bonds_section:
-                parts = line.split()
-                if len(parts) >= 2:
-                    atom1, atom2 = int(parts[0]), int(parts[1])
-                    bead1 = next(
-                        (
-                            b["unique_name"]
-                            for b in self.bead_mappings
-                            if atom1 in b["atom_indices"]
-                        ),
-                        None,
-                    )
-                    bead2 = next(
-                        (
-                            b["unique_name"]
-                            for b in self.bead_mappings
-                            if atom2 in b["atom_indices"]
-                        ),
-                        None,
-                    )
-                    if bead1 and bead2:
-                        itp_bonds.append((bead1, bead2))
+    def _get_atom_metadata(self, atom_index: int) -> Tuple[int, str, str]:
+        """
+        Retrieves (RESID, RESNAME, ATOMNAME) for a given atom index.
 
-        # Compare with existing bonds
-        missing_bonds = [b for b in itp_bonds if b not in self.bonds]
-        if missing_bonds:
-            print(f"[WARNING] Missing bonds in VOTCA mapping: {missing_bonds}")
+        :param atom_index: Atom index.
+        :return: (RESID, RESNAME, ATOMNAME)
+        """
+
+        adjusted_index = atom_index + 1
+        self.itp_data["nr"] = self.itp_data["nr"].astype(int)
+        row = self.itp_data[self.itp_data["nr"] == adjusted_index]
+        if row.empty:
+            raise ValueError(
+                f"[ERROR] Atom index {adjusted_index} not found in .itp file!"
+            )
+
+        resname = row["res"].values[0]  # Residue name
+        atomname = row["atom"].values[0]  # Atom name
+
+        return 1, resname, atomname  # RESID is always 1ID is always 1
 
     def save_to_xml(self, filename: str):
         """
@@ -100,11 +102,16 @@ class VOTCAMappingGenerator:
             ET.SubElement(bead_elem, "mapping").text = (
                 f"M{self.bead_mappings.index(bead) + 1}"
             )
-            ET.SubElement(bead_elem, "beads").text = " ".join(
-                map(str, bead["atom_indices"])
-            )
 
-        # Add bonded interactions
+            # Corrected: Format bead definitions using RESID:RESNAME:ATOMNAME
+            bead_entries = []
+            for atom in bead["atom_indices"]:
+                resid, resname, atomname = self._get_atom_metadata(atom)
+                bead_entries.append(f"{resid}:{resname}:{atomname}")
+
+            ET.SubElement(bead_elem, "beads").text = " ".join(bead_entries)
+
+        # **Reintroduced Bonded Interactions**
         if self.bonds or self.angles:
             cg_bonded_elem = ET.SubElement(topology_elem, "cg_bonded")
 
@@ -122,14 +129,15 @@ class VOTCAMappingGenerator:
                     f"{b1} {b2} {b3}" for b1, b2, b3 in self.angles
                 )
 
-        # Add maps
+        # **Reintroduced Mapping Weights**
         maps_elem = ET.SubElement(root, "maps")
         for i, bead in enumerate(self.bead_mappings):
             map_elem = ET.SubElement(maps_elem, "map")
             ET.SubElement(map_elem, "name").text = f"M{i + 1}"
-            ET.SubElement(map_elem, "weights").text = " ".join(
-                ["1.0"] * len(bead["atom_indices"])
-            )
+
+            # Corrected: Ensure weights are extracted from mapping
+            weights = " ".join(map(str, bead["x-weight"]))
+            ET.SubElement(map_elem, "weights").text = weights
 
         xml_str = ET.tostring(root, encoding="utf-8").decode("utf-8")
         formatted_xml = self._prettify_xml(xml_str)

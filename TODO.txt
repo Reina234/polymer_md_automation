@@ -22,3 +22,13 @@
    pycgtool for CG mapping in post, and then full prod run
 
    will need to add in ions.itp into topol
+
+   1/22/2025
+   Need to make sure that the course graining mapping files properly outputs things like 1:TMZK:C1,
+   instead of just the indices
+
+   Also, make a strategy class that rdkit takes in, which does the add to mapping stuff
+
+
+csg_map --top temp/nvt_short.tpr --trj temp/nvt_short.trr --out CG-traj.xtc --cg "rdkit_test2.xml;solvent.xml"
+seems to have worked!!!

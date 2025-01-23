@@ -2,16 +2,16 @@
 ;	File 'mdout.mdp' was generated
 ;	By user: unknown (1000)
 ;	On host: LENOVO-PC
-;	At date: Wed Jan 22 18:07:33 2025
+;	At date: Thu Jan 23 11:36:42 2025
 ;
 ;	Created by:
-;	               :-) GROMACS - gmx grompp, 2024.4-conda_forge (-:
+;	                :-) GROMACS - gmx grompp, 2021.3-bioconda (-:
 ;	
 ;	Executable:   /home/reina/miniconda3/envs/lammps_packages/bin.AVX2_256/gmx
 ;	Data prefix:  /home/reina/miniconda3/envs/lammps_packages
 ;	Working dir:  /home/reina/polymerpinn
 ;	Command line:
-;	  gmx grompp -f cache/mdp_cache/b50997728c9e80ac4ce6c4a79bd5e85e.mdp -c temp/minim_2.gro -p temp/topol.top -o temp/nvt_short.tpr
+;	  gmx grompp -f cache/mdp_cache/4f7703302251abe609616968256196c0.mdp -c temp/minim_2.gro -p temp/TMZK_GMX.top -o temp/nvt_short.tpr
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
@@ -32,8 +32,6 @@ init-step                = 0
 simulation-part          = 1
 ; Multiple time-stepping
 mts                      = no
-; factor by which to increase the mass of the lightest atoms
-mass-repartition-factor  = 1
 ; mode for center of mass motion removal
 comm-mode                = Linear
 ; number of steps for center of mass motion removal
@@ -88,11 +86,9 @@ nstlist                  = 10
 ; Periodic boundary conditions: xyz, no, xy
 pbc                      = xyz
 periodic-molecules       = no
-; Allowed energy drift due to the Verlet buffer in kJ/mol/ps per atom,
+; Allowed energy error due to the Verlet buffer in kJ/mol/ps per atom,
 ; a value of -1 means: use rlist
 verlet-buffer-tolerance  = 0.005
-; Allowed error in the average pressure due to the Verlet buffer for LJ interactions
-verlet-buffer-pressure-tolerance = 0.5
 ; nblist cut-off        
 rlist                    = 1.0
 ; long-range cut-off for switched potentials
@@ -134,8 +130,6 @@ epsilon-surface          = 0
 implicit-solvent         = no
 
 ; OPTIONS FOR WEAK COUPLING ALGORITHMS
-ensemble-temperature-setting = auto
-ensemble-temperature     = -1
 ; Temperature coupling  
 tcoupl                   = V-rescale
 nsttcouple               = -1
@@ -151,7 +145,7 @@ pcoupl                   = no
 pcoupltype               = Isotropic
 nstpcouple               = -1
 ; Time constant (ps), compressibility (1/bar) and reference P (bar)
-tau-p                    = 5
+tau-p                    = 1
 compressibility          = 
 ref-p                    = 
 ; Scaling of reference coordinates, No, All or COM
@@ -175,7 +169,7 @@ annealing-temp           =
 ; GENERATE VELOCITIES FOR STARTUP RUN
 gen-vel                  = no
 gen-temp                 = 300
-gen-seed                 = -43059212
+gen-seed                 = -1
 
 ; OPTIONS FOR BONDS    
 constraints              = h-bonds
@@ -265,15 +259,11 @@ temperature-lambdas      =
 calc-lambda-neighbors    = 1
 init-lambda-weights      = 
 dhdl-print-energy        = no
-sc-function              = beutler
 sc-alpha                 = 0
 sc-power                 = 1
 sc-r-power               = 6
 sc-sigma                 = 0.3
 sc-coul                  = no
-sc-gapsys-scale-linpoint-lj = 0.85
-sc-gapsys-scale-linpoint-q = 0.3
-sc-gapsys-sigma-lj       = 0.3
 separate-dhdl-file       = yes
 dhdl-derivatives         = yes
 dh_hist_size             = 0
@@ -286,7 +276,6 @@ freezegrps               =
 freezedim                = 
 cos-acceleration         = 0
 deform                   = 
-deform-init-flow         = no
 
 ; simulated tempering variables
 simulated-tempering      = no
@@ -321,9 +310,3 @@ electric-field-z         = 0 0 0 0
 
 ; Density guided simulation
 density-guided-simulation-active = false
-
-; QM/MM with CP2K
-qmmm-cp2k-active         = false
-
-; Colvars bias
-colvars-active           = false
