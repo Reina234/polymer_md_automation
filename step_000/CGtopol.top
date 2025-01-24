@@ -1,0 +1,22 @@
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Mon Dec 30 00:06:49 2024
+
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+1               2               yes             0.5     0.8333333333
+
+; Include POLY_GMX.itp topology
+#include "CGpolymer.itp"
+#include "CGsolvent.itp"
+
+; Ligand position restraints
+#ifdef POSRES_LIG
+#include "posre_POLY.itp"
+#endif
+
+[ system ]
+ POLY
+
+[ molecules ]
+; Compound        nmols
+ POLY             1     
+ TMZK             577

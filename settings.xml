@@ -33,4 +33,13 @@
       <max>2</max>
       <step>0.05</step>
     </non-bonded>
+
+    <non-bonded>
+      <name>B1-CG</name> <!-- Polymer-solvent interaction -->
+      <type1>B1</type1>
+      <type2>CG</type2>
+      <min>0</min>
+      <max>2</max>
+      <step>0.05</step>
+    </non-bonded>
 </cg>

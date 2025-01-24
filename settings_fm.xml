@@ -52,4 +52,35 @@
       <out_step>0.002</out_step>
     </fmatch>
   </non-bonded>
+
+  <non-bonded>
+    <name>B1-CG</name> <!-- Polymer-solvent interaction -->
+    <type1>B1</type1>
+    <type2>CG</type2>
+    <fmatch>
+      <min>0.2</min>
+      <max>2.5</max>
+      <step>0.05</step>
+      <out_step>0.002</out_step>
+    </fmatch>
+  </non-bonded>
+  <non-bonded>
+    <name>B1-B1</name> <!-- Polymer-solvent interaction -->
+    <type1>B1</type1>
+    <type2>B1</type2>
+    <fmatch>
+      <min>1</min>
+      <max>2.5</max>
+      <step>0.05</step>
+      <out_step>0.002</out_step>
+    </fmatch>
+  </non-bonded>
+
+  <inverse>
+    <gromacs>
+      <table_bins>0.001</table_bins>
+      <pot_max>1000000</pot_max>
+      <table_end>2.5</table_end>
+    </gromacs>
+  </inverse>
 </cg>
