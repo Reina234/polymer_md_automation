@@ -1,0 +1,74 @@
+from rdkit_new.base_polymer_generator import BasePolymerGenerator
+from rdkit import Chem
+from typing import Optional, Dict, List
+from itertools import cycle
+
+
+class AlternatingPolymerGenerator(BasePolymerGenerator):
+    def __init__(self, monomer_smiles: List[str]):
+        super().__init__(monomer_smiles=monomer_smiles)
+        self.monomer_bead_map: Dict[str, str] = {}  # Map SMILES → Bead Type
+
+    def _generate_polymer_rdkit(self, num_units: int) -> Chem.Mol:
+        """
+        Generates a polymer using a flexible list of monomer types and bead assignments.
+
+        :param monomer_smiles: List of monomer SMILES.
+        :param num_units: Corresponding number of monomer units per type.
+        :return: Final polymer molecule.
+        """
+        monomer_iterators = []
+        for monomer in self.monomer_smiles_list:
+            monomer_result = self._create_monomer_residue(
+                monomer
+            )  # Get tuple (residue_mol, open_sites, bead_type)
+            monomer_iterators.append(monomer_result)  # Create a cycling iterator
+
+        monomer_iterator = cycle(monomer_iterators)
+
+        first_residue, first_open_sites, first_bead_type = next(monomer_iterator)
+
+        polymer, _, idx = self._create_cap_residues(
+            first_residue,
+            open_sites=first_open_sites,
+            use_open_site=0,
+            add_to_map=True,
+            add_to_sequence=True,
+        )
+        # print(self.debug_print_mol(polymer))
+        for i in range(num_units - 2):
+            residue_mol, open_sites, bead_type = next(monomer_iterator)
+
+            polymer, idx = self._add_monomer_to_polymer(
+                polymer,
+                monomer=residue_mol,
+                prev_end_idx=idx,
+                bead_type=bead_type,
+                open_sites=open_sites,
+                add_to_sequence=True,
+            )
+
+        # Add end monomer
+        residue_mol, open_sites, bead_type = next(monomer_iterator)
+        end_monomer, bead_type, _ = self._create_cap_residues(
+            monomer=residue_mol,
+            open_sites=open_sites,
+            use_open_site=1,
+            add_to_map=False,
+            add_to_sequence=False,
+        )
+        polymer, _ = self._add_monomer_to_polymer(
+            polymer,
+            monomer=end_monomer,
+            prev_end_idx=idx,
+            bead_type=bead_type,
+            open_sites=open_sites,
+            add_to_sequence=True,
+        )
+
+        Chem.SanitizeMol(polymer)
+        return polymer
+
+    def _generate_filename(self, num_units: int) -> str:
+        file_name = "_".join(self.monomer_smiles_list).lower()
+        return f"{file_name}_{num_units}"

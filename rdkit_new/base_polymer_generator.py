@@ -9,10 +9,12 @@ from modules.shared.utils.file_utils import (
     directory_exists_check_wrapper,
 )
 import os
+from itertools import cycle
 
 
 class BasePolymerGenerator(ABC):
-    def __init__(self):
+
+    def __init__(self, monomer_smiles: List[str]):
         self.capping_atom = "[H]"  # Hydrogen cap (this will always be [H])
         self.pycg_map = []  # Mapping information as a list of dictionaries
         self.votca_map = []  # Mapping information for VOTCA
@@ -20,7 +22,14 @@ class BasePolymerGenerator(ABC):
         self.votca_angles = []  # List of angle triplets for VOTCA
         self.monomer_bead_map: Dict[str, str] = {}  # Mapping SMILES to bead types
         self.bead_type_counts: Dict[str, int] = {}  # Tracking counts per bead type
-        self.mol: Optional[Chem.mol] = None
+        self.mol: Optional[Chem.Mol] = None
+        self.monomer_smiles_list: List[str] = monomer_smiles
+        self.sequence: List[str] = []
+        self.pdb_path: Optional[str] = None
+
+    def _add_to_sequence(self, mol: Chem.Mol) -> None:
+        mol_smiles = Chem.MolToSmiles(mol)
+        self.sequence.append(mol_smiles)
 
     def _generate_bead_type(self, monomer_smiles: Optional[str] = None) -> str:
         """
@@ -49,7 +58,7 @@ class BasePolymerGenerator(ABC):
         return f"{bead_type}N{self.bead_type_counts[bead_type]}"
 
     def _add_to_mapping(
-        self, atom_indices: List[int], bead_type: str, unique_name: str
+        self, atom_indices: List[int], bead_type: str, unique_name: str, mol: Chem.Mol
     ):
         """
         Adds atom indices to both self.cg_map (for PyCGTOOL) and self.votca_map (for VOTCA).
@@ -60,7 +69,7 @@ class BasePolymerGenerator(ABC):
         :param unique_name: The unique bead name for this monomer residue.
         """
         self._add_to_pycg_map(atom_indices, bead_type, unique_name)
-        self._add_to_votca_map(atom_indices, bead_type, unique_name)
+        self._add_to_votca_map(atom_indices, bead_type, unique_name, mol)
 
     def _add_bond_to_votca(self, new_bead: str):
         """
@@ -105,7 +114,7 @@ class BasePolymerGenerator(ABC):
             )
 
     def _add_to_votca_map(
-        self, atom_indices: List[int], bead_type: str, unique_name: str
+        self, atom_indices: List[int], bead_type: str, unique_name: str, mol: Chem.Mol
     ):
         """
         Stores mapping data for VOTCA, including atom indices and predicted atom names.
@@ -114,6 +123,7 @@ class BasePolymerGenerator(ABC):
         :param bead_type: The bead type identifier.
         :param unique_name: Unique bead name assigned to this monomer residue.
         """
+        mol_smiles = Chem.MolToSmiles(mol)
         if not atom_indices or not self.mol:
             return
 
@@ -140,6 +150,7 @@ class BasePolymerGenerator(ABC):
                 "atom_names": atom_names,  # Predicted atom names
                 "x-weight": mass_weights,  # Mass-weighted position
                 "f-weight": mass_weights,  # Mass-weighted force distribution
+                "smiles": mol_smiles,
             }
         )
 
@@ -193,6 +204,7 @@ class BasePolymerGenerator(ABC):
         prev_end_idx: int,
         open_sites: Tuple[int, int],
         bead_type: str,
+        add_to_sequence: bool = True,
     ) -> Tuple[Chem.RWMol, int]:
         """
         Adds a monomer to the polymer at the specified open site.
@@ -208,7 +220,8 @@ class BasePolymerGenerator(ABC):
 
         # Create a new copy of the monomer to add to the polymer
         new_monomer = Chem.RWMol(monomer)
-
+        if add_to_sequence:
+            self._add_to_sequence(monomer)
         # Generate a unique name for this monomer residue
         unique_name = self._generate_unique_bead_name(bead_type)
 
@@ -241,7 +254,7 @@ class BasePolymerGenerator(ABC):
         self._add_bond_to_votca(new_bead)
         self._add_angle_to_votca(new_bead)  # Add angle to previous beads
 
-        self._add_to_mapping(new_indices, bead_type, unique_name)
+        self._add_to_mapping(new_indices, bead_type, unique_name, monomer)
 
         # Return the updated polymer and **new open site index**
         return polymer, monomer_site_2
@@ -252,6 +265,7 @@ class BasePolymerGenerator(ABC):
         open_sites: Tuple[int, int],
         use_open_site: int = 0,
         add_to_map: bool = True,
+        add_to_sequence: bool = False,
     ) -> Tuple[Chem.Mol, str, int]:
         """
         Caps the first monomer by adding a hydrogen (or specified capping atom) to the selected open site.
@@ -269,8 +283,6 @@ class BasePolymerGenerator(ABC):
         rw_monomer = Chem.RWMol(monomer)
 
         # Generate a bead type and unique name for this capped residue
-        bead_type = self._generate_bead_type()
-        unique_name = self._generate_unique_bead_name(bead_type)
 
         # Determine which open site to cap and which remains open
         cap_target_idx = open_sites[use_open_site]  # The site to be capped
@@ -286,8 +298,9 @@ class BasePolymerGenerator(ABC):
         # **Ensure all atoms in this monomer are mapped to a unique bead**
         all_atom_indices = [atom.GetIdx() for atom in rw_monomer.GetAtoms()]
         self.mol = rw_monomer
-        if add_to_map:
-            self._add_to_mapping(all_atom_indices, bead_type, unique_name)
+        cap_smiles = Chem.MolToSmiles(rw_monomer)
+        bead_type = self._generate_bead_type(cap_smiles)
+        unique_name = self._generate_unique_bead_name(bead_type)
 
         # Perform controlled sanitization, avoiding unintended changes
         Chem.SanitizeMol(
@@ -295,7 +308,11 @@ class BasePolymerGenerator(ABC):
             sanitizeOps=Chem.SanitizeFlags.SANITIZE_ALL
             ^ Chem.SanitizeFlags.SANITIZE_ADJUSTHS,
         )
+        if add_to_map:
+            self._add_to_mapping(all_atom_indices, bead_type, unique_name, rw_monomer)
 
+        if add_to_sequence:
+            self._add_to_sequence(rw_monomer)
         return rw_monomer, bead_type, unused_open_site  # The remaining open site
 
     def _finalise_molecule(self, mol: Chem.Mol, uff_optimise: bool = True) -> Chem.Mol:
@@ -316,12 +333,34 @@ class BasePolymerGenerator(ABC):
         pass
 
     @abstractmethod
-    def _generate_polymer_rdkit(self, **kwargs) -> Chem.Mol:
+    def _generate_polymer_rdkit(self, num_units: int) -> Chem.Mol:
         pass
 
-    @abstractmethod
-    def generate_polymer(self, **kwargs) -> str:
-        pass
+    def generate_polymer(
+        self,
+        num_units: int,
+        output_dir: str,
+        output_name: Optional[str] = None,
+        uff_optimise: bool = True,
+        overwrite: bool = True,
+        save: bool = True,
+    ) -> str:
+        polymer = self._generate_polymer_rdkit(num_units)
+        polymer = self._finalise_molecule(polymer, uff_optimise=uff_optimise)
+        if save:
+            if output_name is None:
+                output_name = self._generate_filename(num_units)
+            else:
+                output_name = f"{output_name}.pdb"
+            output_path = self._save_as_pdb(
+                polymer,
+                output_dir,
+                output_name=output_name,
+                overwrite=overwrite,
+            )
+            return output_path
+        else:
+            return polymer
 
     @directory_exists_check_wrapper(dir_arg_index=2)
     def _save_as_pdb(
@@ -344,6 +383,8 @@ class BasePolymerGenerator(ABC):
         )
         with open(output_path, "w") as f:
             f.write(Chem.MolToPDBBlock(polymer))
+
+        self.pdb_path = output_path
         return output_path
 
     @staticmethod

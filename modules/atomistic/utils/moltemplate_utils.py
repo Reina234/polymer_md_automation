@@ -53,3 +53,119 @@ def add_polymer_to_solvent(
         W.write(combined)
 
     return output_path
+
+
+import MDAnalysis as mda
+import numpy as np
+from MDAnalysis.analysis.distances import distance_array
+from typing import Optional
+
+import MDAnalysis as mda
+import numpy as np
+from MDAnalysis.analysis.distances import distance_array
+from typing import Optional
+
+
+def add_two_parallel_polymers_to_solvent(
+    polymer_file: str,
+    solvent_file: str,
+    output_dir: Optional[str] = None,
+    output_name: Optional[str] = None,
+    cutoff=0.2,
+    min_distance=1.5,  # Minimum distance between the two polymers (nm)
+    align_axis="x",  # Axis to align the polymers along
+) -> str:
+    """
+    Add two parallel polymer chains to a pre-equilibrated solvent box, ensuring no overlap.
+
+    :param polymer_file: Path to the polymer GRO file.
+    :param solvent_file: Path to the solvent GRO file.
+    :param output_dir: Directory to save the combined system.
+    :param output_name: Name of the output file.
+    :param cutoff: Distance cutoff (in nm) for removing overlapping solvent molecules.
+    :param min_distance: Minimum separation distance between the two polymer chains.
+    :param align_axis: Axis along which the polymers should be aligned ("x" or "z").
+    :return: Path to the output `.gro` file.
+    """
+    output_path = prepare_output_file_path(polymer_file, "gro", output_dir, output_name)
+    u_polymer1 = mda.Universe(polymer_file)
+    u_polymer2 = mda.Universe(polymer_file)  # Duplicate polymer
+    u_solvent = mda.Universe(solvent_file)
+
+    # Get box dimensions
+    box_length = u_solvent.dimensions[:3]
+    solvent_center = box_length / 2
+
+    # Center first polymer
+    polymer1_center = u_polymer1.atoms.center_of_mass()
+    u_polymer1.atoms.translate(solvent_center - polymer1_center)
+
+    # Determine the alignment axis index
+    axis_index = {"x": 0, "y": 1, "z": 2}[align_axis]
+    offset_axis = (
+        axis_index + 1
+    ) % 3  # Offset along the next axis (e.g., if x, then y)
+
+    # Get polymer bounding box size (correctly compute width)
+    polymer_positions = u_polymer1.atoms.positions
+    polymer_width_min = np.min(polymer_positions[:, offset_axis])
+    polymer_width_max = np.max(polymer_positions[:, offset_axis])
+    polymer_width = polymer_width_max - polymer_width_min  # Correct width computation
+
+    # Place second polymer parallel to the first one
+    polymer2_center = u_polymer2.atoms.center_of_mass()
+    u_polymer2.atoms.translate(solvent_center - polymer2_center)
+
+    # Apply a shift to the second polymer to ensure no overlap
+    shift_vector = np.zeros(3)
+    shift_vector[offset_axis] = polymer_width + min_distance  # Ensure proper spacing
+    u_polymer2.atoms.translate(shift_vector)
+
+    # **Fix duplicate residue indices**
+    max_resid = (
+        u_polymer1.residues.resids.max()
+    )  # Get the highest residue ID from polymer1
+    u_polymer2.residues.resids += max_resid + 1  # Increment all residues in polymer2
+
+    # Ensure no overlap between polymers
+    polymer_distance = np.min(
+        distance_array(
+            u_polymer1.atoms.positions,
+            u_polymer2.atoms.positions,
+            box=u_solvent.dimensions,
+        )
+    )
+
+    if polymer_distance < cutoff:
+        print(f"⚠️ Polymers are too close! Adjusting placement...")
+        shift_vector[offset_axis] += min_distance  # Move further apart
+        u_polymer2.atoms.translate(shift_vector)
+
+    # Identify overlapping solvent molecules
+    all_polymer_atoms = np.concatenate(
+        [u_polymer1.atoms.positions, u_polymer2.atoms.positions]
+    )
+    solvent_distances = distance_array(
+        all_polymer_atoms, u_solvent.atoms.positions, box=u_solvent.dimensions
+    )
+    overlapping_atoms = solvent_distances.min(axis=0) < cutoff
+    overlapping_residues = u_solvent.atoms[overlapping_atoms].residues.resids
+
+    if overlapping_residues is None or len(overlapping_residues) == 0:
+        print("⚠️ No overlapping residues detected, keeping all solvent molecules.")
+        non_overlapping_solvent = u_solvent.atoms  # Keep all solvent molecules
+    else:
+        # Select non-overlapping solvent molecules
+        non_overlapping_solvent = u_solvent.select_atoms(
+            f"not resid {' '.join(map(str, overlapping_residues))}"
+        )
+
+    # Combine both polymers and the non-overlapping solvent
+    combined = mda.Merge(u_polymer1.atoms, u_polymer2.atoms, non_overlapping_solvent)
+    combined.dimensions = u_solvent.dimensions  # Retain original box dimensions
+
+    # Save the combined system
+    with mda.Writer(output_path, n_atoms=combined.atoms.n_atoms) as W:
+        W.write(combined)
+
+    return output_path

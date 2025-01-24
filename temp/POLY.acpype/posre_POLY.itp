@@ -1,0 +1,10 @@
+; posre_POLY.itp created by acpype (v: 2023.10.27) on Fri Jan 24 12:42:02 2025
+
+[ position_restraints ]
+; atom  type      fx      fy      fz
+     1     1  1000  1000  1000
+     2     1  1000  1000  1000
+     8     1  1000  1000  1000
+     9     1  1000  1000  1000
+    14     1  1000  1000  1000
+    15     1  1000  1000  1000

@@ -13,4 +13,7 @@ acpype_generated_data = {
     ],  # itp
     "atoms": ["nr", "type", "resi", "res", "atom", "cgnr", "charge", "mass"],  # itp
     "bonds": ["ai", "aj", "funct", "r", "k"],  # itp
+    "pairs": ["ai", "aj", "funct"],
+    "angles": ["ai", "aj", "ak", "funct", "theta", "cth"],
+    "dihedrals": ["i", "j", "k", "l", "funct", "phase", "kd", "pn"],
 }

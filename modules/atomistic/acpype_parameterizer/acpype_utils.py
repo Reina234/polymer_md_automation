@@ -64,7 +64,10 @@ def generate_acpype_paths(
 
 
 def copy_acpype_files(
-    acpype_paths: GromacsPaths, dest_dir: str, delete_original: bool = False
+    acpype_paths: GromacsPaths,
+    dest_dir: str,
+    delete_original: bool = False,
+    skip_if_exists: bool = False,
 ) -> GromacsPaths:
     """
     Copies files in an GromacsPaths instance to a destination directory.
@@ -80,13 +83,19 @@ def copy_acpype_files(
     """
 
     copied_files = [
-        copy_file(path, dest_dir, delete_original) if path else None
+        (
+            copy_file(path, dest_dir, delete_original, skip_if_exists=skip_if_exists)
+            if path
+            else None
+        )
         for path in acpype_paths.to_list()
     ]
     return GromacsPaths(*copied_files)
 
 
-def rename_acpype_paths(acpype_paths: GromacsPaths, new_base_name: str) -> GromacsPaths:
+def rename_acpype_paths(
+    acpype_paths: GromacsPaths, new_base_name: str, suppress_warning: bool = False
+) -> GromacsPaths:
     """
     Renames files in an GromacsPaths instance with a new base name.
 
@@ -98,7 +107,11 @@ def rename_acpype_paths(acpype_paths: GromacsPaths, new_base_name: str) -> Groma
     :rtype: GromacsPaths
     """
     renamed_files = [
-        rename_file(path, new_base_name) if path else None
+        (
+            rename_file(path, new_base_name, suppress_warning=suppress_warning)
+            if path
+            else None
+        )
         for path in acpype_paths.to_list()
     ]
     return GromacsPaths(*renamed_files)

@@ -74,6 +74,7 @@ class ACPYPEParameterizer(CommandLineOperation):
         new_file_name: Optional[str] = None,
         additional_notes: Optional[str] = None,
         verbose: bool = False,
+        skip_existing: bool = False,
     ) -> GromacsPaths:
         input_file_path = os.path.abspath(input_file_path)
         command = self.acpype_command(input_file_path=input_file_path)
@@ -83,10 +84,12 @@ class ACPYPEParameterizer(CommandLineOperation):
         raw_acpype_paths = generate_acpype_paths(
             acpype_output_config, self.raw_output_dir, self.molecule_name
         )
-        copied_acpype_paths = copy_acpype_files(raw_acpype_paths, output_dir)
+        copied_acpype_paths = copy_acpype_files(
+            raw_acpype_paths, output_dir, skip_if_exists=skip_existing
+        )
         if new_file_name:
             renamed_acpype_paths = rename_acpype_paths(
-                copied_acpype_paths, new_file_name
+                copied_acpype_paths, new_file_name, suppress_warning=skip_existing
             )
 
             final_acpype_paths = renamed_acpype_paths

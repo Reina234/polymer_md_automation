@@ -2,7 +2,7 @@
 ;	File 'mdout.mdp' was generated
 ;	By user: unknown (1000)
 ;	On host: LENOVO-PC
-;	At date: Thu Jan 23 18:08:00 2025
+;	At date: Fri Jan 24 08:42:36 2025
 ;
 ;	Created by:
 ;	                :-) GROMACS - gmx grompp, 2021.3-bioconda (-:
@@ -11,7 +11,7 @@
 ;	Data prefix:  /home/reina/miniconda3/envs/lammps_packages
 ;	Working dir:  /home/reina/polymerpinn
 ;	Command line:
-;	  gmx grompp -f cache/mdp_cache/b50997728c9e80ac4ce6c4a79bd5e85e.mdp -c temp/minim_2.gro -p temp/topol.top -o temp/nvt_short.tpr
+;	  gmx grompp -f cache/mdp_cache/cede7a5f58c1a99d0ffafe57d71b1116.mdp -c temp/npt_2.gro -p temp/topol.top -o temp/production.tpr
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.
@@ -37,7 +37,7 @@ comm-mode                = Linear
 ; number of steps for center of mass motion removal
 nstcomm                  = 100
 ; group(s) for center of mass motion removal
-comm-grps                = 
+comm-grps                = System
 
 ; LANGEVIN DYNAMICS OPTIONS
 ; Friction coefficient (amu/ps) and random seed
@@ -69,7 +69,7 @@ nstlog                   = 1000
 nstcalcenergy            = 100
 nstenergy                = 1000
 ; Output frequency and precision for .xtc file
-nstxout-compressed       = 0
+nstxout-compressed       = 1000
 compressed-x-precision   = 1000
 ; This selects the subset of atoms for the compressed
 ; trajectory file. You can select multiple groups. By
@@ -103,7 +103,7 @@ rcoulomb                 = 1.0
 epsilon-r                = 1
 epsilon-rf               = 0
 ; Method for doing Van der Waals
-vdwtype                  = cutoff
+vdw-type                 = Cut-off
 vdw-modifier             = Potential-shift-Verlet
 ; cut-off lengths       
 rvdw-switch              = 0
@@ -141,13 +141,13 @@ tc-grps                  = System
 tau_t                    = 0.1
 ref_t                    = 300
 ; pressure coupling     
-pcoupl                   = no
-pcoupltype               = Isotropic
+pcoupl                   = Parrinello-Rahman
+pcoupltype               = isotropic
 nstpcouple               = -1
 ; Time constant (ps), compressibility (1/bar) and reference P (bar)
-tau-p                    = 1
-compressibility          = 
-ref-p                    = 
+tau_p                    = 2.0
+compressibility          = 4.5e-5
+ref_p                    = 1.0
 ; Scaling of reference coordinates, No, All or COM
 refcoord-scaling         = No
 
@@ -176,7 +176,7 @@ constraints              = h-bonds
 ; Type of constraint algorithm
 constraint_algorithm     = LINCS
 ; Do not constrain the start configuration
-continuation             = no
+continuation             = yes
 ; Use successive overrelaxation to reduce the number of shake iterations
 Shake-SOR                = no
 ; Relative tolerance of shake
