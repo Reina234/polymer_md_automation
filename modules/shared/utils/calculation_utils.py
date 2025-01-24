@@ -5,13 +5,15 @@ from config.constants import (
     MassUnits,
 )
 from functools import wraps
-from typing import List, Callable, TypeVar, ParamSpec, Optional
+from typing import List, Callable, TypeVar, Optional
+
+# from typing import List, Callable, TypeVar, ParamSpec, Optional
 import logging
 
 logger = logging.getLogger(__name__)
 
-P = ParamSpec("P")  # Represents the parameters of the wrapped function
-R = TypeVar("R")  # Represents the return type of the wrapped function
+# P = ParamSpec("P")  # Represents the parameters of the wrapped function
+# R = TypeVar("R")  # Represents the return type of the wrapped function
 
 
 def calculate_minimum_box_size(
@@ -139,9 +141,9 @@ def calculate_num_particles(
     return round(int(num_particles))
 
 
-def box_dimensions_check_wrapper(
-    box_arg_index: int, suppress_error: bool = True
-) -> Callable[[Callable[P, R]], Callable[P, Optional[R]]]:
+def box_dimensions_check_wrapper(box_arg_index: int, suppress_error: bool = True):
+    # Callable[[Callable[P, R]], Callable[P, Optional[R]]]
+    # NOTE
     """
     A wrapper to validate box dimensions passed to a function.
 
@@ -153,9 +155,11 @@ def box_dimensions_check_wrapper(
     :rtype: Callable[[Callable], Callable]
     """
 
-    def decorator(func: Callable[P, R]) -> Callable[P, Optional[R]]:
+    # def decorator(func: Callable[P, R]) -> Callable[P, Optional[R]]:
+    def decorator(func):
         @wraps(func)
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
+        # def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[R]:
+        def wrapper(*args, **kwargs):
             # Retrieve the box dimensions argument
             box_dimensions = (
                 args[box_arg_index]

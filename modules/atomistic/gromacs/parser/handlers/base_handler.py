@@ -7,7 +7,7 @@ import re
 
 class BaseHandler:
     construct_name: str
-    re_pattern: Optional[re.Pattern[str]]
+    re_pattern: Optional[re.Pattern]
     suppress: Optional[List[str]]
 
     def __init__(self, store_top_line: bool = False):

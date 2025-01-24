@@ -6,6 +6,12 @@ import xml.dom.minidom
 import pandas as pd
 from modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
 from modules.atomistic.gromacs.parser.handlers.data_handler import DataHandler
+from rdkit_new.base_polymer_generator import BasePolymerGenerator
+from modules.shared.utils.file_utils import check_directory_exists
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class VOTCAMappingGenerator:
@@ -15,11 +21,9 @@ class VOTCAMappingGenerator:
 
     def __init__(
         self,
-        molecule_name: str,
-        bead_mappings: List[Dict[str, any]],
-        bonds: Optional[List[Tuple[str, str]]],
-        angles: Optional[List[Tuple[str, str, str]]],
+        polymer: BasePolymerGenerator,
         itp_file_path: Optional[str],
+        molecule_name: Optional[str] = None,
         verify_itp: bool = False,
     ):
         """
@@ -36,15 +40,24 @@ class VOTCAMappingGenerator:
         :param verify_itp: If True, validates against an .itp file.
         :param itp_file_path: Path to the .itp file.
         """
-        self.molecule_name = molecule_name
-        self.bead_mappings = bead_mappings
-        self.bonds = bonds if bonds else []
-        self.angles = angles if angles else []
+        if not molecule_name:
+            self._molecule_name = polymer.res_name
+        self.bead_mappings = polymer.cg_map
+        self.bonds = polymer.cg_bonds if polymer.cg_bonds else []
+        self.angles = polymer.cg_angles if polymer.cg_angles else []
         self.itp_data = None
         self.itp_data = self._parse_itp_data(itp_file_path)
 
         if verify_itp and itp_file_path:
             self._verify_bonds_against_itp()
+
+    @property
+    def molecule_name(self) -> str:
+        return self._molecule_name
+
+    @molecule_name.setter
+    def molecule_name(self, name: str):
+        self._molecule_name = name
 
     def _parse_itp_data(self, itp_file_path: str) -> pd.DataFrame:
         """
@@ -83,10 +96,13 @@ class VOTCAMappingGenerator:
 
         return 1, resname, atomname  # RESID is always 1ID is always 1
 
-    def save_to_xml(self, filename: str):
+    def save_mapping(self, filename: str, output_dir: Optional[str] = None):
         """
         Saves the mapping data to a VOTCA-compatible XML file.
         """
+        check_directory_exists(output_dir, make_dirs=True)
+        if output_dir:
+            filename = f"{output_dir}/{filename}.xml"
         root = ET.Element("cg_molecule")
         ET.SubElement(root, "name").text = self.molecule_name
         ET.SubElement(root, "ident").text = self.molecule_name
@@ -144,8 +160,7 @@ class VOTCAMappingGenerator:
 
         with open(filename, "w") as f:
             f.write(formatted_xml)
-
-        print(f"[INFO] VOTCA XML mapping saved as {filename}")
+        logger.info(f"[INFO] VOTCA XML mapping saved as {filename}")
 
     def _prettify_xml(self, xml_str: str) -> str:
         """Formats XML with proper indentation."""

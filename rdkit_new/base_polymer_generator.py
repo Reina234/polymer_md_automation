@@ -14,18 +14,18 @@ from itertools import cycle
 
 class BasePolymerGenerator(ABC):
 
-    def __init__(self, monomer_smiles: List[str]):
+    def __init__(self, monomer_smiles: List[str], res_name: str = "POLY"):
         self.capping_atom = "[H]"  # Hydrogen cap (this will always be [H])
-        self.pycg_map = []  # Mapping information as a list of dictionaries
-        self.votca_map = []  # Mapping information for VOTCA
-        self.votca_bonds = []  # List of VOTCA bond tuples (prev_bead, new_bead)
-        self.votca_angles = []  # List of angle triplets for VOTCA
+        self.cg_map = []  # Mapping information for VOTCA
+        self.cg_bonds = []  # List of VOTCA bond tuples (prev_bead, new_bead)
+        self.cg_angles = []  # List of angle triplets for VOTCA
         self.monomer_bead_map: Dict[str, str] = {}  # Mapping SMILES to bead types
         self.bead_type_counts: Dict[str, int] = {}  # Tracking counts per bead type
         self.mol: Optional[Chem.Mol] = None
         self.monomer_smiles_list: List[str] = monomer_smiles
         self.sequence: List[str] = []
         self.pdb_path: Optional[str] = None
+        self.res_name = res_name
 
     def _add_to_sequence(self, mol: Chem.Mol) -> None:
         mol_smiles = Chem.MolToSmiles(mol)
@@ -57,69 +57,39 @@ class BasePolymerGenerator(ABC):
 
         return f"{bead_type}N{self.bead_type_counts[bead_type]}"
 
-    def _add_to_mapping(
-        self, atom_indices: List[int], bead_type: str, unique_name: str, mol: Chem.Mol
-    ):
-        """
-        Adds atom indices to both self.cg_map (for PyCGTOOL) and self.votca_map (for VOTCA).
-        Ensures that PyCGTOOL mapping is stored per atom, while VOTCA mapping is stored per bead.
-
-        :param atom_indices: List of atom indices belonging to a monomer.
-        :param bead_type: The bead type identifier.
-        :param unique_name: The unique bead name for this monomer residue.
-        """
-        self._add_to_pycg_map(atom_indices, bead_type, unique_name)
-        self._add_to_votca_map(atom_indices, bead_type, unique_name, mol)
-
-    def _add_bond_to_votca(self, new_bead: str):
+    def _add_cg_bond(self, new_bead: str):
         """
         Adds a bond to the VOTCA bond list.
         Ensures that the new bead bonds with the last added bead.
         """
-        if len(self.votca_map) < 1:
+        if len(self.cg_map) < 1:
             return  # No previous bead to bond with
 
-        prev_bead = self.votca_map[-1]["unique_name"]  # Last added bead before this one
-        if (prev_bead, new_bead) not in self.votca_bonds:
-            self.votca_bonds.append((prev_bead, new_bead))
+        prev_bead = self.cg_map[-1]["unique_name"]  # Last added bead before this one
+        if (prev_bead, new_bead) not in self.cg_bonds:
+            self.cg_bonds.append((prev_bead, new_bead))
 
-    def _add_angle_to_votca(self, new_bead: str):
+    def _add_cg_angle(self, new_bead: str):
         """
         Adds an angle to the VOTCA angle list.
         Uses the last three beads added to define an angle.
         """
-        if len(self.votca_bonds) > 1:
-            bead1, bead2 = self.votca_bonds[-1]  # First bond
+        if len(self.cg_bonds) > 1:
+            bead1, bead2 = self.cg_bonds[-1]  # First bond
             bead3 = new_bead
-            self.votca_angles.append((bead1, bead2, bead3))
+            self.cg_angles.append((bead1, bead2, bead3))
 
-    def _add_to_pycg_map(
-        self, atom_indices: List[int], bead_type: str, unique_name: str
-    ):
-        """
-        Stores mapping data for PyCGTOOL in self.cg_map.
-        Each atom is recorded individually.
-
-        :param atom_indices: List of atom indices in a monomer.
-        :param bead_type: The bead type identifier.
-        :param unique_name: Unique name assigned to this bead.
-        """
-        for idx in atom_indices:
-            self.pycg_map.append(
-                {
-                    "atom_index": idx,  # Each atom has a separate row
-                    "bead_type": bead_type,
-                    "unique_name": unique_name,
-                }
-            )
-
-    def _add_to_votca_map(
+    def _add_to_cg_map(
         self, atom_indices: List[int], bead_type: str, unique_name: str, mol: Chem.Mol
     ):
         """
-        Stores mapping data for VOTCA, including atom indices and predicted atom names.
+        Stores mapping data for VOTCA and Martini, ensuring correct atom numbering per atom type.
 
-        :param atom_indices: List of atom indices in a monomer.
+        - Resets atom numbering **per element type** (C0, C1, H0, H1, ...).
+        - Uses validated names from `.itp` to ensure correct atom naming.
+        - Keeps numbering **continuous across the full polymer**.
+
+        :param atom_indices: List of atom indices in the current residue.
         :param bead_type: The bead type identifier.
         :param unique_name: Unique bead name assigned to this monomer residue.
         """
@@ -129,27 +99,46 @@ class BasePolymerGenerator(ABC):
 
         periodic_table = Chem.GetPeriodicTable()
 
-        # Compute atom names & masses
+        # Track atom numbering per atom type (C, H, O, etc.)
+        if not hasattr(self, "_global_atom_counters"):
+            self._global_atom_counters = (
+                {}
+            )  # Tracks numbering separately for each atom type
+
         atom_names = []
         atomic_masses = []
+
         for idx in atom_indices:
             atom = self.mol.GetAtomWithIdx(idx)
-            atom_names.append(atom.GetSymbol() + str(idx))  # Predict atom name
-            atomic_masses.append(periodic_table.GetAtomicWeight(atom.GetSymbol()))
+            atom_symbol = atom.GetSymbol()
+
+            # Ensure numbering **starts at 0 for each atom type** (C0, C1, H0, H1, etc.)
+            if atom_symbol not in self._global_atom_counters:
+                self._global_atom_counters[atom_symbol] = 0
+            else:
+                self._global_atom_counters[atom_symbol] += 1  # Increment per atom type
+
+            corrected_atom_name = (
+                f"{atom_symbol}{self._global_atom_counters[atom_symbol]}"
+            )
+            atom_names.append(corrected_atom_name)
+
+            # Store atomic masses
+            atomic_masses.append(periodic_table.GetAtomicWeight(atom_symbol))
 
         # Compute mass fractions (normalized)
-
         mass_weights = [round(mass) for mass in atomic_masses]
+        weights = [1 for mass in atomic_masses]
 
         # Store mapping
-        self.votca_map.append(
+        self.cg_map.append(
             {
                 "unique_name": unique_name,
                 "bead_type": bead_type,
-                "atom_indices": atom_indices,  # Atom indices
-                "atom_names": atom_names,  # Predicted atom names
-                "x-weight": mass_weights,  # Mass-weighted position
-                "f-weight": mass_weights,  # Mass-weighted force distribution
+                "atom_indices": atom_indices,
+                "atom_names": atom_names,  # FIXED: Correctly numbered per atom type
+                "x-weight": mass_weights,
+                "f-weight": weights,
                 "smiles": mol_smiles,
             }
         )
@@ -251,10 +240,10 @@ class BasePolymerGenerator(ABC):
 
         self.mol = polymer
         new_bead = unique_name
-        self._add_bond_to_votca(new_bead)
-        self._add_angle_to_votca(new_bead)  # Add angle to previous beads
+        self._add_cg_bond(new_bead)
+        self._add_cg_angle(new_bead)  # Add angle to previous beads
 
-        self._add_to_mapping(new_indices, bead_type, unique_name, monomer)
+        self._add_to_cg_map(new_indices, bead_type, unique_name, monomer)
 
         # Return the updated polymer and **new open site index**
         return polymer, monomer_site_2
@@ -309,7 +298,7 @@ class BasePolymerGenerator(ABC):
             ^ Chem.SanitizeFlags.SANITIZE_ADJUSTHS,
         )
         if add_to_map:
-            self._add_to_mapping(all_atom_indices, bead_type, unique_name, rw_monomer)
+            self._add_to_cg_map(all_atom_indices, bead_type, unique_name, rw_monomer)
 
         if add_to_sequence:
             self._add_to_sequence(rw_monomer)

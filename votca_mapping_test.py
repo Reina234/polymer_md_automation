@@ -10,17 +10,17 @@ from typing import Dict, List, Tuple
 
 generator = HomopolymerGenerator()
 generator.generate_polymer("C=Cc1ccccc1", 3, "rdkit_test2", overwrite=False, save=False)
-print(generator.votca_bonds)
-print(generator.votca_map)
-print(generator.votca_angles)
+print(generator.cg_bonds)
+print(generator.cg_map)
+print(generator.cg_angles)
 # print(generator.map)
 # print(generator.votca_map)
 # print(generator.pycg_map)
 mapper = VOTCAMappingGenerator(
     "POLY",
-    generator.votca_map,
-    generator.votca_bonds,
-    generator.votca_angles,
+    generator.cg_map,
+    generator.cg_bonds,
+    generator.cg_angles,
     itp_file_path="1_22_test/c=cc1ccccc1_3/POLY_GMX.itp",
 )
 mapper.save_to_xml("rdkit_test3.xml")

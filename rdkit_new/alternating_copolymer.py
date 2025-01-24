@@ -5,8 +5,8 @@ from itertools import cycle
 
 
 class AlternatingPolymerGenerator(BasePolymerGenerator):
-    def __init__(self, monomer_smiles: List[str]):
-        super().__init__(monomer_smiles=monomer_smiles)
+    def __init__(self, monomer_smiles: List[str], res_name: str = "POLY"):
+        super().__init__(monomer_smiles=monomer_smiles, res_name=res_name)
         self.monomer_bead_map: Dict[str, str] = {}  # Map SMILES → Bead Type
 
     def _generate_polymer_rdkit(self, num_units: int) -> Chem.Mol:

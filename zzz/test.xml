@@ -1,0 +1,52 @@
+<?xml version="1.0" ?>
+<cg_molecule>
+  <name>UNL</name>
+  <ident>UNL</ident>
+  <topology>
+    <cg_beads>
+      <cg_bead>
+        <name>B2N1</name>
+        <type>B2</type>
+        <mapping>M1</mapping>
+        <beads>1:UNL:C 1:UNL:C1 1:UNL:C2 1:UNL:C3 1:UNL:C4 1:UNL:C5 1:UNL:C6 1:UNL:C7 1:UNL:H 1:UNL:H1 1:UNL:H2 1:UNL:H3 1:UNL:H4 1:UNL:H5 1:UNL:H6 1:UNL:H7 1:UNL:H8</beads>
+      </cg_bead>
+      <cg_bead>
+        <name>B1N1</name>
+        <type>B1</type>
+        <mapping>M2</mapping>
+        <beads>1:UNL:C8 1:UNL:C9 1:UNL:H9 1:UNL:H10 1:UNL:H11 1:UNL:H12 1:UNL:C10 1:UNL:C11 1:UNL:C12 1:UNL:C13 1:UNL:C14 1:UNL:C15 1:UNL:C16 1:UNL:C17 1:UNL:H13 1:UNL:H14</beads>
+      </cg_bead>
+      <cg_bead>
+        <name>B3N2</name>
+        <type>B3</type>
+        <mapping>M3</mapping>
+        <beads>1:UNL:H15 1:UNL:H16 1:UNL:H17 1:UNL:H18 1:UNL:H19 1:UNL:H20 1:UNL:C18 1:UNL:C19 1:UNL:H21 1:UNL:H22 1:UNL:H23 1:UNL:H24 1:UNL:C20 1:UNL:C21 1:UNL:C22 1:UNL:C23 1:UNL:C24</beads>
+      </cg_bead>
+    </cg_beads>
+    <cg_bonded>
+      <bond>
+        <name>bond</name>
+        <beads>B2N1 B1N1
+B1N1 B3N2</beads>
+      </bond>
+      <angle>
+        <name>angle</name>
+        <beads>B1N1 B3N2 B3N2</beads>
+      </angle>
+    </cg_bonded>
+  </topology>
+  <maps>
+    <map>
+      <name>M1</name>
+      <weights>12 12 12 12 12 12 12 12 1 1 1 1 1 1 1 1 1</weights>
+    </map>
+    <map>
+      <name>M2</name>
+      <weights>12 12 12 12 12 12 12 12 1 1 1 1 1 1 1 1</weights>
+    </map>
+    <map>
+      <name>M3</name>
+      <weights>12 12 12 12 12 12 12 12 1 1 1 1 1 1 1 1 1</weights>
+    </map>
+  </maps>
+</cg_molecule>

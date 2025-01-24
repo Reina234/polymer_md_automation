@@ -11,7 +11,7 @@ from modules.shared.utils.file_utils import delete_directory, copy_file
 from data_models.output_types import GromacsPaths
 from modules.atomistic.utils.moltemplate_utils import (
     add_polymer_to_solvent,
-    add_two_parallel_polymers_to_solvent,
+    add_n_parallel_polymers_to_solvent,
 )
 import os
 
@@ -145,7 +145,7 @@ from modules.atomistic.workflows.solvated_neutralised_polymer.workflow_config im
 
 # NOTE: will need naming scheme
 # NOTE: will need helper function to extract temperatures, solvent gro, solvent itp, all from folder
-def run_two_polymer_solvation_workflow(
+def run_three_polymer_solvation_workflow(
     parameterised_polymer: GromacsPaths,
     solvent_equilibriated_gro: str,
     solvent_itp: str,
@@ -155,7 +155,7 @@ def run_two_polymer_solvation_workflow(
     compressibility: float,
     polymer_name: str = "POLY",
     cutoff: float = 0.2,
-    min_polymer_distance: float = 1.5,
+    min_polymer_distance: float = 1.2,
     temp_dir=TEMP_DIR,
     log_dir=LOG_DIR,
     verbose: bool = False,
@@ -166,9 +166,10 @@ def run_two_polymer_solvation_workflow(
     confirm_log_deletion: bool = True,
 ) -> str:
     final_output_dir = os.path.join(output_dir, subdir)
-    polymer_in_solvent = add_two_parallel_polymers_to_solvent(
+    polymer_in_solvent = add_n_parallel_polymers_to_solvent(
         parameterised_polymer.gro_path,
         solvent_equilibriated_gro,
+        2,
         temp_dir,
         "polymer_in_solvent",
         cutoff=cutoff,

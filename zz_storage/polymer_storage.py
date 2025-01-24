@@ -7,7 +7,7 @@ from modules.atomistic.acpype_parameterizer.acpype_parametizer import (
     ACPYPEParameterizer,
 )
 from collections import defaultdict
-from itp_parser import ITPModifier
+from modules.atomistic.gromacs.parser.itp_parser import ITPParser
 from config.acpype_config import AcpypeOutputConfig
 import re
 from data_models.output_types import GromacsPaths
@@ -188,7 +188,7 @@ class PolymerStorage:
         # ✅ Ensure mapping between residue SMILES and their atom indices
         residue_atom_mapping = {
             entry["smiles"]: set(entry["atom_indices"])  # Use a set for fast lookup
-            for entry in polymer_generator.votca_map
+            for entry in polymer_generator.cg_map
         }
 
         # ✅ STEP 1: Assign ATOMS to the correct residue

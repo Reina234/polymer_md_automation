@@ -1,7 +1,9 @@
 import os
 import shutil
 import logging
-from typing import List, Callable, TypeVar, Any, ParamSpec
+from typing import List, Callable, TypeVar, Any
+
+# from typing import List, Callable, TypeVar, Any, ParamSpec
 from pathlib import Path
 from functools import wraps
 from typing import Optional
@@ -479,13 +481,12 @@ def delete_directory(directory_path: str, verbose: bool = False, confirm: bool =
 
 
 # Define type variables for the input parameters and return type of the wrapped function
-P = ParamSpec("P")  # Represents the parameters of the wrapped function
-R = TypeVar("R")  # Represents the return type of the wrapped function
+# P = ParamSpec("P")  # Represents the parameters of the wrapped function
+# R = TypeVar("R")  # Represents the return type of the wrapped function
 
 
-def directory_exists_check_wrapper(
-    dir_arg_index: int, make_dirs: bool = True
-) -> Callable[[Callable[P, R]], Callable[P, R]]:
+def directory_exists_check_wrapper(dir_arg_index: int, make_dirs: bool = True):
+    # -> Callable[[Callable[P, R]], Callable[P, R]]
     """
     A wrapper to ensure a directory exists, optionally creating it if missing.
 
@@ -497,9 +498,11 @@ def directory_exists_check_wrapper(
     :rtype: Callable[[Callable], Callable]
     """
 
-    def decorator(func: Callable[P, R]) -> Callable[P, R]:
+    # def decorator(func: Callable[P, R]) -> Callable[P, R]:
+    def decorator(func):
         @wraps(func)
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        def wrapper(*args, **kwargs):
+            # def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
             dir_path = (
                 args[dir_arg_index]
                 if len(args) > dir_arg_index
@@ -529,7 +532,8 @@ def directory_exists_check_wrapper(
 
 def file_does_not_exist_check_wrapper(
     file_arg_index: int, suppress_error: bool = False
-) -> Callable[[Callable[P, R]], Callable[P, R | None]]:
+):
+    # -> Callable[[Callable[P, R]], Callable[P, R | None]]
     """
     A wrapper to ensure a file does not exist before calling the wrapped function.
 
@@ -541,9 +545,11 @@ def file_does_not_exist_check_wrapper(
     :rtype: Callable[[Callable], Callable]
     """
 
-    def decorator(func: Callable[P, R]) -> Callable[P, R | None]:
+    # def decorator(func: Callable[P, R]) -> Callable[P, R | None]:
+    def decorator(func):
         @wraps(func)
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R | None:
+        # def wrapper(*args: P.args, **kwargs: P.kwargs) -> R | None:
+        def wrapper(*args, **kwargs):
             file_path = (
                 args[file_arg_index]
                 if len(args) > file_arg_index
@@ -569,9 +575,8 @@ def file_does_not_exist_check_wrapper(
     return decorator
 
 
-def file_exists_check_wrapper(
-    file_arg_index: int, suppress_error: bool = False
-) -> Callable[[Callable[P, R]], Callable[P, R | None]]:
+def file_exists_check_wrapper(file_arg_index: int, suppress_error: bool = False):
+    # -> Callable[[Callable[P, R]], Callable[P, R | None]]
     """
     A wrapper to check if a file exists before calling the wrapped function.
 
@@ -584,9 +589,11 @@ def file_exists_check_wrapper(
     :rtype: Callable[[Callable], Callable]
     """
 
-    def decorator(func: Callable[P, R]) -> Callable[P, R | None]:
+    # def decorator(func: Callable[P, R]) -> Callable[P, R | None]:
+    def decorator(func):
         @wraps(func)
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R | None:
+        # def wrapper(*args: P.args, **kwargs: P.kwargs) -> R | None:
+        def wrapper(*args, **kwargs):
             file_path = (
                 args[file_arg_index]
                 if len(args) > file_arg_index
@@ -612,9 +619,8 @@ def file_exists_check_wrapper(
     return decorator
 
 
-def file_type_check_wrapper(
-    file_arg_index: int, expected_file_type: str
-) -> Callable[[Callable[P, R]], Callable[P, R]]:
+def file_type_check_wrapper(file_arg_index: int, expected_file_type: str):
+    # -> Callable[[Callable[P, R]], Callable[P, R]]
     """
     A wrapper to validate the file type of a specific argument before calling the function.
 
@@ -626,9 +632,11 @@ def file_type_check_wrapper(
     :rtype: Callable[[Callable], Callable]
     """
 
-    def decorator(func: Callable[P, R]) -> Callable[P, R]:
+    # def decorator(func: Callable[P, R]) -> Callable[P, R]:
+    def decorator(func):
         @wraps(func)
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        # def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        def wrapper(*args, **kwargs):
             file_path = (
                 args[file_arg_index]
                 if len(args) > file_arg_index
