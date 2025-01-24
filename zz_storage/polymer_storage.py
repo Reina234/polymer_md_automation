@@ -159,10 +159,10 @@ class PolymerStorage:
     def _segment_itp_by_residue(
         self, polymer_generator: BasePolymerGenerator, itp_sections: Dict
     ) -> Dict:
-        """Segments `.itp` data based on residue SMILES from `self.sequence`, ensuring correct headers."""
+        """Segments `.itp` data based on residue SMILES, ensuring proper assignment of bonds, angles, and dihedrals."""
 
         segmented_itp = defaultdict(
-            lambda: {
+            lambda: {  # Stores `.itp` sections per residue
                 "atoms": [],
                 "bonds": [],
                 "angles": [],
@@ -172,7 +172,6 @@ class PolymerStorage:
             }
         )
 
-        # ✅ Define expected headers for each section
         section_headers = {
             "atoms": ["nr", "type", "resnr", "res", "atom", "cgnr", "charge", "mass"],
             "bonds": ["ai", "aj", "funct", "r", "k"],
@@ -182,121 +181,76 @@ class PolymerStorage:
             "constraints": ["ai", "aj", "funct"],
         }
 
-        # ✅ Get the ordered sequence of residue SMILES
-        residue_sequence = polymer_generator.sequence
+        residue_sequence = polymer_generator.sequence  # Get residue SMILES order
 
-        # ✅ Ensure mapping between residue SMILES and their atom indices
+        # **Residue Atom Mapping** (Used for Bond Assignments)
         residue_atom_mapping = {
-            entry["smiles"]: set(entry["atom_indices"])  # Use a set for fast lookup
+            entry["smiles"]: set(entry["atom_indices"])
             for entry in polymer_generator.cg_map
         }
 
-        # ✅ STEP 1: Assign ATOMS to the correct residue
+        ### **Step 1: Assign ATOMS to the Correct Residue**
         for section, content in itp_sections.items():
             for line in content:
                 if isinstance(line, str):
                     row_parts = line.split()
-
                     try:
-                        if section == "atoms":
-                            row = dict(zip(section_headers["atoms"], row_parts))
-                            row["nr"] = int(row["nr"])
-                            row["resnr"] = int(row["resnr"])
-                            row["cgnr"] = int(row["cgnr"])
-                            row["charge"] = float(row["charge"])
-                            row["mass"] = float(row["mass"])
-                        elif section == "bonds":
-                            row = dict(zip(section_headers["bonds"], row_parts))
-                            row["ai"], row["aj"], row["funct"] = map(
-                                int, [row["ai"], row["aj"], row["funct"]]
-                            )
-                            row["r"], row["k"] = map(float, [row["r"], row["k"]])
-                        elif section == "angles":
-                            row = dict(zip(section_headers["angles"], row_parts))
-                            row["ai"], row["aj"], row["ak"], row["funct"] = map(
-                                int, [row["ai"], row["aj"], row["ak"], row["funct"]]
-                            )
-                            row["theta"] = float(row["theta"])
-                        elif section == "dihedrals":
-                            row = dict(zip(section_headers["dihedrals"], row_parts))
-                            row["ai"], row["aj"], row["ak"], row["al"], row["funct"] = (
-                                map(
-                                    int,
-                                    [
-                                        row["ai"],
-                                        row["aj"],
-                                        row["ak"],
-                                        row["al"],
-                                        row["funct"],
-                                    ],
-                                )
-                            )
-                            row["phase"], row["kd"], row["pn"] = map(
-                                float, [row["phase"], row["kd"], row["pn"]]
-                            )
-                        elif section == "improper_dihedrals":
-                            row = dict(
-                                zip(section_headers["improper_dihedrals"], row_parts)
-                            )
-                            row["ai"], row["aj"], row["ak"], row["al"], row["funct"] = (
-                                map(
-                                    int,
-                                    [
-                                        row["ai"],
-                                        row["aj"],
-                                        row["ak"],
-                                        row["al"],
-                                        row["funct"],
-                                    ],
-                                )
-                            )
-                        elif section == "constraints":
-                            row = dict(zip(section_headers["constraints"], row_parts))
-                            row["ai"], row["aj"], row["funct"] = map(
-                                int, [row["ai"], row["aj"], row["funct"]]
-                            )
-                        else:
-                            continue  # Skip unrecognized sections
+                        row = dict(zip(section_headers[section], row_parts))
+                        row["nr"] = int(row["nr"])
+                        row["resnr"] = int(row["resnr"])
+                        row["cgnr"] = int(row["cgnr"])
+                        row["charge"] = (
+                            float(row["charge"]) if "charge" in row else None
+                        )
+                        row["mass"] = float(row["mass"]) if "mass" in row else None
                     except (IndexError, ValueError):
-                        continue  # Skip invalid lines
+                        continue
                 else:
-                    row = line  # If it's already a dictionary, use it directly
+                    row = line  # Use dictionary directly if already parsed
 
-                # ✅ STEP 2: Assign the row to the correct residue(s)
+                # **Assign Atom to the Correct Residue**
+                atom_idx = row["nr"]
+                matched_residue = None
+                for residue_smiles, indices in residue_atom_mapping.items():
+                    if atom_idx in indices:
+                        matched_residue = residue_smiles
+                        break
+
+                if matched_residue:
+                    segmented_itp[matched_residue]["atoms"].append(row)
+
+        ### **Step 2: Assign Bonds, Angles, Dihedrals to the Correct Residue**
+        for section in ["bonds", "angles", "dihedrals", "improper_dihedrals"]:
+            for line in itp_sections.get(section, []):
+                row_parts = line.split()
+                try:
+                    row = dict(zip(section_headers[section], row_parts))
+                    for key in ["ai", "aj", "ak", "al"]:
+                        if key in row:
+                            row[key] = int(row[key])
+                except (IndexError, ValueError):
+                    continue
+
+                # **Identify which residues the bonded atoms belong to**
                 atom_indices = {
                     row[key] for key in ["ai", "aj", "ak", "al"] if key in row
-                } | {row.get("nr", None)}
-                atom_indices.discard(None)  # Remove None values
+                }
+                matched_residues = [
+                    residue_smiles
+                    for residue_smiles, indices in residue_atom_mapping.items()
+                    if any(idx in indices for idx in atom_indices)
+                ]
 
-                matched_residues = set()
-                for residue_smiles, indices in residue_atom_mapping.items():
-                    if any(idx in indices for idx in atom_indices):
-                        matched_residues.add(residue_smiles)
+                if len(matched_residues) == 1:
+                    # ✅ If all atoms are within **one residue**, store normally
+                    residue_smiles = matched_residues[0]
+                    segmented_itp[residue_smiles][section].append(row)
 
-                # ✅ STEP 3: Handle assignments correctly
-                if section == "atoms":
-                    # ✅ Assign ATOMS to the correct residue
-                    for residue_smiles in matched_residues:
-                        segmented_itp[residue_smiles]["atoms"].append(row)
-
-                elif section in ["bonds", "angles", "dihedrals", "improper_dihedrals"]:
-                    if len(matched_residues) == 1:
-                        # ✅ If the entire bond/angle/dihedral is **within one residue**, assign normally
-                        residue_smiles = next(iter(matched_residues))
-                        segmented_itp[residue_smiles][section].append(row)
-                    elif len(matched_residues) > 1:
-                        # 🚀 **SPECIAL CASE: Bond/Angle/Dihedral connects multiple residues**
-                        residue_list = sorted(
-                            matched_residues, key=residue_sequence.index
-                        )
-                        first_residue = residue_list[0]
-                        segmented_itp[first_residue][section].append(
-                            row
-                        )  # Assign to the first residue in sequence
-
-                else:
-                    # ✅ Catch unexpected cases
-                    print(f"⚠️ WARNING: Skipping unexpected entry in {section}: {row}")
+                elif len(matched_residues) > 1:
+                    # 🚀 **Special Case: Bond/Angle/Dihedral Spans Multiple Residues**
+                    residue_list = sorted(matched_residues, key=residue_sequence.index)
+                    first_residue = residue_list[0]  # Assign to the earlier residue
+                    segmented_itp[first_residue][section].append(row)
 
         return segmented_itp
 

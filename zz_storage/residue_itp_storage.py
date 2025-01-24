@@ -28,8 +28,7 @@ class ResidueITPStorage:
             conn.commit()
 
     def store_residue_itp(self, segmented_itp):
-        """Stores `.itp` data per **residue SMILES**."""
-        print("!!!!!!!!!!! residue itp stored")
+        """Stores `.itp` data per residue SMILES."""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             for residue_smiles, sections in segmented_itp.items():
@@ -58,15 +57,14 @@ class ResidueITPStorage:
                 (residue_smiles,),
             )
             row = cursor.fetchone()
-            if row:  # Print raw data
-                parsed_data = {
+            if row:
+                return {
                     "atoms": json.loads(row[0]) if row[0] else [],
                     "bonds": json.loads(row[1]) if row[1] else [],
                     "angles": json.loads(row[2]) if row[2] else [],
                     "dihedrals": json.loads(row[3]) if row[3] else [],
                     "constraints": json.loads(row[4]) if row[4] else [],
-                }  # Verify structure
-                return parsed_data
+                }
             return None
 
 
