@@ -13,9 +13,9 @@ from data_models.solvent import Solvent
 from data_models.output_types import GromacsPaths
 
 polymer_paths = GromacsPaths(
-    itp_path="1_22_test/c=cc1ccccc1_3/POLY_GMX.itp",
-    gro_path="1_22_test/c=cc1ccccc1_3/POLY_GMX.gro",
-    top_path="1_22_test/c=cc1ccccc1_3/POLY_GMX.top",
+    itp_path="test_3.itp",
+    gro_path="manual_gro.gro",
+    top_path="topol_manual.top",
 )
 solvent = Solvent("hexane", 86.17, 661, "input_data/solvent_pdbs/hexane.pdb", 1.24e-4)
 

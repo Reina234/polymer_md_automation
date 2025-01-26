@@ -15,8 +15,7 @@ ns_type         = grid          ; Grid-based neighbor search
 rlist           = 1.0           ; Short-range neighbor list cutoff (nm)
 
 ; Electrostatics and VDW
-coulombtype     = PME           ; Particle-Mesh Ewald for long-range electrostatics
-rcoulomb        = 1.0           ; Short-range electrostatic cutoff (nm)
+coulombtype = cutoff
 rvdw            = 1.0           ; Short-range Van der Waals cutoff (nm)
 
 ; Constraints

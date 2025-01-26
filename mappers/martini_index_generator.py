@@ -1,4 +1,5 @@
 from mappers.base_map_generator import BaseMapGenerator
+from typing import Optional
 
 
 class MARTINIIndexGenerator(BaseMapGenerator):
@@ -11,7 +12,7 @@ class MARTINIIndexGenerator(BaseMapGenerator):
     def __init__(self, polymer):
         super().__init__(polymer)
 
-    def _generate_mapping(self) -> str:
+    def _generate_mapping(self, start_index: Optional[int] = None) -> str:
         """
         Generates the .ndx file content.
         """

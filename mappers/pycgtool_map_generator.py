@@ -4,7 +4,7 @@ from typing import Optional
 from modules.atomistic.gromacs.parser.itp_parser import ITPParser
 
 
-class PyCGToolMapper(BaseMapGenerator):
+class PyCGToolMapGenerator(BaseMapGenerator):
     """
     Generates a MARTINI-compatible mapping file.
     """
@@ -32,7 +32,7 @@ class PyCGToolMapper(BaseMapGenerator):
     def molecule_name(self, name: str):
         self._molecule_name = name
 
-    def _generate_polymer_mapping(self) -> str:
+    def _generate_polymer_mapping(self, start_index: Optional[int] = None) -> str:
         """
         Generates the MARTINI mapping file content.
         """
@@ -44,7 +44,12 @@ class PyCGToolMapper(BaseMapGenerator):
         for bead in self.bead_mappings:
             bead_name = bead["unique_name"]
             bead_type = bead["bead_type"]
-            atom_names = [self.reformat_atom_0(atom) for atom in bead["atom_names"]]
+            for atom in bead["atom_names"]:
+                print(atom)
+            atom_names = [
+                self.reformat_atom_name(atom, start_index=start_index)
+                for atom in bead["atom_names"]
+            ]
 
             # **Group all atom names per bead in a single line**
             atom_line = f"{bead_name}\t{bead_type}\t" + " ".join(atom_names)
@@ -52,7 +57,9 @@ class PyCGToolMapper(BaseMapGenerator):
 
         self._polymer_content = "\n".join(output) + "\n"
 
-    def add_solvent_to_map(self, itp_file: str, bead_name: str = "SOL") -> str:
+    def add_solvent_to_map(
+        self, itp_file: str, bead_name: str = "SOL", start_index: Optional[int] = None
+    ) -> str:
         """
         Generates a coarse-grained mapping from a solvent .itp file.
         Each solvent molecule is mapped to one bead.
@@ -72,16 +79,21 @@ class PyCGToolMapper(BaseMapGenerator):
         itp_df = itp_data.retrieve_content("atoms")
         solvent_name = itp_df["res"].iloc[0]  # Take the first occurrence
 
-        atom_names = " ".join(itp_df["atom"].apply(self.reformat_atom_0).tolist())
+        atom_names = " ".join(
+            itp_df["atom"]
+            .apply(lambda x: self.reformat_atom_name(x, start_index))
+            .tolist()
+        )
+
         output = f"[ {solvent_name} ]\n{bead_name}\t{bead_name}\t{atom_names}\n"
 
         self._solvent_content = output
 
-    def _generate_mapping(self) -> str:
+    def _generate_mapping(self, start_index: Optional[str] = None) -> str:
         """
         Generates the MARTINI mapping file content.
         """
-        self._generate_polymer_mapping()
+        self._generate_polymer_mapping(start_index=start_index)
 
         if self._solvent_content:
             return self._polymer_content + self._solvent_content

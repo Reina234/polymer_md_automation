@@ -17,6 +17,6 @@ minim_workflow = FullEquilibrationWorkflow(mdp_cache)
 minim_workflow.add_em_step(
     step_name="minim_1",
     workflow_step=workflow_step,
-    template_path="modules/atomistic/gromacs/equilibriation/templates/em_2.mdp",
-    base_params={"nsteps": "50000", "emtol": "1000"},
+    template_path="modules/atomistic/gromacs/equilibriation/templates/ion_em.mdp",
+    base_params={"nsteps": "50000"},
 )

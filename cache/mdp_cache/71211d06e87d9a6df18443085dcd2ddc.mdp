@@ -8,11 +8,12 @@ continuation             = yes            ; Continue from previous run
 cutoff-scheme            = Verlet
 nstlist                  = 10
 rlist                    = 1.2
-rcoulomb                 = 1.2
 rvdw                     = 1.2
 
 ; Electrostatics and VDW
-coulombtype              = PME
+coulombtype = reaction-field
+epsilon_rf = 80
+rcoulomb = 1.2   ; Must be equal to rvdw to work with Verle
 vdwtype                  = cut-off
 DispCorr                 = EnerPres
 

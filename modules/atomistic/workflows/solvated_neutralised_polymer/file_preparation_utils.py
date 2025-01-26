@@ -20,6 +20,7 @@ from modules.atomistic.utils.file_utils import (
     calculate_molecule_counts,
     replace_dataframe_contents,
     export_gro_handler,
+    rename_residue_name_from_gro,
     replace_value_in_dataframe,
     create_includes_section,
     delete_all_include_sections,
@@ -47,6 +48,7 @@ def prepare_solute_files(
     output_top_name: str = "topol",
     parser: GromacsParser = GromacsParser(),
 ) -> GromacsPaths:
+    print(solvent_box_gro_file)
     gro_handler = get_gro_handler(solvent_box_gro_file)
     # NOTE: need to fix to allow for separate things
     # residue_number = get_residue_number(gro_handler)

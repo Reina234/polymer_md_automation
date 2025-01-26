@@ -102,6 +102,7 @@ class GroHandler(BaseHandler):
 
         # Validate that all atoms and box dimensions are parsed correctly
         if len(self.atom_data) != self.num_atoms:
+            print(self.atom_data.headers())
             logger.error(
                 f"Expected {self.num_atoms} atoms but parsed {len(self.atom_data)}."
             )

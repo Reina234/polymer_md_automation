@@ -1,0 +1,12 @@
+#include "amber99sb-ildn.ff/forcefield.itp"
+#include "/home/reina/polymerpinn/temp/test_3.itp"
+#include "/home/reina/polymerpinn/temp/solvent.itp"
+#include "amber99sb-ildn.ff/ions.itp"
+
+[ system ]
+ POLY
+
+[ molecules ]
+; Compound        nmols
+POLY 1
+TMZK 575

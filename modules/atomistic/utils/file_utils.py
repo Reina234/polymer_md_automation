@@ -256,9 +256,37 @@ def get_gro_handler(
     parser: GromacsParser = GromacsParser(),
     gro_handler: GroHandler = GroHandler(),
 ):
+    gro_handler = GroHandler()
     sections = parser.parse(gro_file)
     gro_section = next(iter(sections.values()))
     gro_handler.process(gro_section)
+    return gro_handler
+
+
+def rename_specific_residue_name_from_handler(
+    gro_handler: GroHandler, old_residue_name: str, new_residue_name: str
+):
+    """
+    Selectively renames a specific residue name in a GROMACS .gro file.
+
+    Args:
+        gro_handler (GroHandler): The GROMACS file handler.
+        old_residue_name (str): The residue name to be replaced.
+        new_residue_name (str): The new residue name.
+
+    Returns:
+        GroHandler: The updated handler with modified residue names.
+    """
+
+    content_df = gro_handler.content
+
+    # ✅ Replace only when Residue Name matches `old_residue_name`
+    content_df.loc[content_df["Residue Name"] == old_residue_name, "Residue Name"] = (
+        new_residue_name
+    )
+
+    # Update the handler content with the modified DataFrame
+    gro_handler.content = content_df
     return gro_handler
 
 
@@ -302,6 +330,27 @@ def rename_residue_name_from_gro(
 ):
     gro_handler = get_gro_handler(gro_file)
     gro_handler = rename_residue_name_from_handler(gro_handler, new_residue_name)
+
+    output_file_path = prepare_output_file_path(
+        gro_file, "gro", output_dir, output_name
+    )
+    output_file_path = export_gro_handler(gro_handler, output_file_path, parser)
+    return output_file_path
+
+
+def rename_specific_residue_name_from_gro(
+    gro_file: str,
+    old_residue_name: str,
+    new_residue_name: str,
+    output_dir: Optional[str] = None,
+    output_name: Optional[str] = None,
+    parser: GromacsParser = GromacsParser(),
+    gro_handler: GroHandler = GroHandler(),
+):
+    gro_handler = get_gro_handler(gro_file)
+    gro_handler = rename_specific_residue_name_from_handler(
+        gro_handler, old_residue_name, new_residue_name
+    )
 
     output_file_path = prepare_output_file_path(
         gro_file, "gro", output_dir, output_name

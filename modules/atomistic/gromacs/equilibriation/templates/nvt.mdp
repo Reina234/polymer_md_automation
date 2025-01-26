@@ -11,14 +11,12 @@ nstlog              = 1000          ; Write log file every 1000 steps
 nstfout       = 1000
 ; Neighbor searching
 cutoff-scheme       = Verlet        ; Use Verlet lists for neighbor searching
-ns_type             = grid          ; Grid-based neighbor searching
 nstlist             = 10            ; Update neighbor list every 10 steps
 rlist               = 1.0           ; Neighbor list cutoff (nm)
 
 ; Electrostatics
-coulombtype         = PME           ; Particle Mesh Ewald (PME) for long-range electrostatics
-rcoulomb            = 1.0           ; Real-space Coulomb cutoff (nm)
-
+coulombtype = reaction-field
+epsilon_rf = 80
 ; van der Waals interactions
 vdwtype             = cutoff        ; Cut-off for van der Waals interactions
 rvdw                = 1.0           ; Cut-off for van der Waals (nm)
