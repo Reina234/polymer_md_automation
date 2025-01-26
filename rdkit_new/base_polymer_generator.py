@@ -182,9 +182,7 @@ class BasePolymerGenerator(ABC):
 
         Chem.SanitizeMol(rw_monomer)
 
-        bead_type = self._generate_bead_type(monomer_smiles)
-
-        return rw_monomer, open_sites, bead_type
+        return rw_monomer, open_sites
 
     def _add_monomer_to_polymer(
         self,
@@ -192,7 +190,6 @@ class BasePolymerGenerator(ABC):
         monomer: Chem.Mol,
         prev_end_idx: int,
         open_sites: Tuple[int, int],
-        bead_type: str,
         add_to_sequence: bool = True,
     ) -> Tuple[Chem.RWMol, int]:
         """
@@ -208,6 +205,7 @@ class BasePolymerGenerator(ABC):
         """
 
         # Create a new copy of the monomer to add to the polymer
+        bead_type = self._generate_bead_type(Chem.MolToSmiles(monomer))
         new_monomer = Chem.RWMol(monomer)
         if add_to_sequence:
             self._add_to_sequence(monomer)
@@ -265,6 +263,7 @@ class BasePolymerGenerator(ABC):
         :param add_to_map: Whether to add this to the mapping.
         :return: (Hydrogen-capped monomer, bead type for mapping, new open site index).
         """
+
         if use_open_site not in [0, 1]:
             raise ValueError("Invalid open site index. Must be 0 or 1.")
 
@@ -302,7 +301,7 @@ class BasePolymerGenerator(ABC):
 
         if add_to_sequence:
             self._add_to_sequence(rw_monomer)
-        return rw_monomer, bead_type, unused_open_site  # The remaining open site
+        return rw_monomer, unused_open_site  # The remaining open site
 
     def _finalise_molecule(self, mol: Chem.Mol, uff_optimise: bool = True) -> Chem.Mol:
         """

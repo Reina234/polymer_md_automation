@@ -26,9 +26,9 @@ class AlternatingPolymerGenerator(BasePolymerGenerator):
 
         monomer_iterator = cycle(monomer_iterators)
 
-        first_residue, first_open_sites, first_bead_type = next(monomer_iterator)
+        first_residue, first_open_sites = next(monomer_iterator)
 
-        polymer, _, idx = self._create_cap_residues(
+        polymer, idx = self._create_cap_residues(
             first_residue,
             open_sites=first_open_sites,
             use_open_site=0,
@@ -37,20 +37,19 @@ class AlternatingPolymerGenerator(BasePolymerGenerator):
         )
         # print(self.debug_print_mol(polymer))
         for i in range(num_units - 2):
-            residue_mol, open_sites, bead_type = next(monomer_iterator)
+            residue_mol, open_sites = next(monomer_iterator)
 
             polymer, idx = self._add_monomer_to_polymer(
                 polymer,
                 monomer=residue_mol,
                 prev_end_idx=idx,
-                bead_type=bead_type,
                 open_sites=open_sites,
                 add_to_sequence=True,
             )
 
         # Add end monomer
-        residue_mol, open_sites, bead_type = next(monomer_iterator)
-        end_monomer, bead_type, _ = self._create_cap_residues(
+        residue_mol, open_sites = next(monomer_iterator)
+        end_monomer, _ = self._create_cap_residues(
             monomer=residue_mol,
             open_sites=open_sites,
             use_open_site=1,
@@ -61,7 +60,6 @@ class AlternatingPolymerGenerator(BasePolymerGenerator):
             polymer,
             monomer=end_monomer,
             prev_end_idx=idx,
-            bead_type=bead_type,
             open_sites=open_sites,
             add_to_sequence=True,
         )

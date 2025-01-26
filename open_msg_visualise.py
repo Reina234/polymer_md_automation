@@ -20,8 +20,8 @@ plt.plot(table[:, 1], table[:, 3], label="Force - Kcal/mol/angstrom")
 plt.plot(table[:, 1], table[:, 2], label="Potential Energy - Kcal/mol")
 
 plt.legend(loc="upper right")
-plt.xlim(1, 10)
-plt.ylim(-10, 50)
+plt.xlim(4, 10)
+plt.ylim(-10, 30)
 
 # Save the plot instead of showing it
 plt.savefig("force_potential_plot.png", dpi=300)

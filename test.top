@@ -1,0 +1,42 @@
+cgsites 585
+cgtypes 5 
+B2
+SOL
+B3
+NA
+B1
+moltypes 3
+mol 10 1
+sitetypes
+B1
+B2
+B2
+B2
+B2
+B2
+B2
+B2
+B2
+B3
+bonds 9
+1 2
+2 3
+3 4
+4 5
+5 6
+6 7
+7 8
+8 9
+9 10
+mol 1 1
+sitetypes
+SOL
+bonds 0
+mol 1 1
+sitetypes
+NA
+bonds 0
+system 3
+1 1
+2 574
+3 1

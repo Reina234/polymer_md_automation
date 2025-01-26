@@ -17,6 +17,7 @@ from rdkit import Chem
 import pandas as pd
 from typing import Dict, List, Tuple
 from mappers.pycgtool_map_generator import PyCGToolMapGenerator
+from mappers.open_mscg_map_generator import OpenMSCGMapGenerator
 
 generator = AlternatingPolymerGenerator(["C=Cc1ccccc1"])
 generator.generate_polymer(10, "rdkit_test2", overwrite=False, save=False)

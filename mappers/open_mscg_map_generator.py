@@ -126,7 +126,9 @@ class OpenMSCGMapGenerator(BaseMapGenerator):
                     )
 
                 molecule_count, x_weight, previous_x_weight = (
-                    self._reset_molecule_state(x_weight=x_weight)
+                    self._reset_molecule_state(
+                        molecule_count=molecule_count, x_weight=x_weight
+                    )
                 )
 
             if self._is_new_residue(last_resname, resname):
@@ -151,7 +153,7 @@ class OpenMSCGMapGenerator(BaseMapGenerator):
             last_resname=last_resname,
             previous_x_weight=x_weight,
             start_index=index,
-            molecule_count=molecule_count,
+            molecule_count=molecule_count + 1,
         )
 
     @staticmethod
@@ -160,7 +162,7 @@ class OpenMSCGMapGenerator(BaseMapGenerator):
         resname: Optional[str] = None,
     ) -> Tuple[int, Optional[int], int, List[float], Optional[List[float]]]:
         last_resnum = None
-        molecule_count = 1
+        molecule_count = 0
         x_weight = []
         previous_x_weight = None
         last_resname = resname
@@ -176,9 +178,10 @@ class OpenMSCGMapGenerator(BaseMapGenerator):
 
     @staticmethod
     def _reset_molecule_state(
+        molecule_count: int,
         x_weight: List[float],
     ) -> Tuple[Optional[int], int, List[float], List[float]]:
-        molecule_count = 1
+        molecule_count += 1
         previous_x_weight = x_weight
         resetted_x_weight = []
         return molecule_count, resetted_x_weight, previous_x_weight
