@@ -20,7 +20,7 @@ from mappers.pycgtool_map_generator import PyCGToolMapGenerator
 
 generator = AlternatingPolymerGenerator(["C=Cc1ccccc1"])
 generator.generate_polymer(3, "rdkit_test2", overwrite=False, save=False)
-from open_mscg_map_generator import OpenMSCGMapGenerator
+from mappers.open_mscg_map_generator import OpenMSCGMapGenerator
 
 open_msg_map_generator = OpenMSCGMapGenerator(generator, "temp/production.gro")
 open_msg_map_generator.create_map("test_open_msg", "zzz")
