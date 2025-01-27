@@ -1,8 +1,3 @@
-from modules.atomistic.workflows.parameterised_polymer_generator.full_workflow import (
-    run_polymerisation_workflow,
-)
-
-
 from data_models.solvent import Solvent
 
 

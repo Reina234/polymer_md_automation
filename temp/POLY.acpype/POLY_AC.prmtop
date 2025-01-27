@@ -1,4 +1,4 @@
-%VERSION  VERSION_STAMP = V0001.000  DATE = 01/27/25  21:30:53                  
+%VERSION  VERSION_STAMP = V0001.000  DATE = 01/27/25  22:09:58                  
 %FLAG TITLE                                                                     
 %FORMAT(20a4)                                                                   
 temp/c=cc1ccccc1_c=c_4.pdb                                                      

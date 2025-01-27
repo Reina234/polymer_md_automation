@@ -10,8 +10,6 @@ from data_models.output_types import GromacsPaths
 import os
 from data_models.output_types import GromacsOutputs
 from config.mdp_workflow_config import minim_workflow, polymer_workflow
-
-from modules.cache_store.solvent_cache import SolventCache
 from modules.workflows.base_workflow import BaseWorkflow
 from data_models.solvent import Solvent
 from modules.workflows.atomistic.solvent_equilibriator import (
@@ -30,7 +28,7 @@ import logging
 import os
 import shutil
 from data_models.output_types import GromacsPaths
-from modules.atomistic.utils.file_utils import (
+from modules.utils.atomistic.file_utils import (
     get_gro_handler,
     calculate_molecule_counts,
     replace_dataframe_contents,
@@ -42,6 +40,9 @@ from modules.atomistic.utils.file_utils import (
 from modules.workflows.atomistic.polymer_parametizer import PolymerGeneratorWorkflow
 from modules.cache_store.equilibriated_atomistic_polymer_cache import (
     EquilibriatedAtomisticPolymerCache,
+)
+from modules.moltemplate.moltemplate_utils import (
+    add_polymer_to_solvent,
 )
 import logging
 
@@ -55,6 +56,8 @@ class PolymerEquilibriationWorkflow(BaseWorkflow):
     forcefield: str = "amber99sb-ildn.ff/forcefield.itp"
     ion_itp_file: str = "amber99sb-ildn.ff/ions.itp"
     topol_name: str = "topol"
+    polymer_in_solvent_name: str = "polymer_in_solvent"
+    polymer_addition_cutoff: float = 0.2
 
     def __init__(
         self,
@@ -155,10 +158,17 @@ class PolymerEquilibriationWorkflow(BaseWorkflow):
 
     def _run_per_temp(self, temperature: float) -> GromacsOutputs:
         solvent_box = self._retrieve_solvent_box(temperature)
+        polymer_in_solvent = add_polymer_to_solvent(
+            polymer_file=self.parameterised_polymer.gro_path,
+            solvent_file=solvent_box.gro,
+            output_dir=TEMP_DIR,
+            output_name=self.polymer_in_solvent_name,
+            cutoff=self.polymer_addition_cutoff,
+        )
         initial_minim_files = self._prepare_solute_files(
             solute_itp_file=self.parameterised_polymer.itp_path,
             solvent_itp_file=solvent_box.itp,
-            solvent_box_gro_file=solvent_box.gro,
+            solvent_box_gro_file=polymer_in_solvent,
             input_top_file=self.parameterised_polymer.top_path,
             output_dir=TEMP_DIR,
         )

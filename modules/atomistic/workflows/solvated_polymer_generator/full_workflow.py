@@ -13,7 +13,7 @@ from modules.atomistic.workflows.solvated_polymer_generator.file_preparation_uti
 )
 from modules.utils.shared.file_utils import delete_directory, copy_file
 from data_models.output_types import GromacsPaths
-from modules.atomistic.utils.moltemplate_utils import add_polymer_to_solvent
+from modules.moltemplate.moltemplate_utils import add_polymer_to_solvent
 import os
 
 

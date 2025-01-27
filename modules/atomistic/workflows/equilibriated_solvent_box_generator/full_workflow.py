@@ -13,7 +13,7 @@ from modules.gromacs.equilibriation.full_equilibriation_workflow import (
 from modules.atomistic.workflows.equilibriated_solvent_box_generator.workflow_config import (
     workflow,
 )
-from modules.atomistic.utils.file_utils import (
+from modules.utils.atomistic.file_utils import (
     get_gro_handler,
     get_residue_number,
     rename_residue_name_from_handler,
@@ -29,7 +29,7 @@ from typing import List, Optional
 from data_models.output_types import GromacsOutputs
 from config.paths import TEMP_DIR, LOG_DIR
 from modules.utils.shared.file_utils import add_identifier_name, delete_directory
-from modules.atomistic.utils.mdp_utils import format_temperatures
+from modules.utils.atomistic.mdp_utils import format_temperatures
 from modules.atomistic.workflows.equilibriated_solvent_box_generator.full_workflow import (
     workflow,
 )

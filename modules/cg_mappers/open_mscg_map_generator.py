@@ -6,7 +6,7 @@ from rdkit import Chem
 from modules.gromacs.parsers.gromacs_parser import GromacsParser
 from modules.utils.shared.file_utils import check_directory_exists
 from modules.cg_mappers.base_map_generator import BaseMapGenerator
-from modules.atomistic.utils.file_utils import get_gro_handler
+from modules.utils.atomistic.file_utils import get_gro_handler
 from modules.rdkit.polymer_builders.base_polymer_generator import BasePolymerGenerator
 from ruamel.yaml import YAML
 

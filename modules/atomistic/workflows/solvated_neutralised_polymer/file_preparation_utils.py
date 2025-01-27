@@ -12,7 +12,7 @@ import logging
 import os
 import shutil
 from data_models.output_types import GromacsPaths
-from modules.atomistic.utils.file_utils import (
+from modules.utils.atomistic.file_utils import (
     get_gro_handler,
     get_residue_number,
     rename_residue_name_from_handler,

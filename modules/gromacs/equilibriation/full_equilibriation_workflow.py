@@ -8,7 +8,7 @@ from modules.utils.shared.file_utils import (
     copy_and_rename,
 )
 from data_models.output_types import GromacsOutputs
-from modules.atomistic.utils.mdp_utils import generate_dynamic_filename
+from modules.utils.atomistic.mdp_utils import generate_dynamic_filename
 from config.paths import EQUILIBRIATED_OUTPUTS_SUBDIR
 
 
@@ -121,8 +121,6 @@ class FullEquilibrationWorkflow:
                     file_path = os.path.join(temp_output_dir, file_name)
                     if file_name_override:
                         new_filename = file_name_override
-                        print("!!!!!!!!!!!!!!!!!!!")
-                        print(file_name_override)
                     else:
                         new_filename = generate_dynamic_filename(
                             varying_params, extension=None

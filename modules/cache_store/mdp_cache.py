@@ -114,6 +114,10 @@ class MDPCache:
         """
         # Validate cache directory
         check_directory_exists(self.cache_dir)
+        logger.info(f"Using cache directory: {self.cache_dir}")
+        logger.info(
+            f"Checking cache for MDP file with params: {params} with template: {template_path}"
+        )
 
         # Ensure the cache index is initialized
         if not self.cache_index:

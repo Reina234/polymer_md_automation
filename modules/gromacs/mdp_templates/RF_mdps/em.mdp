@@ -11,11 +11,10 @@ nstenergy       = 10            ; Save energies every 10 steps
 ; Neighbor searching
 cutoff-scheme   = Verlet        ; Faster neighbor list calculation
 nstlist         = 10            ; Frequency of neighbor list update
-ns_type         = grid          ; Grid-based neighbor search
 rlist           = 1.0           ; Short-range neighbor list cutoff (nm)
 
 ; Electrostatics and VDW
-coulombtype = cutoff
+coulombtype       = Cut-off
 rvdw            = 1.0           ; Short-range Van der Waals cutoff (nm)
 
 ; Constraints

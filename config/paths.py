@@ -14,7 +14,9 @@ EQUILIBRIATED_SOLVENT_BOX_DIR = os.path.join(
 )
 
 MDP_CACHE_DIR = os.path.join(MAIN_CACHE_DIR, "mdp_cache")
-SHORT_POLYMER_CACHE_DIR = os.path.join(MAIN_CACHE_DIR, "short_polymer_cache")
+SHORT_POLYMER_CACHE_DIR = os.path.join(
+    PREPROCESSED_DIR, "parameterised_polymer_building_blocks"
+)
 
 # SOLVENT_ITP_DIR = "preprocessed_output/solvents/solvent_itp"
 # SOLVENT_MOL2_DIR = "preprocessed_output/solvents/solvent_mol2"

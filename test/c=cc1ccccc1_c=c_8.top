@@ -1,0 +1,9 @@
+; Include POLY_GMX.itp topology
+#include "/home/reina/polymerpinn/test/c=cc1ccccc1_c=c_8.itp"
+
+[ system ]
+ POLY
+
+[ molecules ]
+; Compound        nmols
+ POLY             1     

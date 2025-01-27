@@ -1,6 +1,6 @@
 from typing import List, Optional
 from modules.gromacs.parsers.gromacs_parser import GromacsParser
-from modules.atomistic.utils.file_utils import calculate_minimum_box_size_from_df
+from modules.utils.atomistic.file_utils import calculate_minimum_box_size_from_df
 from modules.gromacs.parsers.handlers.gro_handler import GroHandler
 import re
 

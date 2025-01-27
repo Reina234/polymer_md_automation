@@ -24,7 +24,7 @@ class PolymerITPScaler:
         k: v for k, v in num_cols.items() if k != "atoms"
     }  # Exclude "atoms"
 
-    def __init__(self, itp_path, cg_map, n_repeat, atom_start_index=None):
+    def __init__(self, itp_path, short_cg_map, n_repeat, atom_start_index=None):
         """
         Args:
             itp_path (str): Path to .itp file.
@@ -36,7 +36,7 @@ class PolymerITPScaler:
                 - 1 → "C1", "H1", etc.
         """
         self.itp_path = itp_path
-        self.cg_map = cg_map
+        self.cg_map = short_cg_map
         self.n_repeat = n_repeat
         self.atom_start_index = atom_start_index  # Determines how atom indices start
         self.sections = {}

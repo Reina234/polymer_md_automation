@@ -59,7 +59,7 @@ def replace_itp_names(itp_path, output_path, new_name="SOL"):
 
 
 replace_itp_names("temp/solvent.itp", "itp_manual.itp")
-from modules.atomistic.utils.file_utils import rename_specific_residue_name_from_gro
+from modules.utils.atomistic.file_utils import rename_specific_residue_name_from_gro
 
 rename_specific_residue_name_from_gro(
     "temp/polymer_in_solvent.gro", "TMZK", "SOL", output_name="manual_gro"

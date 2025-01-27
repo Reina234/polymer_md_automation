@@ -10,6 +10,13 @@ from modules.utils.shared.file_utils import (
     delete_directory,
     check_directory_exists,
 )
+from typing import List, Optional
+from modules.gromacs.parsers.gromacs_parser import GromacsParser
+from modules.utils.atomistic.file_utils import calculate_minimum_box_size_from_df
+from modules.gromacs.parsers.handlers.gro_handler import GroHandler
+import re
+
+
 from modules.acpype.acpype_parametizer import (
     ACPYPEParameterizer,
 )
@@ -43,14 +50,19 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-short_polymer_cache_dir = os.path.join(MAIN_CACHE_DIR, SHORT_POLYMER_CACHE_DIR)
+short_polymer_cache_dir = SHORT_POLYMER_CACHE_DIR
 short_polymer_cache = PickleCache(
     name="short_polymer_cache", cache_dir=short_polymer_cache_dir
 )
-long_polymer_cache = PickleCache(name="long_polymer_cache")
+polymer_cache_dir = PARAMETERISED_POLYMER_DIR
+long_polymer_cache = PickleCache(
+    cache_dir=PARAMETERISED_POLYMER_DIR, name="long_polymer_cache"
+)
 
 
 class PolymerGeneratorWorkflow(BaseWorkflow):
+    box_dim_padding: float = 0.1
+
     def __init__(
         self,
         monomer_smiles: List[str],
@@ -59,10 +71,13 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
         long_polymer_cache: PickleCache = long_polymer_cache,
         polymer_generator: BasePolymerGenerator = AlternatingPolymerGenerator,
         verbose: bool = True,
+        output_dir: str = PARAMETERISED_POLYMER_DIR,
         short_polymer_cache_dir: str = SHORT_POLYMER_CACHE_DIR,
         res_name="POLY",
     ):
         super().__init__()
+        self.output_dir: str = output_dir
+        self.short_polymer_cache_dir: str = short_polymer_cache_dir
         self.monomer_smiles: List[str] = monomer_smiles
         self.verbose: bool = verbose
         self.num_units: int = num_units
@@ -104,7 +119,7 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
             overwrite=True,
             save=True,
         )
-        return short_polymer_pdb
+        return short_polymer_pdb, self.short_polymer_generator.cg_map
 
     def build_and_parameterize_short_polymer(
         self,
@@ -112,8 +127,8 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
         output_dir: str = SHORT_POLYMER_CACHE_DIR,
         mol2_output_dir: str = TEMP_DIR,
     ):
-        pdb = self._build_short_polymer(length)
-        return self.parameterize_pdb(pdb, output_dir, mol2_output_dir)
+        pdb, short_cg_map = self._build_short_polymer(length)
+        return self.parameterize_pdb(pdb, output_dir, mol2_output_dir), short_cg_map
 
     def parameterize_pdb(
         self, pdb_path: str, output_dir: str = TEMP_DIR, mol2_output_dir: str = TEMP_DIR
@@ -129,35 +144,48 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
     def _retrieve_or_build_short_parameterized_short_polymer(self):
         parameterised_short_polymer = self.check_short_polymer_cache()
         if parameterised_short_polymer:
-            return parameterised_short_polymer
+            return (
+                parameterised_short_polymer["outputs"],
+                parameterised_short_polymer["cg_map"],
+            )
         logging.info(f"Short polymer not found in cache, generating...")
         length = self._get_minimum_polymer_length()
-        parameterised_files = self.build_and_parameterize_short_polymer(length)
+        parameterised_files, short_cg_map = self.build_and_parameterize_short_polymer(
+            length
+        )
 
         cache_key = "_".join(self.monomer_smiles)
-        self.short_polymer_cache.store_object(cache_key, parameterised_files)
+        self.short_polymer_cache.store_object(
+            cache_key, {"outputs": parameterised_files, "cg_map": short_cg_map}
+        )
         logger.info(f"Parameterised polymer saved to cache with key: {cache_key}")
-        return parameterised_files
+        return parameterised_files, short_cg_map
 
     def _get_n_repeat(self):
-        closest_multiple = self.num_units // self._get_minimum_polymer_length() - 1
+        closest_multiple = (self.num_units - self._get_minimum_polymer_length()) // len(
+            self.monomer_smiles
+        )
         if closest_multiple < 1:
             length = self.num_units
         else:
-            length = self._get_minimum_polymer_length() * closest_multiple
+            length = (
+                len(self.monomer_smiles) * closest_multiple
+                + self._get_minimum_polymer_length()
+            )
+        print(closest_multiple, length)
         return closest_multiple, length
 
     def _extend_itp(
         self,
         output_path: str,
         short_polymer_itp: str,
-        long_polymer_cg_map: Dict[str, List[Union[str, int]]],
+        short_polymer_cg_map: Dict[str, List[Union[str, int]]],
         atom_start_index: Optional[int],
     ):
 
         itp_scaler = PolymerITPScaler(
             itp_path=short_polymer_itp,
-            cg_map=long_polymer_cg_map,
+            short_cg_map=short_polymer_cg_map,
             n_repeat=self.num_repeats,
             atom_start_index=atom_start_index,
         )
@@ -181,20 +209,20 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
         return int(match.group(1)) if match else None
 
     def _build_long_polymer(self, output_dir: str, pdb_output_dir: str = TEMP_DIR):
-        short_polymer_files = (
+        short_polymer_files, cg_map = (
             self._retrieve_or_build_short_parameterized_short_polymer()
         )
         pdb = self.long_polymer_generator.generate_polymer(
             num_units=self.actual_num_units, output_dir=pdb_output_dir
         )
         gro = EditconfPDBtoGROConverter().run(pdb, output_dir)
+        self.add_box_dim(gro_file=gro, padding=self.box_dim_padding)
         atom_start_index = self._determine_atom_start_index(gro)
-
         itp_output_path = self._get_itp_path(gro)
         itp = self._extend_itp(
             output_path=itp_output_path,
             short_polymer_itp=short_polymer_files.itp_path,
-            long_polymer_cg_map=self.long_polymer_generator.cg_map,
+            short_polymer_cg_map=cg_map,
             atom_start_index=atom_start_index,
         )
         top_output_path = self._get_top_path(gro)
@@ -231,7 +259,8 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
         logging.info(f"Parameterised polymer not found in cache with key: {cache_key}")
         return None
 
-    def run(self, output_dir: str = PARAMETERISED_POLYMER_DIR):
+    def run(self):
+        output_dir = self.output_dir
         check_directory_exists(output_dir)
         parameterised_polymer = self.check_long_polymer_cache()
         if parameterised_polymer:
@@ -239,7 +268,7 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
         logging.info(f"Long polymer not found in cache, generating...")
 
         if self.num_repeats < 1:
-            polymer = self.build_and_parameterize_short_polymer(
+            polymer, cg_map = self.build_and_parameterize_short_polymer(
                 self.num_units, output_dir=output_dir
             )
 
@@ -251,3 +280,19 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
         self.long_polymer_cache.store_object(cache_key, polymer)
         logger.info(f"Parameterised polymer saved to cache with key: {cache_key}")
         return polymer
+
+    @staticmethod
+    def add_box_dim(
+        gro_file, padding: float = 0.1, parser=GromacsParser(), gro_handler=GroHandler()
+    ) -> List[float]:
+        sections = parser.parse(gro_file)
+        first_key = next(iter(sections))  # Get the first key
+        gro_section = sections[first_key]
+        gro_handler.process(gro_section)
+        box_size = calculate_minimum_box_size_from_df(gro_handler.content, padding)
+        gro_handler.box_dimensions = box_size
+        sections[first_key] = gro_handler.export()
+
+        parser.export(sections, gro_file)
+
+        return gro_file
