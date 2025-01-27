@@ -1,13 +1,13 @@
 from typing import List, Optional
-from modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow import (
+from modules.gromacs.equilibriation.full_equilibriation_workflow import (
     FullEquilibrationWorkflow,
 )
 from config.paths import TEMP_DIR, LOG_DIR
-from modules.atomistic.gromacs.commands.genion import GenIon
+from modules.gromacs.commands.genion import GenIon
 from modules.atomistic.workflows.solvated_neutralised_polymer.file_preparation_utils import (
     prepare_solute_files,
 )
-from modules.shared.utils.file_utils import delete_directory, copy_file
+from modules.utils.shared.file_utils import delete_directory, copy_file
 from data_models.output_types import GromacsPaths
 from modules.atomistic.utils.moltemplate_utils import (
     add_polymer_to_solvent,
@@ -122,15 +122,15 @@ def run_polymer_solvation_workflow(
 
 
 from typing import List, Optional
-from modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow import (
+from modules.gromacs.equilibriation.full_equilibriation_workflow import (
     FullEquilibrationWorkflow,
 )
 from config.paths import TEMP_DIR, LOG_DIR
-from modules.atomistic.gromacs.commands.genion import GenIon
+from modules.gromacs.commands.genion import GenIon
 from modules.atomistic.workflows.solvated_neutralised_polymer.file_preparation_utils import (
     prepare_solute_files,
 )
-from modules.shared.utils.file_utils import delete_directory, copy_file
+from modules.utils.shared.file_utils import delete_directory, copy_file
 from data_models.output_types import GromacsPaths
 from modules.atomistic.utils.moltemplate_utils import add_polymer_to_solvent
 import os

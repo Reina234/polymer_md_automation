@@ -1,12 +1,14 @@
-from rdkit_new.alternating_copolymer import AlternatingPolymerGenerator
+from modules.rdkit.polymer_builders.alternating_copolymer import (
+    AlternatingPolymerGenerator,
+)
 from config.paths import TEMP_DIR
 from config.acpype_config import AcpypeOutputConfig
-from modules.atomistic.acpype_parameterizer.acpype_parametizer import (
+from modules.acpype.acpype_parametizer import (
     ACPYPEParameterizer,
 )
-from modules.shared.file_conversion.converter_factory import ConverterFactory
-from modules.shared.utils.file_utils import copy_file, delete_directory
-from modules.atomistic.acpype_parameterizer.acpype_parametizer import (
+from modules.file_conversion.converter_factory import ConverterFactory
+from modules.utils.shared.file_utils import copy_file, delete_directory
+from modules.acpype.acpype_parametizer import (
     ACPYPEParameterizer,
 )
 from data_models.output_types import GromacsPaths

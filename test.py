@@ -1,12 +1,12 @@
-from rdkit_new.homopolymer_generator import HomopolymerGenerator
+from modules.rdkit.polymer_builders.homopolymer_generator import HomopolymerGenerator
 from config.paths import TEMP_DIR
 from config.acpype_config import AcpypeOutputConfig
-from modules.atomistic.acpype_parameterizer.acpype_parametizer import (
+from modules.acpype.acpype_parametizer import (
     ACPYPEParameterizer,
 )
-from modules.shared.file_conversion.converter_factory import ConverterFactory
-from modules.shared.utils.file_utils import copy_file, delete_directory
-from modules.atomistic.acpype_parameterizer.acpype_parametizer import (
+from modules.file_conversion.converter_factory import ConverterFactory
+from modules.utils.shared.file_utils import copy_file, delete_directory
+from modules.acpype.acpype_parametizer import (
     ACPYPEParameterizer,
 )
 from data_models.output_types import GromacsPaths
@@ -45,12 +45,14 @@ def parameterize(
     return parametized_polymer
 
 
-from rdkit_new.alternating_copolymer import AlternatingPolymerGenerator
+from modules.rdkit.polymer_builders.alternating_copolymer import (
+    AlternatingPolymerGenerator,
+)
 from rdkit import Chem
 
-from rdkit_new.votca_mapping_generator import VOTCAMappingGenerator
-from modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
-from modules.atomistic.gromacs.parser.handlers.data_handler import DataHandler
+from modules.rdkit.votca_mapping_generator import VOTCAMappingGenerator
+from modules.gromacs.parsers.gromacs_parser import GromacsParser
+from modules.gromacs.parsers.handlers.data_handler import DataHandler
 from rdkit import Chem
 import pandas as pd
 from typing import Dict, List, Tuple

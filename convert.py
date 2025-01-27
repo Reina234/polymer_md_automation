@@ -1,13 +1,15 @@
-from modules.shared.file_conversion.converters.editconf_pdb_to_gro import (
+from modules.file_conversion.converters.editconf_pdb_to_gro import (
     EditconfPDBtoGROConverter,
 )
 import os
-from rdkit_new.alternating_copolymer import AlternatingPolymerGenerator
+from modules.rdkit.polymer_builders.alternating_copolymer import (
+    AlternatingPolymerGenerator,
+)
 from rdkit import Chem
 
-from rdkit_new.votca_mapping_generator import VOTCAMappingGenerator
-from modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
-from modules.atomistic.gromacs.parser.handlers.data_handler import DataHandler
+from modules.rdkit.votca_mapping_generator import VOTCAMappingGenerator
+from modules.gromacs.parsers.gromacs_parser import GromacsParser
+from modules.gromacs.parsers.handlers.data_handler import DataHandler
 from rdkit import Chem
 import pandas as pd
 from typing import Dict, List, Tuple

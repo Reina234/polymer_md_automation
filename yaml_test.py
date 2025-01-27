@@ -1,23 +1,23 @@
 import yaml
 import pandas as pd
-from modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
-from modules.atomistic.gromacs.parser.handlers.gro_handler import GroHandler
-from modules.atomistic.gromacs.parser.handlers.data_handler import DataHandler
-from rdkit_new.base_polymer_generator import BasePolymerGenerator
+from modules.gromacs.parsers.gromacs_parser import GromacsParser
+from modules.gromacs.parsers.handlers.gro_handler import GroHandler
+from modules.gromacs.parsers.handlers.data_handler import DataHandler
+from modules.rdkit.polymer_builders.base_polymer_generator import BasePolymerGenerator
 from typing import Optional, Dict, List
-from modules.atomistic.gromacs.parser.itp_parser import ITPParser
+from modules.gromacs.parsers.itp_parser import ITPParser
 
 import yaml
 import pandas as pd
-from modules.atomistic.gromacs.parser.itp_parser import ITPParser
-from rdkit_new.base_polymer_generator import BasePolymerGenerator
+from modules.gromacs.parsers.itp_parser import ITPParser
+from modules.rdkit.polymer_builders.base_polymer_generator import BasePolymerGenerator
 from typing import Optional, Dict, List
 
 import yaml
 import pandas as pd
-from modules.atomistic.gromacs.parser.itp_parser import ITPParser
-from modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
-from rdkit_new.base_polymer_generator import BasePolymerGenerator
+from modules.gromacs.parsers.itp_parser import ITPParser
+from modules.gromacs.parsers.gromacs_parser import GromacsParser
+from modules.rdkit.polymer_builders.base_polymer_generator import BasePolymerGenerator
 from typing import Optional, Dict, List
 
 
@@ -161,7 +161,9 @@ class OpenMSCGMappingGenerator:
 
 
 # === USAGE EXAMPLE ===
-from rdkit_new.alternating_copolymer import AlternatingPolymerGenerator
+from modules.rdkit.polymer_builders.alternating_copolymer import (
+    AlternatingPolymerGenerator,
+)
 
 polymer = AlternatingPolymerGenerator(["C=Cc1ccccc1"])
 polymer.generate_polymer(3, "rdkit_test2", overwrite=False, save=False)

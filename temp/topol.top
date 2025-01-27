@@ -1,13 +1,11 @@
 #include "amber99sb-ildn.ff/forcefield.itp"
-#include "/home/reina/polymerpinn/temp/test_3.itp"
+#include "/home/reina/polymerpinn/temp/c=cc1ccccc1_c=c_4.itp"
 #include "/home/reina/polymerpinn/temp/solvent.itp"
 #include "amber99sb-ildn.ff/ions.itp"
-
+; Include POLY_GMX.itp topology
 [ system ]
  POLY
 
 [ molecules ]
 ; Compound        nmols
-POLY 1
-TMZK 574
-NA 1
+TMZK 1584

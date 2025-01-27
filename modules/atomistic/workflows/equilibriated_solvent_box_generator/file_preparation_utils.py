@@ -1,10 +1,10 @@
-from modules.shared.utils.file_utils import (
+from modules.utils.shared.file_utils import (
     file_type_check_wrapper,
     prepare_output_file_path,
 )
 from collections import OrderedDict
-from modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
-from modules.atomistic.gromacs.parser.handlers.gro_handler import GroHandler
+from modules.gromacs.parsers.gromacs_parser import GromacsParser
+from modules.gromacs.parsers.handlers.gro_handler import GroHandler
 from typing import Optional
 import logging
 import os

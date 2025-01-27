@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional, List
-from mappers.martini_index_generator import MARTINIIndexGenerator
-from mappers.martini_map_generator import MARTINIMapGenerator
-from rdkit_new.base_polymer_generator import BasePolymerGenerator
+from modules.cg_mappers.martini_index_generator import MARTINIIndexGenerator
+from modules.cg_mappers.martini_map_generator import MARTINIMapGenerator
+from modules.rdkit.polymer_builders.base_polymer_generator import BasePolymerGenerator
 
 from dataclasses import dataclass
 

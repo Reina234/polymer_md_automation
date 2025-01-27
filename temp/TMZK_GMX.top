@@ -1,0 +1,10 @@
+#include "amber99sb-ildn.ff/forcefield.itp"
+#include "/home/reina/polymerpinn/preprocessed/equilibriated_solvent_boxes/hexane/solvent.itp"
+; TMZK_GMX.top created by acpype (v: 2023.10.27) on Mon Jan 27 21:33:46 2025
+
+[ system ]
+ TMZK
+
+[ molecules ]
+; Compound        nmols
+TMZK 1584

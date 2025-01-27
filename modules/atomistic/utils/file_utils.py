@@ -1,7 +1,7 @@
-from modules.shared.utils.dataframe_utils import (
+from modules.utils.shared.dataframe_utils import (
     dataframe_not_empty_check,
 )
-from modules.shared.utils.file_utils import (
+from modules.utils.shared.file_utils import (
     file_exists_check_wrapper,
     file_type_check_wrapper,
     check_directory_exists,
@@ -9,24 +9,24 @@ from modules.shared.utils.file_utils import (
     add_suffix_to_filename,
     copy_file,
 )
-from modules.atomistic.gromacs.parser.handlers.includes_handler import IncludesHandler
+from modules.gromacs.parsers.handlers.includes_handler import IncludesHandler
 from collections import OrderedDict
-from modules.atomistic.gromacs.commands.insert_molecules import InsertMolecules
+from modules.gromacs.commands.insert_molecules import InsertMolecules
 from config.paths import TEMP_DIR
 from config.constants import MassUnits, LengthUnits
-from modules.shared.utils.calculation_utils import calculate_num_particles
+from modules.utils.shared.calculation_utils import calculate_num_particles
 import pandas as pd
-from modules.atomistic.gromacs.parser.gromacs_parser import GromacsParser
-from modules.atomistic.gromacs.parser.handlers.gro_handler import GroHandler
+from modules.gromacs.parsers.gromacs_parser import GromacsParser
+from modules.gromacs.parsers.handlers.gro_handler import GroHandler
 from typing import List, Optional, Dict, Union
 from data_models.solvent import Solvent
-from modules.atomistic.gromacs.commands.solvate import Solvate
-from modules.atomistic.gromacs.parser.handlers.data_handler import DataHandler
+from modules.gromacs.commands.solvate import Solvate
+from modules.gromacs.parsers.handlers.data_handler import DataHandler
 import logging
 import os
-from modules.atomistic.gromacs.commands.editconf import Editconf
+from modules.gromacs.commands.editconf import Editconf
 from data_models.output_types import GromacsPaths
-from modules.atomistic.gromacs.parser.data_models.section import Section
+from modules.gromacs.parsers.data_models.section import Section
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -860,41 +860,3 @@ def create_solvated_box(
 
 def prepare_solvent_box_name(solvent: Solvent, extension: str):
     return f"{solvent.name.lower()}_solvent_box.{extension}"
-
-
-from modules.shared.file_conversion.converters.base_converter import BaseConverter
-from modules.shared.file_conversion.converters.editconf_gro_to_pdb import (
-    EditconfGROtoPDBConverter,
-)
-from modules.shared.file_conversion.converters.editconf_pdb_to_gro import (
-    EditconfPDBtoGROConverter,
-)
-from modules.shared.packmol.solvent_box import PackmolSolventBox
-
-
-def create_solvent_box_gro(
-    input_gro_file,
-    output_dir: str,
-    box_size_nm: List[float],
-    solvent: Solvent,
-    output_name: Optional[str] = None,
-    temp_dir: str = TEMP_DIR,
-    gro_to_pdb_converter: BaseConverter = EditconfGROtoPDBConverter(),
-    pdb_to_gro_converter: BaseConverter = EditconfPDBtoGROConverter(),
-    packmol_operation: PackmolSolventBox = PackmolSolventBox(),
-) -> str:
-    output_pdb = gro_to_pdb_converter.run(input_gro_file, temp_dir)
-    if not output_name:
-        output_name = prepare_solvent_box_name(solvent, "gro")
-
-    packmol_output = packmol_operation.run(
-        output_pdb,
-        output_dir=temp_dir,
-        solvent=solvent,
-        box_size_nm=box_size_nm,
-    )
-    print(packmol_output)
-    output_gro = pdb_to_gro_converter.run(
-        packmol_output, output_dir, box_size_nm=box_size_nm, output_name=output_name
-    )
-    return output_gro

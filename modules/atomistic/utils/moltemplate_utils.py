@@ -1,6 +1,6 @@
 import MDAnalysis as mda
 from MDAnalysis.analysis.distances import distance_array
-from modules.shared.utils.file_utils import prepare_output_file_path
+from modules.utils.shared.file_utils import prepare_output_file_path
 from typing import Optional
 
 

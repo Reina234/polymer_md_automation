@@ -1,13 +1,13 @@
 from data_models.solvent import Solvent
 from config.acpype_config import AcpypeOutputConfig
-from modules.atomistic.acpype_parameterizer.acpype_parametizer import (
+from modules.acpype.acpype_parametizer import (
     ACPYPEParameterizer,
 )
-from modules.shared.file_conversion.converter_factory import ConverterFactory
+from modules.file_conversion.converter_factory import ConverterFactory
 from modules.atomistic.workflows.equilibriated_solvent_box_generator.file_preparation_utils import (
     process_solvent_files,
 )
-from modules.atomistic.gromacs.equilibriation.full_equilibriation_workflow import (
+from modules.gromacs.equilibriation.full_equilibriation_workflow import (
     FullEquilibrationWorkflow,
 )
 from modules.atomistic.workflows.equilibriated_solvent_box_generator.workflow_config import (
@@ -28,7 +28,7 @@ from config.paths import EQUILIBRIATED_SOLVENT_BOX_DIR
 from typing import List, Optional
 from data_models.output_types import GromacsOutputs
 from config.paths import TEMP_DIR, LOG_DIR
-from modules.shared.utils.file_utils import add_identifier_name, delete_directory
+from modules.utils.shared.file_utils import add_identifier_name, delete_directory
 from modules.atomistic.utils.mdp_utils import format_temperatures
 from modules.atomistic.workflows.equilibriated_solvent_box_generator.full_workflow import (
     workflow,
