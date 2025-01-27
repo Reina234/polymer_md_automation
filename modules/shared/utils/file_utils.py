@@ -69,6 +69,32 @@ def check_directory_exists(
         return directory_path
 
 
+def move_files(
+    file_paths: List[str], target_directory: str, overwrite: bool = False
+) -> List[str]:
+    os.makedirs(target_directory, exist_ok=True)
+    moved_files = []
+    for file_path in file_paths:
+        if not os.path.isfile(file_path):
+            logger.warning(f"Warning: File not found - {file_path}")
+            continue
+
+        file_name = os.path.basename(file_path)
+        destination = os.path.join(target_directory, file_name)
+
+        if os.path.exists(destination) and not overwrite:
+            logger.info(f"Skipping: {destination} already exists (overwrite=False)")
+            continue
+
+        try:
+            shutil.move(file_path, destination)
+            moved_files.append(destination)
+            logger.info(f"Moved: {file_path} -> {destination}")
+        except Exception as e:
+            logger.error(f"Error moving {file_path}: {e}")
+    return moved_files
+
+
 def get_file_contents(file_path: str, get_contents: bool = True) -> Optional[List[str]]:
     """
     Checks that the contents of a file is not empty, and retrieves contents if :param get_contents: is True
