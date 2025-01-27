@@ -20,12 +20,12 @@ import re
 from modules.acpype.acpype_parametizer import (
     ACPYPEParameterizer,
 )
-from data_models.output_types import GromacsPaths
+from config.data_models.output_types import GromacsPaths
 from config.paths import (
     PARAMETERISED_POLYMER_DIR,
     TEMP_DIR,
     MAIN_CACHE_DIR,
-    SHORT_POLYMER_CACHE_DIR,
+    SHORT_POLYMER_BUILDING_BLOCKS_DIR,
 )
 from typing import List
 import time as time
@@ -50,14 +50,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-short_polymer_cache_dir = SHORT_POLYMER_CACHE_DIR
-short_polymer_cache = PickleCache(
-    name="short_polymer_cache", cache_dir=short_polymer_cache_dir
-)
-polymer_cache_dir = PARAMETERISED_POLYMER_DIR
-long_polymer_cache = PickleCache(
-    cache_dir=PARAMETERISED_POLYMER_DIR, name="long_polymer_cache"
-)
+# short_polymer_cache_dir = SHORT_POLYMER_CACHE_DIR
+short_polymer_cache = PickleCache(name="short_polymer_cache", cache_dir=MAIN_CACHE_DIR)
+# polymer_cache_dir = PARAMETERISED_POLYMER_DIR
+long_polymer_cache = PickleCache(cache_dir=MAIN_CACHE_DIR, name="long_polymer_cache")
 
 
 class PolymerGeneratorWorkflow(BaseWorkflow):
@@ -72,7 +68,7 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
         polymer_generator: BasePolymerGenerator = AlternatingPolymerGenerator,
         verbose: bool = True,
         output_dir: str = PARAMETERISED_POLYMER_DIR,
-        short_polymer_cache_dir: str = SHORT_POLYMER_CACHE_DIR,
+        short_polymer_cache_dir: str = SHORT_POLYMER_BUILDING_BLOCKS_DIR,
         res_name="POLY",
     ):
         super().__init__()
@@ -124,7 +120,7 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
     def build_and_parameterize_short_polymer(
         self,
         length: int,
-        output_dir: str = SHORT_POLYMER_CACHE_DIR,
+        output_dir: str = SHORT_POLYMER_BUILDING_BLOCKS_DIR,
         mol2_output_dir: str = TEMP_DIR,
     ):
         pdb, short_cg_map = self._build_short_polymer(length)

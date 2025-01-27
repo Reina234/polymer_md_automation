@@ -7,7 +7,7 @@ from modules.utils.shared.file_utils import (
     check_directory_exists,
     copy_and_rename,
 )
-from data_models.output_types import GromacsOutputs
+from config.data_models.output_types import GromacsOutputs
 from modules.utils.atomistic.mdp_utils import generate_dynamic_filename
 from config.paths import EQUILIBRIATED_OUTPUTS_SUBDIR
 

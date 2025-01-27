@@ -9,7 +9,7 @@ from modules.file_conversion.converters.obabel_pdb_to_mol2_converter import (
 )
 from config.acpype_config import AcpypeOutputConfig
 from modules.gromacs.parsers.gromacs_parser import GromacsParser
-from data_models.solvent import Solvent
+from config.data_models.solvent import Solvent
 from config.paths import (
     EQUILIBRIATED_SOLVENT_BOX_DIR,
     EQUILIBRIATED_OUTPUTS_SUBDIR,
@@ -20,7 +20,7 @@ from config.paths import (
 from typing import Optional
 import logging
 import os
-from data_models.output_types import GromacsPaths, GromacsOutputs
+from config.data_models.output_types import GromacsPaths, GromacsOutputs
 from modules.utils.atomistic.file_utils import (
     get_gro_handler,
     get_residue_number,

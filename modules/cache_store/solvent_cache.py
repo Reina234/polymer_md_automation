@@ -1,6 +1,6 @@
 from modules.cache_store.pickle_cache import PickleCache
 from config.paths import MAIN_CACHE_DIR
-from data_models.solvent import Solvent
+from config.data_models.solvent import Solvent
 
 
 class SolventCache(PickleCache):

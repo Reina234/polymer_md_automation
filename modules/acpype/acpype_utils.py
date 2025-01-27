@@ -1,7 +1,7 @@
 import os
 from modules.utils.shared.file_utils import copy_file, rename_file
 from config.acpype_config import AcpypeOutputConfig
-from data_models.output_types import GromacsPaths
+from config.data_models.output_types import GromacsPaths
 
 
 def generate_acpype_paths(

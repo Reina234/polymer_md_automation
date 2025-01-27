@@ -8,7 +8,7 @@ from modules.command_line_operation import CommandLineOperation
 from config.acpype_config import (
     AcpypeOutputConfig,
 )
-from data_models.output_types import GromacsPaths
+from config.data_models.output_types import GromacsPaths
 from modules.acpype.acpype_utils import (
     generate_acpype_paths,
     copy_acpype_files,

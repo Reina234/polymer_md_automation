@@ -5,13 +5,13 @@ from modules.gromacs.equilibriation.full_equilibriation_workflow import (
 from config.paths import TEMP_DIR, LOG_DIR, EQUILIBRIATED_OUTPUTS_SUBDIR
 from modules.gromacs.commands.genion import GenIon
 from modules.utils.shared.file_utils import copy_file
-from data_models.output_types import GromacsPaths
+from config.data_models.output_types import GromacsPaths
 
 import os
-from data_models.output_types import GromacsOutputs
+from config.data_models.output_types import GromacsOutputs
 from config.mdp_workflow_config import minim_workflow, polymer_workflow
 from modules.workflows.base_workflow import BaseWorkflow
-from data_models.solvent import Solvent
+from config.data_models.solvent import Solvent
 from modules.workflows.atomistic.solvent_equilibriator import (
     SolventEquilibriationWorkflow,
 )
@@ -27,7 +27,7 @@ from modules.gromacs.parsers.handlers.data_handler import DataHandler
 import logging
 import os
 import shutil
-from data_models.output_types import GromacsPaths
+from config.data_models.output_types import GromacsPaths
 from modules.utils.atomistic.file_utils import (
     get_gro_handler,
     calculate_molecule_counts,

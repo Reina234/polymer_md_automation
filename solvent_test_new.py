@@ -1,4 +1,4 @@
-from data_models.solvent import Solvent
+from config.data_models.solvent import Solvent
 
 
 solvent = Solvent("hexane", 86.17, 661, "input_data/solvent_pdbs/hexane.pdb", 1.24e-4)

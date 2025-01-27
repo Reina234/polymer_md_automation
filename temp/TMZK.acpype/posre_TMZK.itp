@@ -1,4 +1,4 @@
-; posre_TMZK.itp created by acpype (v: 2023.10.27) on Mon Jan 27 22:37:58 2025
+; posre_TMZK.itp created by acpype (v: 2023.10.27) on Mon Jan 27 22:44:05 2025
 
 [ position_restraints ]
 ; atom  type      fx      fy      fz

@@ -1,6 +1,6 @@
 from typing import Dict, List
 from modules.packmol.base_packmol_operation import BasePackmolOperation
-from data_models.solvent import Solvent
+from config.data_models.solvent import Solvent
 from modules.utils.shared.calculation_utils import (
     calculate_num_particles,
     box_dimensions_check_wrapper,

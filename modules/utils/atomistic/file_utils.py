@@ -19,13 +19,13 @@ import pandas as pd
 from modules.gromacs.parsers.gromacs_parser import GromacsParser
 from modules.gromacs.parsers.handlers.gro_handler import GroHandler
 from typing import List, Optional, Dict, Union
-from data_models.solvent import Solvent
+from config.data_models.solvent import Solvent
 from modules.gromacs.commands.solvate import Solvate
 from modules.gromacs.parsers.handlers.data_handler import DataHandler
 import logging
 import os
 from modules.gromacs.commands.editconf import Editconf
-from data_models.output_types import GromacsPaths
+from config.data_models.output_types import GromacsPaths
 from modules.gromacs.parsers.data_models.section import Section
 
 logger = logging.getLogger(__name__)
