@@ -12,6 +12,7 @@ class OpenMSCGTopolGenerator:
         self.map_data = self._parse_yaml(map_path)
         self.mol_counter = 1
         self.mols_list = []
+        self.top_path = None
 
         self._process_yaml()
 
@@ -128,22 +129,18 @@ class OpenMSCGTopolGenerator:
         return "\n".join(topol_lines)
 
     def _save_topol(
-        self, content: List[str], output_path: str, output_dir: Optional[str] = None
+        self, content: List[str], output_filename: str, output_dir: Optional[str] = None
     ):
         if output_dir:
             check_directory_exists(output_dir, make_dirs=True)
-            output_path = f"{output_dir}/{output_path}"
-        with open(output_path, "w") as file:
+            output_filename = f"{output_dir}/{output_filename}"
+        with open(output_filename, "w") as file:
             file.write(content)
-
-        logger.info(f"Successfully saved topol file to {output_path}")
+        logger.info(f"Successfully saved topol file to {output_filename}")
+        self.top_path = output_filename
 
     def create_topol(self, output_path: str, output_dir: Optional[str] = None):
         topol_content = self._generate_topol()
         self._save_topol(
-            content=topol_content, output_path=output_path, output_dir=output_dir
+            content=topol_content, output_filename=output_path, output_dir=output_dir
         )
-
-
-topol = OpenMSCGTopolGenerator("zzz/test_open_msg.yaml")
-topol.create_topol("test.top")
