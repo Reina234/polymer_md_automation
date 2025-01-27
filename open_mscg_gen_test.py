@@ -21,7 +21,12 @@ from mappers.open_mscg_map_generator import OpenMSCGMapGenerator
 
 generator = AlternatingPolymerGenerator(["C=Cc1ccccc1"])
 generator.generate_polymer(10, "rdkit_test2", overwrite=False, save=False)
-from mappers.open_mscg_map_generator import OpenMSCGMapGenerator
+# rom mappers.open_mscg_map_generator import OpenMSCGMapGenerator
 
-open_msg_map_generator = OpenMSCGMapGenerator(generator, "temp/production.gro")
-open_msg_map_generator.create_map("test_open_msg", "zzz")
+# open_msg_map_generator = OpenMSCGMapGenerator(generator, "temp/production.gro")
+# open_msg_map_generator.create_map("test_open_msg", "zzz")
+
+from zzz_open_mscg.trajectory_mapper import OpenMSCGTrajectoryMapper
+
+mapper = OpenMSCGTrajectoryMapper(generator, "temp/production.gro")
+mapper.run_cgmap(trr_path="temp/production.trr", output_dir="zzz")
