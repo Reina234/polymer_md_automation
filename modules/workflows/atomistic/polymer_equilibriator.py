@@ -44,6 +44,7 @@ from modules.cache_store.equilibriated_atomistic_polymer_cache import (
 from modules.moltemplate.moltemplate_utils import (
     add_polymer_to_solvent,
 )
+from modules.utils.shared.file_utils import delete_directory
 import logging
 
 logger = logging.getLogger(__name__)
@@ -154,6 +155,13 @@ class PolymerEquilibriationWorkflow(BaseWorkflow):
             )
             self.outputs.append(outputs)
             self.cache.store_object(key=cache_key, data=outputs)
+
+        if self.cleanup:
+            delete_directory(
+                TEMP_DIR, verbose=self.verbose, confirm=self.confirm_temp_deletion
+            )
+            delete_directory(LOG_DIR, verbose=self.verbose, confirm=False)
+
         return self.outputs
 
     def _run_per_temp(self, temperature: float) -> GromacsOutputs:

@@ -1,0 +1,19 @@
+; POLY_GMX_OPLS.top created by acpype (v: 2023.10.27) on Mon Jan 27 23:40:48 2025
+
+; Include forcefield parameters
+#include "ffoplsaa.itp"
+
+; Include POLY_GMX.itp topology
+#include "POLY_GMX.itp"
+
+; Ligand position restraints
+#ifdef POSRES_LIG
+#include "posre_POLY.itp"
+#endif
+
+[ system ]
+ POLY
+
+[ molecules ]
+; Compound        nmols
+ POLY             1     
