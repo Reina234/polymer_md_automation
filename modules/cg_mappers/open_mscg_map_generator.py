@@ -152,7 +152,7 @@ class OpenMSCGMapGenerator(BaseMapGenerator):
         self._finalise_block(
             last_resname=last_resname,
             previous_x_weight=x_weight,
-            start_index=index,
+            start_index=last_start_idx,
             molecule_count=molecule_count + 1,
         )
 

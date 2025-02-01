@@ -415,7 +415,7 @@ class OpenMSCGForceMatcher:
 
     def run_cgfm(
         self,
-        file_name: str,
+        filename: str,
         output_dir: Optional[str] = None,
         include_ions: bool = False,
     ) -> str:
@@ -429,9 +429,9 @@ class OpenMSCGForceMatcher:
         self.bonded_inputs = bonded_inputs
         if output_dir:
             check_directory_exists(output_dir)
-            output_path = f"{output_dir}/{file_name}"
+            output_path = f"{output_dir}/{filename}"
         else:
-            output_path = f"{file_name}"
+            output_path = f"{filename}"
 
         logger.info(
             f"Running cgfm with inputs: top: {self.top_path}, traj: {self.traj_path}"
@@ -514,6 +514,7 @@ class OpenMSCGForceMatcher:
         non_bonding_padding_rule: str = "L2",
         bonded_padding_rule: str = "LH",
     ) -> None:
+
         if None in [self.results_path, self.non_bonded_inputs, self.bonded_inputs]:
             raise ValueError(
                 "Must run run_cgfm before running run_cgdump to generate results"

@@ -1,4 +1,4 @@
-; POLY_GMX_OPLS.itp created by acpype (v: 2023.10.27) on Mon Jan 27 23:40:48 2025
+; POLY_GMX_OPLS.itp created by acpype (v: 2023.10.27) on Fri Jan 31 16:24:11 2025
 
 ; For OPLS atomtypes manual fine tuning
 ; AC_at:OPLS_at:OPLScode: Possible_Alternatives (see ffoplsaa.atp and ffoplsaanb.itp)
@@ -13,52 +13,52 @@
 
 [ atoms ]
 ;   nr  type  resi  res  atom  cgnr     charge      mass       ; qtot   bond_type
-     1 opls_135     1   UNL     C    1    -0.089100     12.01100 ; qtot -0.089  CT  
-     2 opls_135     1   UNL    C1    2    -0.021400     12.01100 ; qtot -0.111  CT  
-     3 opls_145     1   UNL    C2    3    -0.070300     12.01100 ; qtot -0.181  CA  
-     4 opls_145     1   UNL    C3    4    -0.129000     12.01100 ; qtot -0.310  CA  
-     5 opls_145     1   UNL    C4    5    -0.129000     12.01100 ; qtot -0.439  CA  
-     6 opls_145     1   UNL    C5    6    -0.133000     12.01100 ; qtot -0.572  CA  
-     7 opls_145     1   UNL    C6    7    -0.129000     12.01100 ; qtot -0.701  CA  
-     8 opls_145     1   UNL    C7    8    -0.129000     12.01100 ; qtot -0.830  CA  
+     1 opls_135     1   UNL     C    1    -0.087100     12.01100 ; qtot -0.087  CT  
+     2 opls_135     1   UNL    C1    2    -0.023400     12.01100 ; qtot -0.110  CT  
+     3 opls_145     1   UNL    C2    3    -0.074300     12.01100 ; qtot -0.185  CA  
+     4 opls_145     1   UNL    C3    4    -0.127000     12.01100 ; qtot -0.312  CA  
+     5 opls_145     1   UNL    C4    5    -0.129000     12.01100 ; qtot -0.441  CA  
+     6 opls_145     1   UNL    C5    6    -0.133000     12.01100 ; qtot -0.574  CA  
+     7 opls_145     1   UNL    C6    7    -0.129000     12.01100 ; qtot -0.703  CA  
+     8 opls_145     1   UNL    C7    8    -0.127000     12.01100 ; qtot -0.830  CA  
      9 opls_140     1   UNL     H    9     0.036700      1.00800 ; qtot -0.793  HC  
     10 opls_140     1   UNL    H1   10     0.036700      1.00800 ; qtot -0.756  HC  
-    11 opls_140     1   UNL    H2   11     0.048700      1.00800 ; qtot -0.708  HC  
-    12 opls_146     1   UNL    H3   12     0.131500      1.00800 ; qtot -0.576  HA  
-    13 opls_146     1   UNL    H4   13     0.129500      1.00800 ; qtot -0.447  HA  
-    14 opls_146     1   UNL    H5   14     0.130000      1.00800 ; qtot -0.317  HA  
-    15 opls_146     1   UNL    H6   15     0.129500      1.00800 ; qtot -0.187  HA  
-    16 opls_146     1   UNL    H7   16     0.131500      1.00800 ; qtot -0.056  HA  
-    17 opls_140     1   UNL    H8   17     0.036700      1.00800 ; qtot -0.019  HC  
-    18 opls_135     1   UNL    C8   18    -0.069400     12.01100 ; qtot -0.088  CT  
-    19 opls_135     1   UNL    C9   19    -0.084400     12.01100 ; qtot -0.173  CT  
-    20 opls_140     1   UNL    H9   20     0.039200      1.00800 ; qtot -0.134  HC  
-    21 opls_140     1   UNL   H10   21     0.039200      1.00800 ; qtot -0.094  HC  
-    22 opls_140     1   UNL   H11   22     0.048700      1.00800 ; qtot -0.046  HC  
-    23 opls_140     1   UNL   H12   23     0.048700      1.00800 ; qtot  0.003  HC  
-    24 opls_135     1   UNL   C10   24    -0.070400     12.01100 ; qtot -0.067  CT  
-    25 opls_135     1   UNL   C11   25    -0.023400     12.01100 ; qtot -0.091  CT  
-    26 opls_145     1   UNL   C12   26    -0.071300     12.01100 ; qtot -0.162  CA  
-    27 opls_145     1   UNL   C13   27    -0.128000     12.01100 ; qtot -0.290  CA  
-    28 opls_145     1   UNL   C14   28    -0.129000     12.01100 ; qtot -0.419  CA  
-    29 opls_145     1   UNL   C15   29    -0.133000     12.01100 ; qtot -0.552  CA  
-    30 opls_145     1   UNL   C16   30    -0.129000     12.01100 ; qtot -0.681  CA  
-    31 opls_145     1   UNL   C17   31    -0.128000     12.01100 ; qtot -0.809  CA  
-    32 opls_140     1   UNL   H13   32     0.043200      1.00800 ; qtot -0.766  HC  
-    33 opls_140     1   UNL   H14   33     0.043200      1.00800 ; qtot -0.723  HC  
-    34 opls_140     1   UNL   H15   34     0.054700      1.00800 ; qtot -0.668  HC  
-    35 opls_146     1   UNL   H16   35     0.131000      1.00800 ; qtot -0.537  HA  
-    36 opls_146     1   UNL   H17   36     0.129500      1.00800 ; qtot -0.408  HA  
-    37 opls_146     1   UNL   H18   37     0.130000      1.00800 ; qtot -0.278  HA  
-    38 opls_146     1   UNL   H19   38     0.129500      1.00800 ; qtot -0.148  HA  
-    39 opls_146     1   UNL   H20   39     0.131000      1.00800 ; qtot -0.017  HA  
-    40 opls_135     1   UNL   C18   40    -0.076400     12.01100 ; qtot -0.093  CT  
-    41 opls_135     1   UNL   C19   41    -0.093100     12.01100 ; qtot -0.187  CT  
-    42 opls_140     1   UNL   H21   42     0.043200      1.00800 ; qtot -0.143  HC  
-    43 opls_140     1   UNL   H22   43     0.043200      1.00800 ; qtot -0.100  HC  
-    44 opls_140     1   UNL   H23   44     0.033367      1.00800 ; qtot -0.067  HC  
-    45 opls_140     1   UNL   H24   45     0.033367      1.00800 ; qtot -0.033  HC  
-    46 opls_140     1   UNL   H25   46     0.033367      1.00800 ; qtot -0.000  HC  
+    11 opls_140     1   UNL    H2   11     0.053700      1.00800 ; qtot -0.703  HC  
+    12 opls_146     1   UNL    H3   12     0.130500      1.00800 ; qtot -0.572  HA  
+    13 opls_146     1   UNL    H4   13     0.130000      1.00800 ; qtot -0.442  HA  
+    14 opls_146     1   UNL    H5   14     0.130000      1.00800 ; qtot -0.312  HA  
+    15 opls_146     1   UNL    H6   15     0.130000      1.00800 ; qtot -0.182  HA  
+    16 opls_146     1   UNL    H7   16     0.130500      1.00800 ; qtot -0.052  HA  
+    17 opls_140     1   UNL    H8   17     0.036700      1.00800 ; qtot -0.015  HC  
+    18 opls_135     1   UNL    C8   18    -0.074400     12.01100 ; qtot -0.089  CT  
+    19 opls_135     1   UNL    C9   19    -0.082400     12.01100 ; qtot -0.172  CT  
+    20 opls_140     1   UNL    H9   20     0.042700      1.00800 ; qtot -0.129  HC  
+    21 opls_140     1   UNL   H10   21     0.042700      1.00800 ; qtot -0.086  HC  
+    22 opls_140     1   UNL   H11   22     0.044700      1.00800 ; qtot -0.042  HC  
+    23 opls_140     1   UNL   H12   23     0.044700      1.00800 ; qtot  0.003  HC  
+    24 opls_135     1   UNL   C10   24    -0.071400     12.01100 ; qtot -0.068  CT  
+    25 opls_135     1   UNL   C11   25    -0.023400     12.01100 ; qtot -0.092  CT  
+    26 opls_145     1   UNL   C12   26    -0.072300     12.01100 ; qtot -0.164  CA  
+    27 opls_145     1   UNL   C13   27    -0.128000     12.01100 ; qtot -0.292  CA  
+    28 opls_145     1   UNL   C14   28    -0.129000     12.01100 ; qtot -0.421  CA  
+    29 opls_145     1   UNL   C15   29    -0.135000     12.01100 ; qtot -0.556  CA  
+    30 opls_145     1   UNL   C16   30    -0.129000     12.01100 ; qtot -0.685  CA  
+    31 opls_145     1   UNL   C17   31    -0.128000     12.01100 ; qtot -0.813  CA  
+    32 opls_140     1   UNL   H13   32     0.042700      1.00800 ; qtot -0.770  HC  
+    33 opls_140     1   UNL   H14   33     0.042700      1.00800 ; qtot -0.728  HC  
+    34 opls_140     1   UNL   H15   34     0.056700      1.00800 ; qtot -0.671  HC  
+    35 opls_146     1   UNL   H16   35     0.131500      1.00800 ; qtot -0.540  HA  
+    36 opls_146     1   UNL   H17   36     0.130000      1.00800 ; qtot -0.410  HA  
+    37 opls_146     1   UNL   H18   37     0.130000      1.00800 ; qtot -0.280  HA  
+    38 opls_146     1   UNL   H19   38     0.130000      1.00800 ; qtot -0.150  HA  
+    39 opls_146     1   UNL   H20   39     0.131500      1.00800 ; qtot -0.018  HA  
+    40 opls_135     1   UNL   C18   40    -0.076400     12.01100 ; qtot -0.094  CT  
+    41 opls_135     1   UNL   C19   41    -0.093100     12.01100 ; qtot -0.188  CT  
+    42 opls_140     1   UNL   H21   42     0.043200      1.00800 ; qtot -0.144  HC  
+    43 opls_140     1   UNL   H22   43     0.043200      1.00800 ; qtot -0.101  HC  
+    44 opls_140     1   UNL   H23   44     0.033700      1.00800 ; qtot -0.067  HC  
+    45 opls_140     1   UNL   H24   45     0.033700      1.00800 ; qtot -0.034  HC  
+    46 opls_140     1   UNL   H25   46     0.033700      1.00800 ; qtot -0.000  HC  
 
 [ bonds ]
 ;   ai     aj funct   r             k

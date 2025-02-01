@@ -130,7 +130,7 @@ class OpenMSCGTopolGenerator:
 
     def _save_topol(
         self, content: List[str], output_filename: str, output_dir: Optional[str] = None
-    ):
+    ) -> str:
         if output_dir:
             check_directory_exists(output_dir, make_dirs=True)
             output_filename = f"{output_dir}/{output_filename}"
@@ -138,9 +138,12 @@ class OpenMSCGTopolGenerator:
             file.write(content)
         logger.info(f"Successfully saved topol file to {output_filename}")
         self.top_path = output_filename
+        return output_filename
 
-    def create_topol(self, output_path: str, output_dir: Optional[str] = None):
+    def create_topol(self, filename: str, output_dir: Optional[str] = None) -> str:
+        filename = f"{filename}.top"
         topol_content = self._generate_topol()
-        self._save_topol(
-            content=topol_content, output_filename=output_path, output_dir=output_dir
+        filepath = self._save_topol(
+            content=topol_content, output_filename=filename, output_dir=output_dir
         )
+        return filepath

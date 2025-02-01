@@ -44,7 +44,7 @@ solvent_workflow.add_thermal_step(
 )
 
 solvent_workflow.add_thermal_step(
-    step_name="npt_c_rescale_shprt",
+    step_name="npt_c_rescale_short",
     workflow_step=workflow_step,
     template_path=os.path.join(PME_TEMPLATE_DIR, "npt_c_rescale.mdp"),
     base_params={
@@ -75,20 +75,20 @@ polymer_workflow = FullEquilibrationWorkflow(mdp_cache)
 
 
 polymer_workflow.add_em_step(
-    step_name="minim_1",
+    step_name="minim_1_RF",
     workflow_step=workflow_step,
     template_path=os.path.join(RF_TEMPLATE_DIR, "em.mdp"),
     base_params={"nsteps": "50000", "emtol": "1000"},
 )
 polymer_workflow.add_em_step(
-    step_name="minim_2",
+    step_name="minim_2_RF",
     workflow_step=workflow_step,
     template_path=os.path.join(RF_TEMPLATE_DIR, "em.mdp"),
     base_params={"nsteps": "50000", "emtol": "100"},
 )
 
 polymer_workflow.add_thermal_step(
-    step_name="nvt",
+    step_name="nvt_RF",
     workflow_step=workflow_step,
     template_path=os.path.join(RF_TEMPLATE_DIR, "nvt.mdp"),
     base_params={
@@ -97,7 +97,7 @@ polymer_workflow.add_thermal_step(
 )
 
 polymer_workflow.add_thermal_step(
-    step_name="npt_c_rescale_shprt",
+    step_name="npt_c_rescale_short_RF",
     workflow_step=workflow_step,
     template_path=os.path.join(RF_TEMPLATE_DIR, "npt_c_rescale.mdp"),
     base_params={
@@ -106,7 +106,7 @@ polymer_workflow.add_thermal_step(
     },
 )
 polymer_workflow.add_thermal_step(
-    step_name="npt_PR_long",
+    step_name="npt_PR_long_RF",
     workflow_step=workflow_step,
     template_path=os.path.join(RF_TEMPLATE_DIR, "npt_PR.mdp"),
     base_params={
@@ -115,7 +115,7 @@ polymer_workflow.add_thermal_step(
     },
 )
 polymer_workflow.add_thermal_step(
-    step_name="production",
+    step_name="production_RF",
     workflow_step=workflow_step,
     template_path=os.path.join(RF_TEMPLATE_DIR, "prod.mdp"),
     base_params={

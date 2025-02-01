@@ -2,7 +2,7 @@
 ;	File 'mdout.mdp' was generated
 ;	By user: unknown (1000)
 ;	On host: LENOVO-PC
-;	At date: Fri Jan 31 10:55:36 2025
+;	At date: Sat Feb  1 13:38:36 2025
 ;
 ;	Created by:
 ;	                :-) GROMACS - gmx grompp, 2021.3-bioconda (-:
@@ -11,7 +11,7 @@
 ;	Data prefix:  /home/reina/miniconda3/envs/openmscg_env
 ;	Working dir:  /home/reina/polymerpinn
 ;	Command line:
-;	  gmx grompp -f cache/mdp_cache/015cc6e80d20b1c73300c2cefd1e1568.mdp -c temp/npt_PR_long.gro -p temp/topol.top -o temp/production.tpr
+;	  gmx grompp -f cache/mdp_cache/015cc6e80d20b1c73300c2cefd1e1568.mdp -c temp/npt_PR_long_RF.gro -p temp/topol.top -o temp/production_RF.tpr
 
 ; VARIOUS PREPROCESSING OPTIONS
 ; Preprocessor information: use cpp syntax.

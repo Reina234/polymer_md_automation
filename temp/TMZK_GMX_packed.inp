@@ -1,9 +1,0 @@
-tolerance 1.5
-filetype pdb
-
-output temp/TMZK_GMX_packed.pdb
-
-structure temp/TMZK_GMX.pdb
-  number 1584
-  inside box 0.0 0.0 0.0 70.0 70.0 70.0
-end structure

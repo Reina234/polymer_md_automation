@@ -168,7 +168,7 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
                 len(self.monomer_smiles) * closest_multiple
                 + self._get_minimum_polymer_length()
             )
-        print(closest_multiple, length)
+
         return closest_multiple, length
 
     def _extend_itp(
@@ -247,35 +247,41 @@ class PolymerGeneratorWorkflow(BaseWorkflow):
             self.monomer_smiles, self.actual_num_units
         )
         if self.long_polymer_cache.has_key(cache_key):
-            parameterised_polymer = self.long_polymer_cache.retrieve_object(cache_key)
+            polymer, parameterised_polymer_pdb = (
+                self.long_polymer_cache.retrieve_object(cache_key)
+            )
             logging.info(
                 f"Parameterised polymer retrieved from cache with key: {cache_key}"
             )
-            return parameterised_polymer
+            return polymer, parameterised_polymer_pdb
         logging.info(f"Parameterised polymer not found in cache with key: {cache_key}")
-        return None
+        return None, None
 
     def run(self):
         output_dir = self.output_dir
         check_directory_exists(output_dir)
-        parameterised_polymer = self.check_long_polymer_cache()
-        if parameterised_polymer:
-            return parameterised_polymer
+        polymer_generator, parameterised_polymer_pdb = self.check_long_polymer_cache()
+        if polymer_generator and parameterised_polymer_pdb:
+            self.long_polymer_generator = polymer_generator
+            return parameterised_polymer_pdb
         logging.info(f"Long polymer not found in cache, generating...")
 
         if self.num_repeats < 1:
-            polymer, cg_map = self.build_and_parameterize_short_polymer(
+            polymer_paths, cg_map = self.build_and_parameterize_short_polymer(
                 self.num_units, output_dir=output_dir
             )
 
         else:
-            polymer = self._build_long_polymer(output_dir)
+            polymer_paths = self._build_long_polymer(output_dir)
         cache_key = self._generate_polymer_cache_key(
             self.monomer_smiles, self.actual_num_units
         )
-        self.long_polymer_cache.store_object(cache_key, polymer)
+
+        self.long_polymer_cache.store_object(
+            cache_key, (self.long_polymer_generator, polymer_paths)
+        )
         logger.info(f"Parameterised polymer saved to cache with key: {cache_key}")
-        return polymer
+        return polymer_generator
 
     @staticmethod
     def add_box_dim(

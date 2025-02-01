@@ -16,11 +16,20 @@ from modules.workflows.atomistic.polymer_equilibriator import (
 )
 
 
-PolymerEquilibriationWorkflow(
+equilibriator = PolymerEquilibriationWorkflow(
     monomer_smiles=["C=Cc1ccccc1", "C=C"],
     num_units=10,
     temperatures=[298],
     solvent=solvent,
     box_size_nm=[7, 7, 7],
     output_dir="ZZZ",
-).run()
+)
+outputs = equilibriator.run()
+
+from modules.workflows.cg.course_grainer import CourseGrainer
+
+polymer = equilibriator.polymer
+print(polymer.cg_map)
+
+cg = CourseGrainer(polymer=equilibriator.polymer, outputs=outputs[0], output_dir="ZZZ")
+cg.run()

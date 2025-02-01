@@ -40,7 +40,7 @@ class OpenMSCGTrajectoryMapper:
     ) -> str:
         if not map_filename:
             map_filename = self.default_map_name
-        output_name = f"{map_filename}.yaml"
+        output_name = f"{map_filename}"
         map_path = self.map_generator.create_map(
             filename=output_name, output_dir=output_dir
         )
@@ -64,7 +64,7 @@ class OpenMSCGTrajectoryMapper:
     def run_cgmap(
         self,
         trr_path: str,
-        output_filename: Optional[str] = None,
+        filename: Optional[str] = None,
         output_dir: Optional[str] = None,
         map_filename: Optional[str] = None,
     ) -> str:
@@ -73,7 +73,30 @@ class OpenMSCGTrajectoryMapper:
             check_directory_exists(output_dir, make_dirs=True)
         map_path = self._generate_map(output_dir=output_dir, map_filename=map_filename)
         output_path = self._generate_output_name(
-            output_dir=output_dir, output_filename=output_filename
+            output_dir=output_dir, output_filename=filename
+        )
+        self.map_path = map_path
+        self.cg_lammpstrj = output_path
+
+        logger.info(
+            f"Running cgmap with map: {map_path}, traj: {trr_path}, out: {output_path}"
+        )
+
+        cgmap.main(map=map_path, traj=trr_path, out=output_path)
+        return output_path
+
+    def run_with_premade_map(
+        self,
+        trr_path: str,
+        map_path: str,
+        filename: Optional[str] = None,
+        output_dir: Optional[str] = None,
+    ) -> str:
+        check_file_type(trr_path, "trr")
+        if output_dir:
+            check_directory_exists(output_dir, make_dirs=True)
+        output_path = self._generate_output_name(
+            output_dir=output_dir, output_filename=filename
         )
         self.map_path = map_path
         self.cg_lammpstrj = output_path

@@ -81,8 +81,9 @@ class PolymerEquilibriationWorkflow(BaseWorkflow):
         super().__init__()
         self.verbose = verbose
         self.solvent = solvent
-        self.outputs = []
+        self.outputs: List[GromacsOutputs] = []
         self.cache = cache
+        self.polymer = None
         self.monomer_smiles = monomer_smiles
         self.num_units = num_units
         self.pname = pos_ion_name
@@ -112,8 +113,11 @@ class PolymerEquilibriationWorkflow(BaseWorkflow):
         polymer_workflow = PolymerGeneratorWorkflow(
             monomer_smiles=self.monomer_smiles, num_units=self.num_units
         )
+
         self.actual_num_units = polymer_workflow.actual_num_units
         outputs = polymer_workflow.run()
+        self.polymer = polymer_workflow.long_polymer_generator
+
         return outputs
 
     def check_polymer_cache(self, temperature: float) -> Optional[GromacsOutputs]:
@@ -139,7 +143,7 @@ class PolymerEquilibriationWorkflow(BaseWorkflow):
         ).run()
         return solvent_box
 
-    def run(self) -> GromacsOutputs:
+    def run(self) -> List[GromacsOutputs]:
         for temperature in self.temperatures:
             outputs = self.check_polymer_cache(temperature)
             if outputs:

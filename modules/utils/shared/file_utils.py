@@ -84,6 +84,7 @@ def move_files(
 
         if os.path.exists(destination) and not overwrite:
             logger.info(f"Skipping: {destination} already exists (overwrite=False)")
+            moved_files.append(destination)
             continue
 
         try:
