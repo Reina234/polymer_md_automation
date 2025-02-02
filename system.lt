@@ -1,0 +1,316 @@
+# Moltemplate system file (with masses and full interactions)
+import "forcefield.lt"
+
+Masses {
+  B1 105
+  B2 28
+  B3 104
+  B4 29
+  SOL 86.0
+}
+Molecule Polymer {
+  $atom:B1 0.0 0.0 0.0
+  $atom:B2_1 1.5 0.0 0.0
+  $atom:B3_1 2.5 0.0 0.0
+  $atom:B2_2 3.5 0.0 0.0
+  $atom:B3_2 4.5 0.0 0.0
+  $atom:B2_3 5.5 0.0 0.0
+  $atom:B3_3 6.5 0.0 0.0
+  $atom:B2_4 7.5 0.0 0.0
+  $atom:B3_4 8.5 0.0 0.0
+  $atom:B2_5 9.5 0.0 0.0
+  $atom:B3_5 10.5 0.0 0.0
+  $atom:B2_6 11.5 0.0 0.0
+  $atom:B3_6 12.5 0.0 0.0
+  $atom:B2_7 13.5 0.0 0.0
+  $atom:B3_7 14.5 0.0 0.0
+  $atom:B2_8 15.5 0.0 0.0
+  $atom:B3_8 16.5 0.0 0.0
+  $atom:B2_9 17.5 0.0 0.0
+  $atom:B3_9 18.5 0.0 0.0
+  $atom:B2_10 19.5 0.0 0.0
+  $atom:B3_10 20.5 0.0 0.0
+  $atom:B2_11 21.5 0.0 0.0
+  $atom:B3_11 22.5 0.0 0.0
+  $atom:B2_12 23.5 0.0 0.0
+  $atom:B3_12 24.5 0.0 0.0
+  $atom:B2_13 25.5 0.0 0.0
+  $atom:B3_13 26.5 0.0 0.0
+  $atom:B2_14 27.5 0.0 0.0
+  $atom:B3_14 28.5 0.0 0.0
+  $atom:B2_15 29.5 0.0 0.0
+  $atom:B3_15 30.5 0.0 0.0
+  $atom:B2_16 31.5 0.0 0.0
+  $atom:B3_16 32.5 0.0 0.0
+  $atom:B2_17 33.5 0.0 0.0
+  $atom:B3_17 34.5 0.0 0.0
+  $atom:B2_18 35.5 0.0 0.0
+  $atom:B3_18 36.5 0.0 0.0
+  $atom:B2_19 37.5 0.0 0.0
+  $atom:B3_19 38.5 0.0 0.0
+  $atom:B2_20 39.5 0.0 0.0
+  $atom:B3_20 40.5 0.0 0.0
+  $atom:B2_21 41.5 0.0 0.0
+  $atom:B3_21 42.5 0.0 0.0
+  $atom:B2_22 43.5 0.0 0.0
+  $atom:B3_22 44.5 0.0 0.0
+  $atom:B2_23 45.5 0.0 0.0
+  $atom:B3_23 46.5 0.0 0.0
+  $atom:B2_24 47.5 0.0 0.0
+  $atom:B3_24 48.5 0.0 0.0
+  $atom:B2_25 49.5 0.0 0.0
+  $atom:B3_25 50.5 0.0 0.0
+  $atom:B2_26 51.5 0.0 0.0
+  $atom:B3_26 52.5 0.0 0.0
+  $atom:B2_27 53.5 0.0 0.0
+  $atom:B3_27 54.5 0.0 0.0
+  $atom:B2_28 55.5 0.0 0.0
+  $atom:B3_28 56.5 0.0 0.0
+  $atom:B2_29 57.5 0.0 0.0
+  $atom:B3_29 58.5 0.0 0.0
+  $atom:B2_30 59.5 0.0 0.0
+  $atom:B3_30 60.5 0.0 0.0
+  $atom:B2_31 61.5 0.0 0.0
+  $atom:B3_31 62.5 0.0 0.0
+  $atom:B2_32 63.5 0.0 0.0
+  $atom:B3_32 64.5 0.0 0.0
+  $atom:B2_33 65.5 0.0 0.0
+  $atom:B3_33 66.5 0.0 0.0
+  $atom:B2_34 67.5 0.0 0.0
+  $atom:B3_34 68.5 0.0 0.0
+  $atom:B2_35 69.5 0.0 0.0
+  $atom:B3_35 70.5 0.0 0.0
+  $atom:B2_36 71.5 0.0 0.0
+  $atom:B3_36 72.5 0.0 0.0
+  $atom:B2_37 73.5 0.0 0.0
+  $atom:B3_37 74.5 0.0 0.0
+  $atom:B2_38 75.5 0.0 0.0
+  $atom:B3_38 76.5 0.0 0.0
+  $atom:B2_39 77.5 0.0 0.0
+  $atom:B3_39 78.5 0.0 0.0
+  $atom:B2_40 79.5 0.0 0.0
+  $atom:B3_40 80.5 0.0 0.0
+  $atom:B2_41 81.5 0.0 0.0
+  $atom:B3_41 82.5 0.0 0.0
+  $atom:B2_42 83.5 0.0 0.0
+  $atom:B3_42 84.5 0.0 0.0
+  $atom:B2_43 85.5 0.0 0.0
+  $atom:B3_43 86.5 0.0 0.0
+  $atom:B2_44 87.5 0.0 0.0
+  $atom:B3_44 88.5 0.0 0.0
+  $atom:B2_45 89.5 0.0 0.0
+  $atom:B3_45 90.5 0.0 0.0
+  $atom:B2_46 91.5 0.0 0.0
+  $atom:B3_46 92.5 0.0 0.0
+  $atom:B2_47 93.5 0.0 0.0
+  $atom:B3_47 94.5 0.0 0.0
+  $atom:B2_48 95.5 0.0 0.0
+  $atom:B3_48 96.5 0.0 0.0
+  $atom:B2_49 97.5 0.0 0.0
+  $atom:B3_49 98.5 0.0 0.0
+  $atom:B4 99.5 0.0 0.0
+
+  # Bonds
+  bond:bond_1 @atom:B1 @atom:B2_1
+  bond:bond_2 @atom:B2_1 @atom:B3_1
+  bond:bond_3 @atom:B3_1 @atom:B2_2
+  bond:bond_4 @atom:B2_2 @atom:B3_2
+  bond:bond_5 @atom:B3_2 @atom:B2_3
+  bond:bond_6 @atom:B2_3 @atom:B3_3
+  bond:bond_7 @atom:B3_3 @atom:B2_4
+  bond:bond_8 @atom:B2_4 @atom:B3_4
+  bond:bond_9 @atom:B3_4 @atom:B2_5
+  bond:bond_10 @atom:B2_5 @atom:B3_5
+  bond:bond_11 @atom:B3_5 @atom:B2_6
+  bond:bond_12 @atom:B2_6 @atom:B3_6
+  bond:bond_13 @atom:B3_6 @atom:B2_7
+  bond:bond_14 @atom:B2_7 @atom:B3_7
+  bond:bond_15 @atom:B3_7 @atom:B2_8
+  bond:bond_16 @atom:B2_8 @atom:B3_8
+  bond:bond_17 @atom:B3_8 @atom:B2_9
+  bond:bond_18 @atom:B2_9 @atom:B3_9
+  bond:bond_19 @atom:B3_9 @atom:B2_10
+  bond:bond_20 @atom:B2_10 @atom:B3_10
+  bond:bond_21 @atom:B3_10 @atom:B2_11
+  bond:bond_22 @atom:B2_11 @atom:B3_11
+  bond:bond_23 @atom:B3_11 @atom:B2_12
+  bond:bond_24 @atom:B2_12 @atom:B3_12
+  bond:bond_25 @atom:B3_12 @atom:B2_13
+  bond:bond_26 @atom:B2_13 @atom:B3_13
+  bond:bond_27 @atom:B3_13 @atom:B2_14
+  bond:bond_28 @atom:B2_14 @atom:B3_14
+  bond:bond_29 @atom:B3_14 @atom:B2_15
+  bond:bond_30 @atom:B2_15 @atom:B3_15
+  bond:bond_31 @atom:B3_15 @atom:B2_16
+  bond:bond_32 @atom:B2_16 @atom:B3_16
+  bond:bond_33 @atom:B3_16 @atom:B2_17
+  bond:bond_34 @atom:B2_17 @atom:B3_17
+  bond:bond_35 @atom:B3_17 @atom:B2_18
+  bond:bond_36 @atom:B2_18 @atom:B3_18
+  bond:bond_37 @atom:B3_18 @atom:B2_19
+  bond:bond_38 @atom:B2_19 @atom:B3_19
+  bond:bond_39 @atom:B3_19 @atom:B2_20
+  bond:bond_40 @atom:B2_20 @atom:B3_20
+  bond:bond_41 @atom:B3_20 @atom:B2_21
+  bond:bond_42 @atom:B2_21 @atom:B3_21
+  bond:bond_43 @atom:B3_21 @atom:B2_22
+  bond:bond_44 @atom:B2_22 @atom:B3_22
+  bond:bond_45 @atom:B3_22 @atom:B2_23
+  bond:bond_46 @atom:B2_23 @atom:B3_23
+  bond:bond_47 @atom:B3_23 @atom:B2_24
+  bond:bond_48 @atom:B2_24 @atom:B3_24
+  bond:bond_49 @atom:B3_24 @atom:B2_25
+  bond:bond_50 @atom:B2_25 @atom:B3_25
+  bond:bond_51 @atom:B3_25 @atom:B2_26
+  bond:bond_52 @atom:B2_26 @atom:B3_26
+  bond:bond_53 @atom:B3_26 @atom:B2_27
+  bond:bond_54 @atom:B2_27 @atom:B3_27
+  bond:bond_55 @atom:B3_27 @atom:B2_28
+  bond:bond_56 @atom:B2_28 @atom:B3_28
+  bond:bond_57 @atom:B3_28 @atom:B2_29
+  bond:bond_58 @atom:B2_29 @atom:B3_29
+  bond:bond_59 @atom:B3_29 @atom:B2_30
+  bond:bond_60 @atom:B2_30 @atom:B3_30
+  bond:bond_61 @atom:B3_30 @atom:B2_31
+  bond:bond_62 @atom:B2_31 @atom:B3_31
+  bond:bond_63 @atom:B3_31 @atom:B2_32
+  bond:bond_64 @atom:B2_32 @atom:B3_32
+  bond:bond_65 @atom:B3_32 @atom:B2_33
+  bond:bond_66 @atom:B2_33 @atom:B3_33
+  bond:bond_67 @atom:B3_33 @atom:B2_34
+  bond:bond_68 @atom:B2_34 @atom:B3_34
+  bond:bond_69 @atom:B3_34 @atom:B2_35
+  bond:bond_70 @atom:B2_35 @atom:B3_35
+  bond:bond_71 @atom:B3_35 @atom:B2_36
+  bond:bond_72 @atom:B2_36 @atom:B3_36
+  bond:bond_73 @atom:B3_36 @atom:B2_37
+  bond:bond_74 @atom:B2_37 @atom:B3_37
+  bond:bond_75 @atom:B3_37 @atom:B2_38
+  bond:bond_76 @atom:B2_38 @atom:B3_38
+  bond:bond_77 @atom:B3_38 @atom:B2_39
+  bond:bond_78 @atom:B2_39 @atom:B3_39
+  bond:bond_79 @atom:B3_39 @atom:B2_40
+  bond:bond_80 @atom:B2_40 @atom:B3_40
+  bond:bond_81 @atom:B3_40 @atom:B2_41
+  bond:bond_82 @atom:B2_41 @atom:B3_41
+  bond:bond_83 @atom:B3_41 @atom:B2_42
+  bond:bond_84 @atom:B2_42 @atom:B3_42
+  bond:bond_85 @atom:B3_42 @atom:B2_43
+  bond:bond_86 @atom:B2_43 @atom:B3_43
+  bond:bond_87 @atom:B3_43 @atom:B2_44
+  bond:bond_88 @atom:B2_44 @atom:B3_44
+  bond:bond_89 @atom:B3_44 @atom:B2_45
+  bond:bond_90 @atom:B2_45 @atom:B3_45
+  bond:bond_91 @atom:B3_45 @atom:B2_46
+  bond:bond_92 @atom:B2_46 @atom:B3_46
+  bond:bond_93 @atom:B3_46 @atom:B2_47
+  bond:bond_94 @atom:B2_47 @atom:B3_47
+  bond:bond_95 @atom:B3_47 @atom:B2_48
+  bond:bond_96 @atom:B2_48 @atom:B3_48
+  bond:bond_97 @atom:B3_48 @atom:B2_49
+  bond:bond_98 @atom:B2_49 @atom:B3_49
+  bond:bond_99 @atom:B3_49 @atom:B4
+
+  # Angles
+  angle:angle_1 @atom:B1 @atom:B2_1 @atom:B3_1
+  angle:angle_2 @atom:B2_1 @atom:B3_1 @atom:B2_2
+  angle:angle_3 @atom:B3_1 @atom:B2_2 @atom:B3_2
+  angle:angle_4 @atom:B2_2 @atom:B3_2 @atom:B2_3
+  angle:angle_5 @atom:B3_2 @atom:B2_3 @atom:B3_3
+  angle:angle_6 @atom:B2_3 @atom:B3_3 @atom:B2_4
+  angle:angle_7 @atom:B3_3 @atom:B2_4 @atom:B3_4
+  angle:angle_8 @atom:B2_4 @atom:B3_4 @atom:B2_5
+  angle:angle_9 @atom:B3_4 @atom:B2_5 @atom:B3_5
+  angle:angle_10 @atom:B2_5 @atom:B3_5 @atom:B2_6
+  angle:angle_11 @atom:B3_5 @atom:B2_6 @atom:B3_6
+  angle:angle_12 @atom:B2_6 @atom:B3_6 @atom:B2_7
+  angle:angle_13 @atom:B3_6 @atom:B2_7 @atom:B3_7
+  angle:angle_14 @atom:B2_7 @atom:B3_7 @atom:B2_8
+  angle:angle_15 @atom:B3_7 @atom:B2_8 @atom:B3_8
+  angle:angle_16 @atom:B2_8 @atom:B3_8 @atom:B2_9
+  angle:angle_17 @atom:B3_8 @atom:B2_9 @atom:B3_9
+  angle:angle_18 @atom:B2_9 @atom:B3_9 @atom:B2_10
+  angle:angle_19 @atom:B3_9 @atom:B2_10 @atom:B3_10
+  angle:angle_20 @atom:B2_10 @atom:B3_10 @atom:B2_11
+  angle:angle_21 @atom:B3_10 @atom:B2_11 @atom:B3_11
+  angle:angle_22 @atom:B2_11 @atom:B3_11 @atom:B2_12
+  angle:angle_23 @atom:B3_11 @atom:B2_12 @atom:B3_12
+  angle:angle_24 @atom:B2_12 @atom:B3_12 @atom:B2_13
+  angle:angle_25 @atom:B3_12 @atom:B2_13 @atom:B3_13
+  angle:angle_26 @atom:B2_13 @atom:B3_13 @atom:B2_14
+  angle:angle_27 @atom:B3_13 @atom:B2_14 @atom:B3_14
+  angle:angle_28 @atom:B2_14 @atom:B3_14 @atom:B2_15
+  angle:angle_29 @atom:B3_14 @atom:B2_15 @atom:B3_15
+  angle:angle_30 @atom:B2_15 @atom:B3_15 @atom:B2_16
+  angle:angle_31 @atom:B3_15 @atom:B2_16 @atom:B3_16
+  angle:angle_32 @atom:B2_16 @atom:B3_16 @atom:B2_17
+  angle:angle_33 @atom:B3_16 @atom:B2_17 @atom:B3_17
+  angle:angle_34 @atom:B2_17 @atom:B3_17 @atom:B2_18
+  angle:angle_35 @atom:B3_17 @atom:B2_18 @atom:B3_18
+  angle:angle_36 @atom:B2_18 @atom:B3_18 @atom:B2_19
+  angle:angle_37 @atom:B3_18 @atom:B2_19 @atom:B3_19
+  angle:angle_38 @atom:B2_19 @atom:B3_19 @atom:B2_20
+  angle:angle_39 @atom:B3_19 @atom:B2_20 @atom:B3_20
+  angle:angle_40 @atom:B2_20 @atom:B3_20 @atom:B2_21
+  angle:angle_41 @atom:B3_20 @atom:B2_21 @atom:B3_21
+  angle:angle_42 @atom:B2_21 @atom:B3_21 @atom:B2_22
+  angle:angle_43 @atom:B3_21 @atom:B2_22 @atom:B3_22
+  angle:angle_44 @atom:B2_22 @atom:B3_22 @atom:B2_23
+  angle:angle_45 @atom:B3_22 @atom:B2_23 @atom:B3_23
+  angle:angle_46 @atom:B2_23 @atom:B3_23 @atom:B2_24
+  angle:angle_47 @atom:B3_23 @atom:B2_24 @atom:B3_24
+  angle:angle_48 @atom:B2_24 @atom:B3_24 @atom:B2_25
+  angle:angle_49 @atom:B3_24 @atom:B2_25 @atom:B3_25
+  angle:angle_50 @atom:B2_25 @atom:B3_25 @atom:B2_26
+  angle:angle_51 @atom:B3_25 @atom:B2_26 @atom:B3_26
+  angle:angle_52 @atom:B2_26 @atom:B3_26 @atom:B2_27
+  angle:angle_53 @atom:B3_26 @atom:B2_27 @atom:B3_27
+  angle:angle_54 @atom:B2_27 @atom:B3_27 @atom:B2_28
+  angle:angle_55 @atom:B3_27 @atom:B2_28 @atom:B3_28
+  angle:angle_56 @atom:B2_28 @atom:B3_28 @atom:B2_29
+  angle:angle_57 @atom:B3_28 @atom:B2_29 @atom:B3_29
+  angle:angle_58 @atom:B2_29 @atom:B3_29 @atom:B2_30
+  angle:angle_59 @atom:B3_29 @atom:B2_30 @atom:B3_30
+  angle:angle_60 @atom:B2_30 @atom:B3_30 @atom:B2_31
+  angle:angle_61 @atom:B3_30 @atom:B2_31 @atom:B3_31
+  angle:angle_62 @atom:B2_31 @atom:B3_31 @atom:B2_32
+  angle:angle_63 @atom:B3_31 @atom:B2_32 @atom:B3_32
+  angle:angle_64 @atom:B2_32 @atom:B3_32 @atom:B2_33
+  angle:angle_65 @atom:B3_32 @atom:B2_33 @atom:B3_33
+  angle:angle_66 @atom:B2_33 @atom:B3_33 @atom:B2_34
+  angle:angle_67 @atom:B3_33 @atom:B2_34 @atom:B3_34
+  angle:angle_68 @atom:B2_34 @atom:B3_34 @atom:B2_35
+  angle:angle_69 @atom:B3_34 @atom:B2_35 @atom:B3_35
+  angle:angle_70 @atom:B2_35 @atom:B3_35 @atom:B2_36
+  angle:angle_71 @atom:B3_35 @atom:B2_36 @atom:B3_36
+  angle:angle_72 @atom:B2_36 @atom:B3_36 @atom:B2_37
+  angle:angle_73 @atom:B3_36 @atom:B2_37 @atom:B3_37
+  angle:angle_74 @atom:B2_37 @atom:B3_37 @atom:B2_38
+  angle:angle_75 @atom:B3_37 @atom:B2_38 @atom:B3_38
+  angle:angle_76 @atom:B2_38 @atom:B3_38 @atom:B2_39
+  angle:angle_77 @atom:B3_38 @atom:B2_39 @atom:B3_39
+  angle:angle_78 @atom:B2_39 @atom:B3_39 @atom:B2_40
+  angle:angle_79 @atom:B3_39 @atom:B2_40 @atom:B3_40
+  angle:angle_80 @atom:B2_40 @atom:B3_40 @atom:B2_41
+  angle:angle_81 @atom:B3_40 @atom:B2_41 @atom:B3_41
+  angle:angle_82 @atom:B2_41 @atom:B3_41 @atom:B2_42
+  angle:angle_83 @atom:B3_41 @atom:B2_42 @atom:B3_42
+  angle:angle_84 @atom:B2_42 @atom:B3_42 @atom:B2_43
+  angle:angle_85 @atom:B3_42 @atom:B2_43 @atom:B3_43
+  angle:angle_86 @atom:B2_43 @atom:B3_43 @atom:B2_44
+  angle:angle_87 @atom:B3_43 @atom:B2_44 @atom:B3_44
+  angle:angle_88 @atom:B2_44 @atom:B3_44 @atom:B2_45
+  angle:angle_89 @atom:B3_44 @atom:B2_45 @atom:B3_45
+  angle:angle_90 @atom:B2_45 @atom:B3_45 @atom:B2_46
+  angle:angle_91 @atom:B3_45 @atom:B2_46 @atom:B3_46
+  angle:angle_92 @atom:B2_46 @atom:B3_46 @atom:B2_47
+  angle:angle_93 @atom:B3_46 @atom:B2_47 @atom:B3_47
+  angle:angle_94 @atom:B2_47 @atom:B3_47 @atom:B2_48
+  angle:angle_95 @atom:B3_47 @atom:B2_48 @atom:B3_48
+  angle:angle_96 @atom:B2_48 @atom:B3_48 @atom:B2_49
+  angle:angle_97 @atom:B3_48 @atom:B2_49 @atom:B3_49
+  angle:angle_98 @atom:B2_49 @atom:B3_49 @atom:B4
+}
+Molecule Solvent {
+  $atom:SOL 0.0 0.0 0.0
+}

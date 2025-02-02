@@ -33,6 +33,7 @@ class OpenMSCGTopolExporter:
         self._parse_map()
         self.cg_traj_file = cg_traj_file
         self._parse_traj()
+        self._get_bead_masses()
 
     def _parse_map(self) -> None:
         with open(self.cg_map_file, "r") as file:

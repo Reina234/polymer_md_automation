@@ -31,5 +31,13 @@ from modules.workflows.cg.course_grainer import CourseGrainer
 polymer = equilibriator.polymer
 print(polymer.cg_map)
 
-cg = CourseGrainer(polymer=equilibriator.polymer, outputs=outputs[0], output_dir="ZZZ")
-cg.run()
+# cg = CourseGrainer(polymer=equilibriator.polymer, outputs=outputs[0], output_dir="ZZZ")
+# cg.run()
+
+from moltemplate.moltemplate_system import MoltemplateSystem
+
+system = MoltemplateSystem(
+    n_units=100, polymer=polymer, box_nm=[7, 7, 7], openmscg_topol_path="cg_poly.data"
+)
+
+system.write_system_lt()
