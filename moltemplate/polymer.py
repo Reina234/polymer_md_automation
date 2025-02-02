@@ -1,5 +1,6 @@
 from moltemplate.base_molecule import BaseMoltemplateMolecule
 from typing import Dict, Optional
+from zzz_lammps.parsers.open_mscg_data_parser import OpenMSCGDataParser
 from modules.rdkit.polymer_builders.base_polymer_generator import BasePolymerGenerator
 import logging
 
@@ -9,14 +10,18 @@ logger = logging.getLogger(__name__)
 
 
 class MoltemplatePolymer(BaseMoltemplateMolecule):
+
     def __init__(
         self,
         n_units: int,
         polymer_generator: BasePolymerGenerator,
-        cg_bond_length: float = 1.0,
-        open_mscg_mass_map: Optional[Dict[str, float]] = None,
+        openmscg_parser: OpenMSCGDataParser,
+        replace_using_openmscg_mass_map: bool = False,
     ):
-        super().__init__(open_mscg_mass_map=open_mscg_mass_map)
+        super().__init__(
+            openmscg_parser=openmscg_parser,
+            use_openmscg_mass_map=replace_using_openmscg_mass_map,
+        )
         self.n_units = n_units
         self.polymer_generator = polymer_generator
         self.terminal_left = None
@@ -25,15 +30,11 @@ class MoltemplatePolymer(BaseMoltemplateMolecule):
         self.cg_map = polymer_generator.cg_map
         self.n_repeats = None
         self.actual_n = None
-        self.mass_mapping = {}  # Stores bead masses
-        self._process_polymer_cg_map()
-        self._generate_allowable_n()
+        self.openmscg_parser = openmscg_parser
         self.unique_bead_types = None
-        self.cg_bond_length = cg_bond_length
-        if self.premade_mass_map:
-            self._compare_mass_maps()
+        self.lt_block = self.generate_lt()
 
-    def _process_polymer_cg_map(self) -> None:
+    def _get_mass_mapping(self) -> None:
         unique_bead_types = []
         mass_mapping = {}
         for bead in self.cg_map:
@@ -63,26 +64,38 @@ class MoltemplatePolymer(BaseMoltemplateMolecule):
 
         self.unique_bead_types = unique_bead_types
         self.mass_mapping = mass_mapping
+        return mass_mapping
 
-    def _generate_allowable_n(self) -> None:
+    def _round_polymer_length(self) -> int:
         repeating_units = len(self.middle_beads)
-        self.n_repeats = (self.n_units - 2) // repeating_units
-        self.actual_n = self.n_repeats * repeating_units + 2
+        n_repeats = (self.n_units - 2) // repeating_units
+        actual_n = n_repeats * repeating_units + 2
         logging.info(f"Desired number of beads: {self.n_units}")
         logging.info("Rounding...")
-        logging.info(f"Creating polymer with beads: {self.actual_n}")
+        logging.info(f"Creating polymer with beads: {actual_n}")
+        return n_repeats, actual_n
 
-    def generate_lt(self) -> str:
+    def _retrieve_bond_length(self, bead_1: str, bead_2: str) -> float:
+        return self.openmscg_parser.retrieve_bond_length(bead_1=bead_1, bead_2=bead_2)
+
+    def _generate_lt(self) -> str:
         lines = ["Molecule Polymer {"]
+        x_pos = 0.0
 
-        lines.append(f"  $atom:{self.terminal_left} 0.0 0.0 0.0")
+        lines.append(f"  $atom:{self.terminal_left} {x_pos:.1f} 0.0 0.0")
+        last_bead = self.terminal_left
 
-        x_pos = self.cg_bond_length
+        self.n_repeats, self.actual_n = self._round_polymer_length()
+
         for i in range(self.n_repeats):
             for bead in self.middle_beads:
+                x_pos += self._retrieve_bond_length(bead_1=last_bead, bead_2=bead)
                 lines.append(f"  $atom:{bead}_{i+1} {x_pos:.1f} 0.0 0.0")
-                x_pos += self.cg_bond_length
+                last_bead = bead
 
+        x_pos += self._retrieve_bond_length(
+            bead_1=last_bead, bead_2=self.terminal_right
+        )
         lines.append(f"  $atom:{self.terminal_right} {x_pos:.1f} 0.0 0.0")
 
         lines.append("\n  # Bonds")

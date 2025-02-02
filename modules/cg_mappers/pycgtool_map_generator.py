@@ -44,8 +44,7 @@ class PyCGToolMapGenerator(BaseMapGenerator):
         for bead in self.bead_mappings:
             bead_name = bead["unique_name"]
             bead_type = bead["bead_type"]
-            for atom in bead["atom_names"]:
-                print(atom)
+
             atom_names = [
                 self.reformat_atom_name(atom, start_index=start_index)
                 for atom in bead["atom_names"]
@@ -98,4 +97,4 @@ class PyCGToolMapGenerator(BaseMapGenerator):
         if self._solvent_content:
             return self._polymer_content + self._solvent_content
 
-        return self._polymer_content + self._solvent_content
+        return self._polymer_content

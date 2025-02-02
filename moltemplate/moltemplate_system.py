@@ -1,87 +1,258 @@
+import math
+import numpy as np
+import logging
+from typing import List
+from scipy.spatial import cKDTree
 from moltemplate.polymer import MoltemplatePolymer
 from moltemplate.solvent import MoltemplateSolvent
+from config.data_models.solvent import Solvent
 from modules.utils.shared.file_utils import check_directory_exists, check_file_type
 from modules.rdkit.polymer_builders.base_polymer_generator import BasePolymerGenerator
-from typing import List
-import logging
-import re
+from zzz_lammps.parsers.open_mscg_data_parser import OpenMSCGDataParser
+from config.constants import ANGSTROM3_TO_M3, AVOGADROS_NUMBER, KG_TO_G
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 class MoltemplateSystem:
+    units = "angstrom"
 
     def __init__(
         self,
         n_units: int,
         polymer: BasePolymerGenerator,
         box_nm: List[float],
+        solvent: Solvent,
         openmscg_topol_path: str,
-        cg_bond_length: float = 1.0,
+        default_bond_length: float = 3.0,
+        padding: float = 1.5,  # Overlap cutoff (Å)
         sol_resname: str = "SOL",
+        min_box_factor: float = 1.5,
+        auto_gen_valid_dims: bool = True,
     ):
         check_file_type(openmscg_topol_path, "data")
-        self.openmscg_topol_path = openmscg_topol_path
-        self.open_mscg_mass_map = None
-        self._process_openmscg_topol()
-        self.box = box_nm
-        self.polymer = MoltemplatePolymer(
+        self.padding = padding
+        self.min_box_factor = min_box_factor
+        self.solvent: Solvent = solvent
+        self.openmscg_parser = OpenMSCGDataParser(
+            data_file=openmscg_topol_path, default_bond_length=default_bond_length
+        )
+
+        self.polymer_obj = MoltemplatePolymer(
             n_units=n_units,
             polymer_generator=polymer,
-            cg_bond_length=cg_bond_length,
-            open_mscg_mass_map=self.open_mscg_mass_map,
-        )
-        self.solvent = MoltemplateSolvent(
-            open_mscg_mass_map=self.open_mscg_mass_map, sol_resname=sol_resname
+            openmscg_parser=self.openmscg_parser,
         )
 
-    def _process_openmscg_topol(self):
-        mass_mapping = {}
+        self.solvent_obj = MoltemplateSolvent(
+            solvent=solvent,
+            openmscg_parser=self.openmscg_parser,
+            sol_resname=sol_resname,
+        )
 
-        with open(self.openmscg_topol_path, "r") as file:
-            lines = file.readlines()
+        self.box_nm = box_nm
+        self.box_angstroms = self._validate_and_convert_box_dims(
+            auto_gen_valid_dims=auto_gen_valid_dims
+        )
 
-        inside_masses = False
-        for line in lines:
-            line = line.strip()
-            print(line)
+        self.solvent_positions = []
+        self.polymer_position = self._calculate_box_center()
 
-            if line.strip() == "Masses":
-                inside_masses = True
-                continue
+    def _calculate_box_center(self) -> tuple:
+        """
+        Computes the center of the box in Angstroms.
+        """
+        width, length, height = self.box_angstroms
+        return (width / 2, length / 2, height / 2)
 
-            if inside_masses:
-                if line.strip().startswith("Atoms"):
-                    break
+    def _extract_polymer_coords(self) -> list:
+        """
+        Extracts polymer bead positions dynamically from `lt_block`,
+        ensuring that we correctly parse positions rather than assuming
+        fixed bond lengths.
+        """
+        lt_lines = self.polymer_obj.lt_block.split("\n")
 
-                match = re.match(r"(\d+)\s+([\d.eE+-]+)\s+#\s*(\S+)", line)
-                if match:
-                    atom_type, mass, bead_name = match.groups()
-                    mass_mapping[bead_name] = float(mass)
+        coords = []
+        for line in lt_lines:
+            parts = line.strip().split()
+            if parts and parts[0].startswith("$atom:"):
+                try:
+                    x, y, z = map(float, parts[1:4])
+                    coords.append((x, y, z))
+                except ValueError:
+                    continue  # Skip invalid lines
 
-        self.open_mscg_mass_map = mass_mapping
+        if not coords:
+            raise ValueError("No valid polymer coordinates were found in `lt_block`.")
 
-    def _generate_masses_lt(self) -> str:
-        mass_lines = ["Masses {"]
+        # Calculate center offset for correct centering
+        polymer_min = np.min(coords, axis=0)
+        polymer_max = np.max(coords, axis=0)
+        polymer_center = (polymer_min + polymer_max) / 2
 
-        for bead, mass in self.polymer.mass_mapping.items():
-            mass_lines.append(f"  {bead} {mass}")
+        # Shift polymer to center of the box
+        box_center = np.array(self.polymer_position)
+        centered_coords = [
+            tuple(coord - polymer_center + box_center) for coord in coords
+        ]
 
-        mass_lines.append(f"  {self.solvent.resname} {self.solvent.mass}")
-        mass_lines.append("}\n")
-        return "\n".join(mass_lines)
+        return centered_coords
+
+    def _get_average_bond_length(self):
+        bond_lengths = self.openmscg_parser.bond_lengths
+        avg_bond_length = np.mean(list(bond_lengths.values())[1:-1])
+        return avg_bond_length
+
+    def _validate_and_convert_box_dims(
+        self, auto_gen_valid_dims: bool = True
+    ) -> List[float]:
+        box_angstroms = self.convert_box_dim_nm_to_ang(self.box_nm)
+        min_box_dim = (
+            self.polymer_obj.actual_n
+            * self._get_average_bond_length()
+            * self.min_box_factor
+        )
+        if any(dim < min_box_dim for dim in box_angstroms):
+            logger.warning(
+                f"Box dimensions {self.box_nm[0]:.1f}nm x {self.box_nm[1]:.1f}nm x {self.box_nm[2]:.1f}nm are too small. Minimum box dimension: {min_box_dim:.1f}Å or {(min_box_dim/10):.1f}nm"
+            )
+            if auto_gen_valid_dims:
+                logger.info("Attempting to generate valid box dimensions...")
+                box_angstroms = self._generate_valid_box_dims(
+                    box_dims_angstrom=box_angstroms, min_box_dim=min_box_dim
+                )
+                logger.info(
+                    f"New box dimensions:{box_angstroms[0]*0.1:.1f}nm x {box_angstroms[1]*0.1:.1f}nm x {box_angstroms[2]*0.1:.1f}nm "
+                )
+                return box_angstroms
+            else:
+                raise ValueError("Please provide a larger box size.")
+
+    @staticmethod
+    def _generate_valid_box_dims(
+        box_dims_angstrom: List[float], min_box_dim: float
+    ) -> List[float]:
+        for i, dim in enumerate(box_dims_angstrom):
+            if dim < min_box_dim:
+                box_dims_angstrom[i] = min_box_dim
+        return box_dims_angstrom
+
+    @staticmethod
+    def convert_box_dim_nm_to_ang(box_nm: List[float]) -> None:
+        return [dim * 10 for dim in box_nm]
+
+    def _place_solvent(self):
+        n_sol = self._calculate_num_solvent_molecules()
+
+        positions = self._generate_solvent_positions_grid(n_sol)
+
+        polymer_coords = self._extract_polymer_coords()
+        filtered_positions = self._remove_overlaps(
+            sol_positions=positions, poly_positions=polymer_coords, cutoff=self.padding
+        )
+
+        self.solvent_positions = filtered_positions
+        logging.info(
+            f"Final solvent count after overlap removal: {len(self.solvent_positions)}"
+        )
+
+    def _calculate_num_solvent_molecules(self) -> int:
+
+        width_ang, length_ang, height_ang = self.box_angstroms
+        volume_ang = width_ang * length_ang * height_ang
+        volume_m3 = volume_ang * ANGSTROM3_TO_M3
+
+        mass_kg = self.solvent.density * volume_m3
+        mass_g = mass_kg * KG_TO_G
+        moles = mass_g / self.solvent.molecular_weight
+        n_molecules = int(math.floor(moles * AVOGADROS_NUMBER))
+
+        logging.info(
+            f"Calculated solvent molecules required for box {self.box_angstroms[0]*10:.1f}nm x {self.box_angstroms[1]*10:.1f}nm x {self.box_angstroms[2]*10:.1f}nm: {n_molecules}"
+        )
+        return n_molecules
+
+    def _generate_solvent_positions_grid(self, n_sol: int) -> list:
+        w, l, h = self.box_angstroms
+        spacing = (w * l * h / n_sol) ** (1 / 3)  # approx uniform spacing
+
+        nx = int(w // spacing) + 1
+        ny = int(l // spacing) + 1
+        nz = int(h // spacing) + 1
+
+        x0, x1 = -0.5 * w, 0.5 * w
+        y0, y1 = -0.5 * l, 0.5 * l
+        z0, z1 = -0.5 * h, 0.5 * h
+
+        positions = []
+        for xx in np.linspace(x0, x1, nx):
+            for yy in np.linspace(y0, y1, ny):
+                for zz in np.linspace(z0, z1, nz):
+                    positions.append((xx, yy, zz))
+                    if len(positions) >= n_sol:
+                        break
+
+        logging.info(f"Generated {len(positions)} solvent positions.")
+        return positions
+
+    def _remove_overlaps(
+        self, sol_positions: list, poly_positions: list, cutoff: float
+    ) -> list:
+
+        logger.info("Running optimized solvent overlap removal...")
+
+        # Convert lists to numpy arrays for efficiency
+        sol_positions_np = np.array(sol_positions)
+        poly_positions_np = np.array(poly_positions)
+
+        # Build a KD-Tree for polymer positions
+        polymer_tree = cKDTree(poly_positions_np)
+
+        # Query tree: Find all solvent molecules within cutoff distance of any polymer bead
+        close_solvent_indices = polymer_tree.query_ball_point(sol_positions_np, cutoff)
+
+        # Flatten list and get unique solvent indices to remove
+        close_solvent_indices = set(
+            idx for sublist in close_solvent_indices for idx in sublist
+        )
+
+        # Keep only solvents **not** in the overlap list
+        filtered_positions = [
+            sol_positions[i]
+            for i in range(len(sol_positions))
+            if i not in close_solvent_indices
+        ]
+
+        logger.info(
+            f"Removed {len(sol_positions) - len(filtered_positions)} overlapping solvents."
+        )
+        return filtered_positions
 
     def write_system_lt(self, filename="system.lt", output_dir=None):
         if output_dir:
             check_directory_exists(output_dir, make_dirs=True)
             filename = f"{output_dir}/{filename}"
 
+        self._place_solvent()
         with open(filename, "w") as f:
-            f.write("# Moltemplate system file (with masses and full interactions)\n")
-            f.write('import "forcefield.lt"\n\n')
-            f.write(self._generate_masses_lt())
-            f.write(self.polymer.generate_lt())
-            f.write(self.solvent.generate_lt())
+            f.write("# Moltemplate system file\n")
+            f.write("# Polymer is centered in the box\n")
+            f.write("# Interactions are defined via tabulated .table files\n\n")
 
-        logger.info(f"Moltemplate system file '{filename}' generated.")
+            # place polymer in center of box
+            f.write(self.polymer_obj.lt_block)
+            f.write(
+                f"new Polymer polymer_instance {{ translate {self.polymer_position[0]:.2f} {self.polymer_position[1]:.2f} {self.polymer_position[2]:.2f} }}\n\n"
+            )
+
+            # solvents placed in b ox
+            if self.solvent:
+                f.write(self.solvent_obj.lt_block)
+                for i, (sx, sy, sz) in enumerate(self.solvent_positions):
+                    f.write(
+                        f"new Solvent solvent_{i+1} {{ translate {sx:.2f} {sy:.2f} {sz:.2f} }}\n"
+                    )
+
+        logging.info(f"Moltemplate system file '{filename}' generated.")

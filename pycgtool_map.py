@@ -29,19 +29,12 @@ outputs = equilibriator.run()
 from modules.workflows.cg.course_grainer import CourseGrainer
 
 polymer = equilibriator.polymer
-print(polymer.cg_map)
 
-# cg = CourseGrainer(polymer=equilibriator.polymer, outputs=outputs[0], output_dir="ZZZ")
-# cg.run()
+from modules.cg_mappers.pycgtool_map_generator import PyCGToolMapGenerator
 
-from moltemplate.moltemplate_system import MoltemplateSystem
 
-system = MoltemplateSystem(
-    n_units=100,
-    polymer=polymer,
-    box_nm=[7, 7, 7],
-    solvent=solvent,
-    openmscg_topol_path="cg_poly.data",
+mapper = PyCGToolMapGenerator(polymer=polymer)
+mapper.add_solvent_to_map(
+    itp_file="preprocessed/equilibriated_solvent_boxes/hexane/solvent.itp"
 )
-
-system.write_system_lt()
+mapper.create_map("pycg_map", start_index=1)

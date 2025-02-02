@@ -51,8 +51,10 @@ class BaseMapGenerator(ABC):
         Returns:
             str: The full file path.
         """
-        check_directory_exists(output_dir, make_dirs=True)
-        return f"{output_dir}/{filename}.{self.map_extension}"
+        if output_dir:
+            check_directory_exists(output_dir, make_dirs=True)
+            return f"{output_dir}/{filename}.{self.map_extension}"
+        return f"{filename}.{self.map_extension}"
 
     @abstractmethod
     def _generate_mapping(self, start_index: Optional[int] = None) -> str:
