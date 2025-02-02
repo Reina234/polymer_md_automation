@@ -58,6 +58,8 @@ class MoltemplateSystem:
 
         self.solvent_positions = []
         self.polymer_position = self._calculate_box_center()
+        self.polymer_coords = self._extract_polymer_coords()
+        self.polymer_tree = cKDTree(self.polymer_coords)
 
     def _calculate_box_center(self) -> tuple:
         """
@@ -145,10 +147,12 @@ class MoltemplateSystem:
 
     def _place_solvent(self):
         n_sol = self._calculate_num_solvent_molecules()
-
-        positions = self._generate_solvent_positions_grid(n_sol)
-
-        polymer_coords = self._extract_polymer_coords()
+        ###########################################################
+        positions = self._generate_solvent_positions_grid(
+            n_sol=n_sol, d_cut=50, beta=0.05, min_density=0.05
+        )
+        ###########################################################
+        polymer_coords = self.polymer_coords
         filtered_positions = self._remove_overlaps(
             sol_positions=positions, poly_positions=polymer_coords, cutoff=self.padding
         )
@@ -174,28 +178,67 @@ class MoltemplateSystem:
         )
         return n_molecules
 
-    def _generate_solvent_positions_grid(self, n_sol: int) -> list:
-        w, l, h = self.box_angstroms
-        spacing = (w * l * h / n_sol) ** (1 / 3)  # approx uniform spacing
+    def _generate_solvent_positions_grid(
+        self, n_sol: int, d_cut: float, beta: float, min_density: float
+    ) -> list:
+        """
+        Generates solvent positions using a hybrid density approach:
+        - Full density within `d_cut` (default 3 nm).
+        - Rapid density decay after `d_cut`.
+        - Uses exponential decay beyond cutoff.
 
-        nx = int(w // spacing) + 1
-        ny = int(l // spacing) + 1
-        nz = int(h // spacing) + 1
+        Parameters:
+            - d_cut: Distance (Å) within which full density is maintained.
+            - beta: Decay rate (higher = faster drop-off).
+            - min_density: Minimum density floor (prevents depletion).
+
+        Returns:
+            - List of solvent positions.
+        """
+
+        logging.info("Generating solvent positions using hybrid density approach...")
+
+        w, l, h = self.box_angstroms
+
+        # Default uniform spacing estimate
+        spacing = (w * l * h / n_sol) ** (1 / 3)
+        nx, ny, nz = int(w // spacing), int(l // spacing), int(h // spacing)
 
         x0, x1 = -0.5 * w, 0.5 * w
         y0, y1 = -0.5 * l, 0.5 * l
         z0, z1 = -0.5 * h, 0.5 * h
 
-        positions = []
-        for xx in np.linspace(x0, x1, nx):
-            for yy in np.linspace(y0, y1, ny):
-                for zz in np.linspace(z0, z1, nz):
-                    positions.append((xx, yy, zz))
-                    if len(positions) >= n_sol:
-                        break
+        # Generate an initial uniform solvent grid
+        all_positions = [
+            (xx, yy, zz)
+            for xx in np.linspace(x0, x1, nx)
+            for yy in np.linspace(y0, y1, ny)
+            for zz in np.linspace(z0, z1, nz)
+        ]
 
-        logging.info(f"Generated {len(positions)} solvent positions.")
-        return positions
+        # KD-Tree for efficient polymer distance checking
+        polymer_tree = self.polymer_tree
+
+        # Define hybrid solvent density function
+        def solvent_density_factor(pos):
+            distance = polymer_tree.query(pos)[0]  # Find nearest polymer distance
+            if distance <= d_cut:
+                return 1  # Full density inside cutoff
+            else:
+                return max(np.exp(-beta * (distance - d_cut)), min_density)
+
+        # Filter solvent positions adaptively
+        final_positions = [
+            pos
+            for i, pos in enumerate(all_positions)
+            if np.random.rand() < solvent_density_factor(pos)
+        ]
+
+        logging.info(
+            f"Generated {len(final_positions)} solvent positions after hybrid adaptive filtering."
+        )
+
+        return final_positions
 
     def _remove_overlaps(
         self, sol_positions: list, poly_positions: list, cutoff: float
