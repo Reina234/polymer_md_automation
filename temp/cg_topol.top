@@ -1,10 +1,10 @@
-cgsites 1594
+cgsites 406
 cgtypes 5 
-B3
-B2
-B4
-B1
 SOL
+B4
+B3
+B1
+B2
 moltypes 2
 mol 10 1
 sitetypes
@@ -34,4 +34,4 @@ SOL
 bonds 0
 system 2
 1 1
-2 1584
+2 396

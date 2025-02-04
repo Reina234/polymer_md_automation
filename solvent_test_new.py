@@ -26,15 +26,22 @@ equilibriator = PolymerEquilibriationWorkflow(
 )
 outputs = equilibriator.run()
 
-from modules.workflows.cg.course_grainer import CourseGrainer
+from modules.workflows.cg.multimol_course_grainer import MultimolCourseGrainer
 
 polymer = equilibriator.polymer
 print(polymer.cg_map)
+from modules.workflows.cg.course_grainer import CourseGrainer
 
-# cg = CourseGrainer(polymer=equilibriator.polymer, outputs=outputs[0], output_dir="ZZZ")
+# cg = CourseGrainer(polymer=equilibriator.polymer, outputs=outputs[0], output_dir="ZZZ2")
 # cg.run()
 
-from moltemplate.moltemplate_system import MoltemplateSystem
+# cg2 = MultimolCourseGrainer(
+#    polymer=equilibriator.polymer, outputs=outputs[0], output_dir="ZZZ"
+# )
+# cg2.run()
+
+
+from modules.moltemplate.moltemplate_system import MoltemplateSystem
 
 system = MoltemplateSystem(
     n_units=100,
