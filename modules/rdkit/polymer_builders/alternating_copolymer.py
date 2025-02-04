@@ -1,5 +1,6 @@
 from modules.rdkit.polymer_builders.base_polymer_generator import BasePolymerGenerator
 from rdkit import Chem
+import re
 from typing import Optional, Dict, List
 from itertools import cycle
 
@@ -68,5 +69,17 @@ class AlternatingPolymerGenerator(BasePolymerGenerator):
         return polymer
 
     def _generate_filename(self, num_units: int) -> str:
-        file_name = "_".join(self.monomer_smiles_list).lower()
+        sanitised_smiles = [self.sanitize_filename(s) for s in self.monomer_smiles_list]
+        file_name = "_".join(sanitised_smiles).lower()
         return f"{file_name}_{num_units}"
+
+    @staticmethod
+    def sanitize_filename(smiles: str) -> str:
+        """
+        Converts a SMILES string into a valid filename by replacing
+        special characters with underscores.
+
+        :param smiles: SMILES string to be sanitized
+        :return: Sanitized filename string
+        """
+        return re.sub(r"[^\w\-_]", "_", smiles)  # Replace non-alphanumeric chars

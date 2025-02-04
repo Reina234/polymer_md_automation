@@ -2,6 +2,7 @@ from modules.rdkit.base_molecule_generator import BaseMoleculeGenerator
 from config.paths import SOLVENT_PDB_DIR
 from modules.cache_store.file_cache import FileCache
 from config.data_models.solvent import Solvent
+import re
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -40,13 +41,24 @@ class SolventGenerator(BaseMoleculeGenerator):
 
         with open(pdb_path, "w") as file:
             for line in pdb_lines:
-                if line.startswith("HETATM") or line.startswith("ATOM"):
-                    line = line[:17] + self.sol_resname.ljust(3) + line[20:]
+                if " UNL " in line:
+                    line = line.replace(" UNL ", f" {self.sol_resname.ljust(3)} ")
                 file.write(line)
         return pdb_path
 
+    @staticmethod
+    def sanitize_filename(smiles: str) -> str:
+        """
+        Converts a SMILES string into a valid filename by replacing
+        special characters with underscores.
+
+        :param smiles: SMILES string to be sanitized
+        :return: Sanitized filename string
+        """
+        return re.sub(r"[^\w\-_]", "_", smiles)
+
     def _generate_filename(self):
-        return self.sol_smiles
+        return self.sanitize_filename(self.sol_smiles)
 
     def check_solvent_pdb_cache(self, cache_key: str):
         if self.cache.has_key(cache_key):
@@ -78,4 +90,5 @@ class SolventGenerator(BaseMoleculeGenerator):
             pdb_path=pdb_path,
             compressibility=self.sol_compressibility,
         )
+
         return solvent

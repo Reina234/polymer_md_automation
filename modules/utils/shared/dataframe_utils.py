@@ -1,5 +1,6 @@
 from functools import wraps
 from typing import Callable, List
+import pandas as pd
 
 
 def dataframe_not_empty_check(
@@ -70,3 +71,24 @@ def dataframe_columns_exist_check(
         return wrapper
 
     return decorator
+
+
+def convert_xlsx_to_csv(xlsx_file: str, csv_file: str, required_headers: list):
+    """
+    Converts an Excel (.xlsx) file to a CSV file and ensures headers are correct.
+
+    :param xlsx_file: Path to the input Excel file.
+    :param csv_file: Path to save the output CSV file.
+    :param required_headers: List of expected headers.
+    """
+    # Load the Excel file
+    df = pd.read_excel(xlsx_file)
+
+    # Check if headers are correct
+    missing_headers = [col for col in required_headers if col not in df.columns]
+    if missing_headers:
+        raise ValueError(f"Missing expected headers: {missing_headers}")
+
+    # Save to CSV
+    df.to_csv(csv_file, index=False)
+    print(f"Conversion successful! Saved CSV: {csv_file}")

@@ -11,6 +11,8 @@ from modules.gromacs.equilibriation.full_equilibriation_workflow import (
 from config.data_models.output_types import GromacsOutputs
 from config.mdp_workflow_config import minim_workflow, polymer_workflow
 from modules.workflows.base_workflow import BaseWorkflow
+from config.paths import TEMP_DIR
+from modules.utils.shared.file_utils import delete_directory
 from typing import Any, Dict
 import math
 import csv
@@ -59,6 +61,8 @@ class JoinedAtomisticPolymerWorkflow(BaseWorkflow):
     ):
         self.csv_file_path = f"{csv_file_path}.csv"
         self.solvent_smiles = solvent_smiles
+        self.cleanup = cleanup
+        self.confirm_temp_deletion = confirm_temp_deletion
         self.solvent = SolventGenerator(
             solvent_name=solvent_name,
             solvent_smiles=solvent_smiles,
@@ -163,6 +167,11 @@ class JoinedAtomisticPolymerWorkflow(BaseWorkflow):
     def run(self):
         for temperature in self.temperatures:
             self._run_per_temp(temperature=temperature)
+        if self.cleanup_temp:
+            delete_directory(
+                TEMP_DIR, verbose=self.verbose, confirm=self.confirm_temp_deletion
+            )
+
         return self.csv_file_path
 
     def _write_csv_row(self, row_data: Dict[str, Any]) -> str:

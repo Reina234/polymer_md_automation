@@ -91,9 +91,7 @@ class SolventEquilibriationWorkflow(BaseWorkflow):
         self.verbose = verbose
         self.file_config = AcpypeOutputConfig(itp=True, gro=True, top=True, posre=False)
         self.confirm_temp_dir_deletion = confirm_temp_dir_deletion
-        self.parametizer = ACPYPEParameterizer(
-            acpype_molecule_name=solvent.pdb_molecule_name
-        )
+        self.parametizer = ACPYPEParameterizer(acpype_molecule_name="SVT")
 
     def check_solvent_cache(self, temperature: float) -> Optional[GromacsOutputs]:
         cache_key = self.solvent_cache.get_cache_key(
