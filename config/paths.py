@@ -12,7 +12,7 @@ PARAMETERISED_POLYMER_DIR = os.path.join(PREPROCESSED_DIR, "parameterised_polyme
 EQUILIBRIATED_SOLVENT_BOX_DIR = os.path.join(
     PREPROCESSED_DIR, "equilibriated_solvent_boxes"
 )
-
+SOLVENT_PDB_DIR = os.path.join(PREPROCESSED_DIR, "solvent_pdbs")
 MDP_CACHE_DIR = os.path.join(MAIN_CACHE_DIR, "mdp_cache")
 SHORT_POLYMER_BUILDING_BLOCKS_DIR = os.path.join(
     PREPROCESSED_DIR, "parameterised_polymer_building_blocks"

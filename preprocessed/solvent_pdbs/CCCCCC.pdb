@@ -1,0 +1,12 @@
+HETATM    1  C1  SOL     1       2.686  -0.388  -0.334  1.00  0.00           C  
+HETATM    2  C2  SOL     1       1.746   0.800  -0.255  1.00  0.00           C  
+HETATM    3  C3  SOL     1       0.363   0.416  -0.749  1.00  0.00           C  
+HETATM    4  C4  SOL     1      -0.363  -0.416   0.296  1.00  0.00           C  
+HETATM    5  C5  SOL     1      -1.746  -0.800  -0.199  1.00  0.00           C  
+HETATM    6  C6  SOL     1      -2.686   0.388  -0.120  1.00  0.00           C  
+CONECT    1    2
+CONECT    2    3
+CONECT    3    4
+CONECT    4    5
+CONECT    5    6
+END

@@ -1,0 +1,71 @@
+# This file was created Tue Feb  4 19:33:14 2025
+# Created by:
+#                   :-) GROMACS - gmx msd, 2021.3-bioconda (-:
+# 
+# Executable:   /home/reina/miniconda3/envs/openmscg_env/bin.AVX2_256/gmx
+# Data prefix:  /home/reina/miniconda3/envs/openmscg_env
+# Working dir:  /home/reina/polymerpinn
+# Command line:
+#   gmx msd -f ZZZ/hexane_0.000124_C=Cc1ccccc1_C=C_10/equilibriated_outputs/temp_298_compressibility_0.000124.xtc -s ZZZ/hexane_0.000124_C=Cc1ccccc1_C=C_10/equilibriated_outputs/temp_298_compressibility_0.000124.tpr -n ZZZ/hexane_0.000124_C=Cc1ccccc1_C=C_10/analysis/T_298/index.ndx -o ZZZ/hexane_0.000124_C=Cc1ccccc1_C=C_10/analysis/T_298/msd.xvg
+# gmx msd is part of G R O M A C S:
+#
+# GROup of MAchos and Cynical Suckers
+#
+@    title "Mean Square Displacement"
+@    xaxis  label "Time (ps)"
+@    yaxis  label "MSD (nm\S2\N)"
+@TYPE xy
+# MSD gathered over 100 ps with 11 restarts
+# Diffusion constants fitted from time 10 to 90 ps
+# D[   Polymer] = 0.4250 (+/- 0.5366) (1e-5 cm^2/s)
+         0           0
+         2   0.0395471
+         4   0.0688687
+         6   0.0920414
+         8    0.126098
+        10    0.139788
+        12     0.15942
+        14    0.171918
+        16    0.190174
+        18     0.21009
+        20    0.235224
+        22    0.227606
+        24    0.238848
+        26    0.256802
+        28    0.258675
+        30    0.289481
+        32    0.243348
+        34    0.249514
+        36    0.265818
+        38    0.286317
+        40    0.317635
+        42    0.273539
+        44    0.294095
+        46    0.307378
+        48    0.328916
+        50    0.351069
+        52    0.299468
+        54     0.32607
+        56    0.356748
+        58     0.34268
+        60    0.367687
+        62    0.329378
+        64      0.3319
+        66    0.369128
+        68    0.350628
+        70     0.39108
+        72    0.345024
+        74    0.381883
+        76     0.40536
+        78    0.408652
+        80    0.430066
+        82    0.405834
+        84    0.352008
+        86    0.294922
+        88    0.318745
+        90    0.324417
+        92    0.432391
+        94    0.350548
+        96    0.292458
+        98    0.307227
+       100    0.341451

@@ -75,7 +75,8 @@ class PolymerEquilibriationWorkflow(BaseWorkflow):
         neg_ion_name: str = "CL",
         polymer_name: str = "POLY",
         verbose: bool = True,
-        cleanup: bool = True,
+        cleanup_log: bool = True,
+        cleanup_temp: bool = True,
         confirm_temp_deletion: bool = True,
     ):
         super().__init__()
@@ -93,7 +94,8 @@ class PolymerEquilibriationWorkflow(BaseWorkflow):
         self.temperatures = temperatures
         self.minim_workflow = minim_workflow
         self.full_workflow = full_workflow
-        self.cleanup = cleanup
+        self.cleanup_log = cleanup_log
+        self.cleanup_temp = cleanup_temp
         self.confirm_temp_deletion = confirm_temp_deletion
         self.polymer_name = polymer_name
         self.actual_num_units = None
@@ -160,12 +162,12 @@ class PolymerEquilibriationWorkflow(BaseWorkflow):
             self.outputs.append(outputs)
             self.cache.store_object(key=cache_key, data=outputs)
 
-        if self.cleanup:
+        if self.cleanup_log:
+            delete_directory(LOG_DIR, verbose=self.verbose, confirm=False)
+        if self.cleanup_temp:
             delete_directory(
                 TEMP_DIR, verbose=self.verbose, confirm=self.confirm_temp_deletion
             )
-            delete_directory(LOG_DIR, verbose=self.verbose, confirm=False)
-
         return self.outputs
 
     def _run_per_temp(self, temperature: float) -> GromacsOutputs:
