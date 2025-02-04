@@ -5,6 +5,11 @@ import subprocess
 from typing import List
 import os
 import numpy as np
+from scipy.signal import savgol_filter
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class GromacsAnalyser:
@@ -76,6 +81,13 @@ class GromacsAnalyser:
         return Rg_mean, Rg_std
 
     def extract_diffusion_coefficient(self):
+        """
+        Computes the diffusion coefficient D from mean squared displacement (MSD),
+        applying a denoising step instead of error-raising.
+        Uses:
+        - Savitzky-Golay filter to smooth MSD fluctuations
+        - Weighted least squares regression for a stable fit
+        """
         output_path = self._get_output_path(self.DIFFUSION_COEFFICIENT_FILE)
 
         cmd = [
@@ -95,12 +107,52 @@ class GromacsAnalyser:
         p.communicate("Polymer\n")
         p.wait()
 
-        data = np.loadtxt(output_path, comments=("#", "@"))
-        t = data[:, 0]
-        msd = data[:, 1]
-        start = int(0.8 * len(t))
-        slope, _ = np.polyfit(t[start:], msd[start:], 1)
+        if not os.path.exists(output_path):
+            logger.warning(f"MSD output file not found: {output_path}")
+            return np.nan  # Return NaN if file is missing
+
+        # Load MSD data
+        try:
+            data = np.loadtxt(output_path, comments=("#", "@"))
+            t = data[:, 0]  # Time (ps)
+            msd = data[:, 1]  # Mean Squared Displacement (nm²)
+        except Exception as e:
+            logger.warning(f"Error reading MSD file: {e}")
+            return np.nan  # Return NaN if file is unreadable
+
+        # **Step 1: Apply Savitzky-Golay filter for denoising**
+        smoothed_msd = savgol_filter(msd, window_length=11, polyorder=2, mode="nearest")
+
+        # **Step 2: Compute local slopes to find the stable diffusion regime**
+        slopes = np.gradient(smoothed_msd, t)
+
+        # Identify the region where slope is stable (avoid initial ballistic motion)
+        stable_region = np.where((slopes > 0) & (slopes < 10 * np.mean(slopes)))[0]
+
+        if len(stable_region) < 10:
+            logger.warning(
+                "Stable MSD region too short, using raw MSD data for fitting."
+            )
+            stable_region = np.arange(len(t))  # Use all data if filtering fails
+
+        # **Step 3: Fit only within the stable diffusive regime**
+        start_idx = stable_region[len(stable_region) // 3]
+        end_idx = stable_region[-1]
+
+        # Use weighted least squares to reduce the impact of noise
+        weights = 1 / (1 + np.abs(t[start_idx:end_idx] - np.mean(t[start_idx:end_idx])))
+        slope, intercept = np.polyfit(
+            t[start_idx:end_idx], smoothed_msd[start_idx:end_idx], 1, w=weights
+        )
+
+        # Compute the diffusion coefficient (D = slope / 6 for 3D diffusion)
         D = slope / 6.0
+
+        # **Step 4: Handle edge cases**
+        if D < 0 or np.isnan(D):
+            logger.warning(f"Invalid diffusion coefficient: {D} nm²/ps. Returning NaN.")
+            return np.nan  # Instead of error, return NaN for robustness
+
         return D
 
     def extract_sasa(self):
@@ -129,10 +181,6 @@ class GromacsAnalyser:
         return SASA_mean, SASA_std
 
     def extract_end_to_end_distance(self):
-        """
-        Computes the end-to-end distance of the polymer using 'gmx distance'.
-        Uses the first and last polymer carbon atoms as reference points.
-        """
         output_path = self._get_output_path(self.END_TO_END_DISTANCE_FILE)
 
         cmd = [
@@ -145,12 +193,11 @@ class GromacsAnalyser:
             "-n",
             self.index_file,
             "-oall",
-            output_path,  # FIX: use -oall instead of -o
+            output_path,
         ]
 
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE, text=True)
 
-        # FIX: Ensure correct group selection
         selection_input = f"Polymer_Carbons_Start_and_End\n"
         p.communicate(input=selection_input)
         p.wait()
@@ -158,7 +205,6 @@ class GromacsAnalyser:
         if not os.path.exists(output_path):
             raise FileNotFoundError(f"Output file not found: {output_path}")
 
-        # Load and process the output file
         try:
             data = np.loadtxt(output_path, comments=("#", "@"))
             E2E_mean = np.mean(data[:, 1])

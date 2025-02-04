@@ -1,4 +1,4 @@
-# This file was created Tue Feb  4 19:39:21 2025
+# This file was created Tue Feb  4 19:33:14 2025
 # Created by:
 #                :-) GROMACS - gmx distance, 2021.3-bioconda (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx distance -f ZZZ/hexane_0.000124_C=Cc1ccccc1_C=C_10/equilibriated_outputs/temp_298_compressibility_0.000124.xtc -s ZZZ/hexane_0.000124_C=Cc1ccccc1_C=C_10/equilibriated_outputs/temp_298_compressibility_0.000124.tpr -n ZZZ/hexane_0.000124_C=Cc1ccccc1_C=C_10/analysis/T_298/index.ndx -oall ZZZ/hexane_0.000124_C=Cc1ccccc1_C=C_10/analysis/T_298/end_to_end.xvg
 # gmx distance is part of G R O M A C S:
 #
-# Gravel Rubs Often Many Awfully Cauterized Sores
+# GROup of MAchos and Cynical Suckers
 #
 @    title "Distance"
 @    xaxis  label "Time (ps)"
