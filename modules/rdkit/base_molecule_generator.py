@@ -26,6 +26,9 @@ class BaseMoleculeGenerator(ABC):
     def _generate_filename(self, **kwargs):
         pass
 
+    def _add_hydrogens(self, molecule: Chem.Mol) -> Chem.Mol:
+        return Chem.AddHs(molecule)
+
     def _save_as_pdb(
         self,
         molecule: Chem.Mol,

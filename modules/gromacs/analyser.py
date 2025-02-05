@@ -26,7 +26,6 @@ class GromacsAnalyser:
         output_dir: str = TEMP_DIR,
     ):
         self.outputs = outputs
-        print("!!!!!!!!!!1")
         print(self.outputs)
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)

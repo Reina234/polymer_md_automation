@@ -1,0 +1,71 @@
+# This file was created Wed Feb  5 21:44:09 2025
+# Created by:
+#                   :-) GROMACS - gmx msd, 2021.3-bioconda (-:
+# 
+# Executable:   /home/reina/miniconda3/envs/openmscg_env/bin.AVX2_256/gmx
+# Data prefix:  /home/reina/miniconda3/envs/openmscg_env
+# Working dir:  /home/reina/polymerpinn
+# Command line:
+#   gmx msd -f test3/acetic_acid_0.00045_C=C_None/equilibriated_outputs/temp_298_compressibility_0.00045.xtc -s test3/acetic_acid_0.00045_C=C_None/equilibriated_outputs/temp_298_compressibility_0.00045.tpr -n test3/acetic_acid_0.00045_C=C_None/analysis/T_298/index.ndx -o test3/acetic_acid_0.00045_C=C_None/analysis/T_298/msd.xvg
+# gmx msd is part of G R O M A C S:
+#
+# Getting the Right Output Means no Artefacts in Calculating Stuff
+#
+@    title "Mean Square Displacement"
+@    xaxis  label "Time (ps)"
+@    yaxis  label "MSD (nm\S2\N)"
+@TYPE xy
+# MSD gathered over 100 ps with 11 restarts
+# Diffusion constants fitted from time 10 to 90 ps
+# D[   Polymer] = 350.6180 (+/- 254.4801) (1e-5 cm^2/s)
+         0           0
+         2    0.231892
+         4    0.640353
+         6     1.15776
+         8     1.97051
+        10     2.94963
+        12     4.25167
+        14       5.762
+        16     7.34752
+        18     9.01702
+        20       10.84
+        22     13.4814
+        24     15.8688
+        26     18.1979
+        28     20.4852
+        30     23.0578
+        32     26.7334
+        34     29.8754
+        36     32.7755
+        38     35.4804
+        40     38.5075
+        42     42.3576
+        44     46.1444
+        46     49.7423
+        48     53.1102
+        50     56.7492
+        52     61.6918
+        54     65.9329
+        56     70.2228
+        58     74.2799
+        60     78.6035
+        62     85.9403
+        64     90.5521
+        66     95.1949
+        68      100.12
+        70     104.927
+        72      114.64
+        74     119.954
+        76     124.735
+        78     129.939
+        80     135.106
+        82     148.285
+        84     154.083
+        86     158.746
+        88     163.507
+        90     169.525
+        92     184.363
+        94     190.119
+        96      196.46
+        98     202.154
+       100     207.657

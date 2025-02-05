@@ -18,7 +18,7 @@ class PolymerSimulationManager:
         monomer_smiles: List[str],
         output_dir: str,
         progress_file: str = "progress",
-        csv_file_path: str = "outputs",
+        csv_file: str = "outputs",
         num_units: List[int] = [5, 10, 20],
         temperatures: List[int] = [280, 298, 346],
     ):
@@ -35,7 +35,7 @@ class PolymerSimulationManager:
         self.temperatures = temperatures
         self.output_dir = output_dir
         self.progress_file = f"{progress_file}.csv"
-        self.csv_file_path = csv_file_path
+        self.csv_file_path = os.path.join(output_dir, f"{csv_file}.csv")
         self.completed_jobs = self._load_progress()
 
     def _load_progress(self):

@@ -1,0 +1,71 @@
+# This file was created Wed Feb  5 21:41:34 2025
+# Created by:
+#                   :-) GROMACS - gmx msd, 2021.3-bioconda (-:
+# 
+# Executable:   /home/reina/miniconda3/envs/openmscg_env/bin.AVX2_256/gmx
+# Data prefix:  /home/reina/miniconda3/envs/openmscg_env
+# Working dir:  /home/reina/polymerpinn
+# Command line:
+#   gmx msd -f test3/acetic_acid_0.00045_C=C_None/equilibriated_outputs/temp_298_compressibility_0.00045.xtc -s test3/acetic_acid_0.00045_C=C_None/equilibriated_outputs/temp_298_compressibility_0.00045.tpr -n test3/acetic_acid_0.00045_C=C_None/analysis/T_298/index.ndx -o test3/acetic_acid_0.00045_C=C_None/analysis/T_298/msd.xvg
+# gmx msd is part of G R O M A C S:
+#
+# Georgetown Riga Oslo Madrid Amsterdam Chisinau Stockholm
+#
+@    title "Mean Square Displacement"
+@    xaxis  label "Time (ps)"
+@    yaxis  label "MSD (nm\S2\N)"
+@TYPE xy
+# MSD gathered over 100 ps with 11 restarts
+# Diffusion constants fitted from time 10 to 90 ps
+# D[   Polymer] = 1619.9799 (+/- 1210.7800) (1e-5 cm^2/s)
+         0           0
+         2    0.438238
+         4     1.63232
+         6     3.65819
+         8     6.49609
+        10     10.0793
+        12     14.3067
+        14     19.3778
+        16       25.33
+        18      32.052
+        20     39.4976
+        22     47.7845
+        24     56.8193
+        26     66.8264
+        28     77.5168
+        30     88.8211
+        32     102.132
+        34     115.194
+        36      129.33
+        38     143.971
+        40       158.9
+        42     176.452
+        44     193.169
+        46      211.13
+        48     229.585
+        50     248.208
+        52     271.174
+        54     291.512
+        56     313.108
+        58     334.647
+        60     356.848
+        62     382.989
+        64     407.361
+        66     432.875
+        68     458.126
+        70      483.84
+        72     509.876
+        74     537.365
+        76     565.883
+        78     594.959
+        80     624.526
+        82     648.224
+        84     680.049
+        86     713.699
+        88     748.283
+        90     781.839
+        92     784.161
+        94     821.048
+        96     858.387
+        98     899.205
+       100     936.207

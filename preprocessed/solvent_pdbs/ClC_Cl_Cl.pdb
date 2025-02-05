@@ -1,0 +1,7 @@
+HETATM    1 CL1  SOL     1      -1.107  -1.259  -0.148  1.00  0.00          CL  
+HETATM    2  C1  SOL     1       0.000  -0.000   0.445  1.00  0.00           C  
+HETATM    3 CL2  SOL     1       1.644  -0.329  -0.149  1.00  0.00          CL  
+HETATM    4 CL3  SOL     1      -0.537   1.588  -0.147  1.00  0.00          CL  
+CONECT    1    2
+CONECT    2    3    4
+END

@@ -1,0 +1,13 @@
+#include "amber99sb-ildn.ff/forcefield.itp"
+#include "/home/reina/polymerpinn/temp_local_run/POLY_GMX.itp"
+#include "/home/reina/polymerpinn/temp_local_run/solvent.itp"
+#include "amber99sb-ildn.ff/ions.itp"
+; POLY_GMX.top created by acpype (v: 2023.10.27) on Wed Feb  5 21:33:49 2025
+
+[ system ]
+ POLY
+
+[ molecules ]
+; Compound        nmols
+POLY 1
+SOL 3

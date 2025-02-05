@@ -1,0 +1,75 @@
+# This file was created Wed Feb  5 21:44:09 2025
+# Created by:
+#                  :-) GROMACS - gmx sasa, 2021.3-bioconda (-:
+# 
+# Executable:   /home/reina/miniconda3/envs/openmscg_env/bin.AVX2_256/gmx
+# Data prefix:  /home/reina/miniconda3/envs/openmscg_env
+# Working dir:  /home/reina/polymerpinn
+# Command line:
+#   gmx sasa -f test3/acetic_acid_0.00045_C=C_None/equilibriated_outputs/temp_298_compressibility_0.00045.xtc -s test3/acetic_acid_0.00045_C=C_None/equilibriated_outputs/temp_298_compressibility_0.00045.tpr -n test3/acetic_acid_0.00045_C=C_None/analysis/T_298/index.ndx -o test3/acetic_acid_0.00045_C=C_None/analysis/T_298/sasa.xvg
+# gmx sasa is part of G R O M A C S:
+#
+# Getting the Right Output Means no Artefacts in Calculating Stuff
+#
+@    title "Solvent Accessible Surface"
+@    xaxis  label "Time (ps)"
+@    yaxis  label "Area (nm\S2\N)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "Total"
+      0.000    5.207
+      2.000    5.030
+      4.000    5.103
+      6.000    4.846
+      8.000    5.252
+     10.000    5.131
+     12.000    5.177
+     14.000    5.189
+     16.000    5.167
+     18.000    5.051
+     20.000    5.124
+     22.000    5.009
+     24.000    4.783
+     26.000    4.925
+     28.000    5.203
+     30.000    5.143
+     32.000    4.583
+     34.000    4.124
+     36.000    3.919
+     38.000    3.839
+     40.000    4.199
+     42.000    4.405
+     44.000    4.151
+     46.000    4.084
+     48.000    4.299
+     50.000    4.681
+     52.000    4.526
+     54.000    4.256
+     56.000    4.766
+     58.000    4.178
+     60.000    4.091
+     62.000    5.027
+     64.000    5.271
+     66.000    4.760
+     68.000    5.097
+     70.000    4.773
+     72.000    5.063
+     74.000    4.847
+     76.000    5.029
+     78.000    5.043
+     80.000    5.069
+     82.000    5.027
+     84.000    5.219
+     86.000    5.100
+     88.000    4.970
+     90.000    5.223
+     92.000    5.041
+     94.000    5.251
+     96.000    5.280
+     98.000    5.053
+    100.000    5.143
