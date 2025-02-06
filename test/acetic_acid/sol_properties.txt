@@ -1,6 +1,0 @@
-name=acetic_acid
-compressibility=0.00045
-SMILES=CC(=O)O
-density=1.049
-pdb_path=test/acetic_acid/CC__O_O.pdb
-molecular_weight=60.02

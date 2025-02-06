@@ -6,7 +6,6 @@ from modules.file_conversion.converters.obabel_pdb_to_mol2_converter import (
     OBabelPDBtoMOL2Converter,
 )
 from typing import Optional, List
-import re
 import os
 import logging
 from modules.rdkit.solvent_generator import SolventGenerator
