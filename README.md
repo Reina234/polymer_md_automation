@@ -11,7 +11,7 @@ parametiser_workflow.py holds defunct methods that does the whole parameterisati
 All path inports assumes the repo folder is top level.
 
 ## General structure
-
+```
 📦config
  ┣ 📂__pycache__
  ┃ ┣ 📜__init__.cpython-312.pyc
@@ -265,3 +265,4 @@ All path inports assumes the repo folder is top level.
  ┃ ┗ 📜base_workflow.py
  ┣ 📜__init__.py
  ┗ 📜command_line_operation.py
+ ```
