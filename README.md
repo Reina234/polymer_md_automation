@@ -15,21 +15,7 @@ All path inports assumes the repo folder is top level.
 ```
 📦repo
  ┣ 📂config
- ┃ ┣ 📂__pycache__
- ┃ ┃ ┣ 📜__init__.cpython-312.pyc
- ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┣ 📜acpype_config.cpython-312.pyc
- ┃ ┃ ┣ 📜acpype_config.cpython-38.pyc
- ┃ ┃ ┣ 📜constants.cpython-312.pyc
- ┃ ┃ ┣ 📜constants.cpython-38.pyc
- ┃ ┃ ┣ 📜mdp_workflow_config.cpython-38.pyc
- ┃ ┃ ┣ 📜paths.cpython-312.pyc
- ┃ ┃ ┗ 📜paths.cpython-38.pyc
  ┃ ┣ 📂data_models
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜output_types.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜solvent.cpython-38.pyc
  ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┣ 📜output_types.py
  ┃ ┃ ┗ 📜solvent.py
@@ -39,37 +25,16 @@ All path inports assumes the repo folder is top level.
  ┃ ┣ 📜mdp_workflow_config.py
  ┃ ┗ 📜paths.py
  ┣ 📂input_data
- ┃ ┣ 📂__pycache__
- ┃ ┃ ┣ 📜__init__.cpython-312.pyc
- ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┣ 📜monomer_smiles.cpython-312.pyc
- ┃ ┃ ┗ 📜monomer_smiles.cpython-38.pyc
  ┃ ┣ 📜__init__.py
  ┃ ┣ 📜monomer_smiles.py
  ┃ ┣ 📜solvent_data.csv
  ┃ ┗ 📜solvent_data.xlsx
  ┣ 📂modules
- ┃ ┣ 📂__pycache__
- ┃ ┃ ┣ 📜__init__.cpython-312.pyc
- ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┗ 📜command_line_operation.cpython-38.pyc
  ┃ ┣ 📂acpype
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜acpype_parametizer.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜acpype_utils.cpython-38.pyc
  ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┣ 📜acpype_parametizer.py
  ┃ ┃ ┗ 📜acpype_utils.py
  ┃ ┣ 📂cache_store
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜base_cache.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜equilibriated_atomistic_polymer_cache.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜file_cache.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜mdp_cache.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜pickle_cache.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜solvent_cache.cpython-38.pyc
  ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┣ 📜base_cache.py
  ┃ ┃ ┣ 📜equilibriated_atomistic_polymer_cache.py
@@ -78,14 +43,6 @@ All path inports assumes the repo folder is top level.
  ┃ ┃ ┣ 📜pickle_cache.py
  ┃ ┃ ┗ 📜solvent_cache.py
  ┃ ┣ 📂cg_mappers
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜base_map_generator.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜martini_index_generator.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜martini_map_generator.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜multimol_map_generator.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜open_mscg_map_generator.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜pycgtool_map_generator.cpython-38.pyc
  ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┣ 📜base_map_generator.py
  ┃ ┃ ┣ 📜martini_index_generator.py
@@ -95,16 +52,7 @@ All path inports assumes the repo folder is top level.
  ┃ ┃ ┣ 📜pycgtool_map_generator.py
  ┃ ┃ ┗ 📜votca_map_generator.py
  ┃ ┣ 📂file_conversion
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜converter_factory.cpython-38.pyc
  ┃ ┃ ┣ 📂converters
- ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜base_converter.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜editconf_gro_to_pdb.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜editconf_pdb_to_gro.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┗ 📜obabel_pdb_to_mol2_converter.cpython-38.pyc
  ┃ ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┃ ┣ 📜base_converter.py
  ┃ ┃ ┃ ┣ 📜editconf_gro_to_pdb.py
@@ -114,17 +62,10 @@ All path inports assumes the repo folder is top level.
  ┃ ┃ ┗ 📜converter_factory.py
  ┃ ┣ 📂gromacs
  ┃ ┃ ┣ 📂equilibriation
- ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┣ 📜base_workflow_step.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜full_equilibriation_workflow.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┗ 📜mdp_cache.cpython-38.pyc
  ┃ ┃ ┃ ┣ 📜base_workflow_step.py
  ┃ ┃ ┃ ┗ 📜full_equilibriation_workflow.py
  ┃ ┃ ┣ 📂parsers
  ┃ ┃ ┃ ┣ 📂data_models
- ┃ ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┃ ┗ 📜section.cpython-38.pyc
  ┃ ┃ ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┃ ┃ ┗ 📜section.py
  ┃ ┃ ┃ ┣ 📂handlers
@@ -143,9 +84,6 @@ All path inports assumes the repo folder is top level.
  ┃ ┃ ┃ ┗ 📜open_mscg_data_parser.py
  ┃ ┃ ┗ 📜__init__.py
  ┃ ┣ 📂moltemplate
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜moltemplate_utils.cpython-38.pyc
  ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┣ 📜base_molecule.py
  ┃ ┃ ┣ 📜moltemplate_system.py
@@ -154,14 +92,6 @@ All path inports assumes the repo folder is top level.
  ┃ ┃ ┣ 📜polymer.py
  ┃ ┃ ┗ 📜solvent.py
  ┃ ┣ 📂open_mscg
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜force_matcher.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜multimol_topol_exporter.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜multimol_traj_mapper.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜topol_exporter.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜topol_generator.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜trajectory_mapper.cpython-38.pyc
  ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┣ 📜force_matcher.py
  ┃ ┃ ┣ 📜multimol_topol_exporter.py
@@ -170,10 +100,6 @@ All path inports assumes the repo folder is top level.
  ┃ ┃ ┣ 📜topol_generator.py
  ┃ ┃ ┗ 📜trajectory_mapper.py
  ┃ ┣ 📂packmol
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜base_packmol_operation.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜solvent_box.cpython-38.pyc
  ┃ ┃ ┣ 📂templates
  ┃ ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┃ ┗ 📜solvent_box_template.inp
@@ -181,16 +107,7 @@ All path inports assumes the repo folder is top level.
  ┃ ┃ ┣ 📜base_packmol_operation.py
  ┃ ┃ ┗ 📜solvent_box.py
  ┃ ┣ 📂rdkit
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜base_molecule_generator.cpython-38.pyc
- ┃ ┃ ┃ ┣ 📜polymer_itp_scaler.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜solvent_generator.cpython-38.pyc
  ┃ ┃ ┣ 📂polymer_builders
- ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜alternating_copolymer.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┗ 📜base_polymer_generator.cpython-38.pyc
  ┃ ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┃ ┣ 📜alternating_copolymer.py
  ┃ ┃ ┃ ┣ 📜base_polymer_generator.py
@@ -200,61 +117,29 @@ All path inports assumes the repo folder is top level.
  ┃ ┃ ┣ 📜polymer_itp_scaler.py
  ┃ ┃ ┗ 📜solvent_generator.py
  ┃ ┣ 📂utils
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┗ 📜__init__.cpython-38.pyc
  ┃ ┃ ┣ 📂atomistic
- ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜file_utils.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┗ 📜mdp_utils.cpython-38.pyc
  ┃ ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┃ ┣ 📜file_utils.py
  ┃ ┃ ┃ ┗ 📜mdp_utils.py
  ┃ ┃ ┣ 📂shared
- ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜calculation_utils.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜dataframe_utils.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┗ 📜file_utils.cpython-38.pyc
  ┃ ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┃ ┣ 📜calculation_utils.py
  ┃ ┃ ┃ ┣ 📜dataframe_utils.py
  ┃ ┃ ┃ ┗ 📜file_utils.py
  ┃ ┃ ┗ 📜__init__.py
  ┃ ┣ 📂workflows
- ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┗ 📜base_workflow.cpython-38.pyc
  ┃ ┃ ┣ 📂atomistic
- ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜joined_workflow.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜polymer_equilibriator.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜polymer_parametizer.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┗ 📜solvent_equilibriator.cpython-38.pyc
  ┃ ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┃ ┣ 📜joined_workflow.py
  ┃ ┃ ┃ ┣ 📜polymer_equilibriator.py
  ┃ ┃ ┃ ┣ 📜polymer_parametizer.py
  ┃ ┃ ┃ ┗ 📜solvent_equilibriator.py
  ┃ ┃ ┣ 📂cg
- ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┣ 📜course_grainer.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┗ 📜multimol_course_grainer.cpython-38.pyc
  ┃ ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┃ ┣ 📜course_grainer.py
  ┃ ┃ ┃ ┗ 📜multimol_course_grainer.py
  ┃ ┃ ┣ 📂separated
- ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┗ 📜__init__.cpython-38.pyc
  ┃ ┃ ┃ ┣ 📂parametiser
- ┃ ┃ ┃ ┃ ┣ 📂__pycache__
- ┃ ┃ ┃ ┃ ┃ ┣ 📜__init__.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┃ ┣ 📜polymer.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┃ ┣ 📜polymer_list.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┃ ┣ 📜solvent.cpython-38.pyc
- ┃ ┃ ┃ ┃ ┃ ┗ 📜solvent_csv.cpython-38.pyc
  ┃ ┃ ┃ ┃ ┣ 📜__init__.py
  ┃ ┃ ┃ ┃ ┣ 📜polymer.py
  ┃ ┃ ┃ ┃ ┣ 📜polymer_list.py
