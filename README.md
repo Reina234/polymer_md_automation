@@ -6,7 +6,7 @@ This repo contains code for automating GROMACS molecular dynamics simulation, cu
 
 Overall workflow handling is done via the simulation manager, it uses CSV data for solvents information and a list for the monomer smiles (generates all combinations of 1, 2, 3 monomer type composition). This is called in main.py. Caching, error logging, output formatting is all handled by `SimulationManager`. Cache, logs, and temp folders will be automatically generated.
 
-`parametiser_workflow.py` and `directory_parser` hold defunct methods that does the whole parameterisation workflow. This was part of initial separation attempts of the parameterisation workflow vs MD/GROMACS workflow for HPC uploading purposes.
+`parametiser_workflow.py` and `directory_parser` hold defunct methods that does the whole parameterisation workflow. This was part of initial separation attempts of the parameterisation workflow vs MD/GROMACS workflow for HPC uploading purposes. Example outputs, progress, and error CSVs are given in the samples folder.
 
 All path imports assume the repo folder is top-level.
 
@@ -150,12 +150,13 @@ All path imports assume the repo folder is top-level.
  ┃ ┃ ┗ 📜base_workflow.py
  ┃ ┣ 📜__init__.py
  ┃ ┗ 📜command_line_operation.py
+ ┣ 📂samples
+ ┃ ┣ 📜sample_error.csv
+ ┃ ┣ 📜sample_output_log.csv
+ ┃ ┣ 📜sample_progress.csv
  ┣ 📜README.md
  ┣ 📜main.py
  ┣ 📜parametiser_workflow.py
  ┣ 📜requirements.txt
- ┣ 📜sample_error.csv
- ┣ 📜sample_output_log.csv
- ┣ 📜sample_progress.csv
  ┗ 📜simulation_manager.py
  ```
