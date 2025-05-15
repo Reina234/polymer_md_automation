@@ -2,13 +2,13 @@
 
 This README is a work in progress.
 
-This repo contains code for automating GROMACS molecular dynamics simulation, currently capable of handling addition homopolymers and simple alternating copolymers.
+This repo contains code for automating GROMACS molecular dynamics simulation, currently capable of handling addition homopolymers and simple alternating copolymers. The repository also has methods for automatically deriving coarse-grained force fields via force-matching methodology against short atomistic trajectories, as well as tools for constructing the full coarse-grained system. However, this has not yet been integrated into the full simulation automation due to time constraints, and exists just as manual-use functionality.
 
-Overall workflow handling is done via the simulation manager, it uses csv data for solvents, and a list for the monomer smiles (generates all combinations of 1, 2, 3 monomer type composition). This is called in main.py. Caching, error logging, output formatting is all handled by `SimulationManager`. Cache, logs, and temp folders will be automatically generated.
+Overall workflow handling is done via the simulation manager, it uses CSV data for solvents information and a list for the monomer smiles (generates all combinations of 1, 2, 3 monomer type composition). This is called in main.py. Caching, error logging, output formatting is all handled by `SimulationManager`. Cache, logs, and temp folders will be automatically generated.
 
-parametiser_workflow.py holds defunct methods that does the whole parameterisation workflow, this was part of inital separation attempts of the parameterisation workflow vs md/gromacs workflow for HPC uploading purposes.
+`parametiser_workflow.py` and `directory_parser` hold defunct methods that does the whole parameterisation workflow. This was part of initial separation attempts of the parameterisation workflow vs MD/GROMACS workflow for HPC uploading purposes.
 
-All path inports assumes the repo folder is top level.
+All path imports assume the repo folder is top-level.
 
 ## General structure
 
