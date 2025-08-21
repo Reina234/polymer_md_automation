@@ -1,6 +1,6 @@
 # Automated Polymer Simulations
 
-This README is a work in progress.
+This README is a work in progress. (CODE IS TO BE REFACTORED)
 
 This repo contains code for the GROMACS molecular dynamics automation portion of my IIB Research Project. It is currently capable of handling addition homopolymers and simple alternating copolymers. The repository also has methods for automatically deriving coarse-grained force fields via force-matching methodology against short atomistic trajectories, as well as tools for constructing the full coarse-grained system. However, this has not yet been integrated into the full simulation automation due to time constraints, and exists just as manual-use functionality.
 
